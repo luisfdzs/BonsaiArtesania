@@ -64,7 +64,22 @@ export function Header() {
         </a>
 
         <div className="header-bar page-gutter flex h-20 items-center justify-between gap-6 md:h-24">
-          <Link href="/" aria-label="Bonsái Artesanía, inicio">
+          <Link
+            href="/"
+            aria-label="Bonsái Artesanía, inicio"
+            // Estando ya en la portada, Next no navega y el clic no haría nada:
+            // quien esté en el pie se quedaría en el pie. La marca debe llevar
+            // siempre al principio, así que ahí subimos a mano. Sin `behavior`
+            // a propósito: hereda el scroll suave del CSS —y el salto seco
+            // cuando el sistema pide menos movimiento.
+            onClick={(event) => {
+              setOpen(false)
+              if (pathname === '/') {
+                event.preventDefault()
+                window.scrollTo({ top: 0 })
+              }
+            }}
+          >
             <Wordmark className="h-7 md:h-9" />
           </Link>
 

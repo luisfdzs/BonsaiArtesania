@@ -1,5 +1,6 @@
 import { site } from '@/content/site'
 import { Reveal } from '@/components/ui/Reveal'
+import { GmailIcon } from '@/components/ui/SocialIcons'
 import { SocialLinks } from '@/components/ui/SocialLinks'
 import { customOrderMessage, whatsappLink } from '@/lib/contact'
 
@@ -31,17 +32,20 @@ export function ContactoSection() {
           >
             Escribir por WhatsApp
           </a>
+          {/* El correo era el único de los tres caminos que no parecía pulsable.
+              Va junto al de WhatsApp porque las dos son la misma cosa —escribir—
+              y el sobre de Gmail avisa de que esto abre el correo. */}
+          <a href={`mailto:${site.contact.email}`} className="btn btn-quiet">
+            <GmailIcon className="h-4 w-4" />
+            Escribir un correo
+          </a>
           {/* Los perfiles, con el mismo botón que el resto de la web pero con el
               logo dentro: al lado del de WhatsApp, dos nombres de red escritos
               competían con la única acción que importa aquí. */}
           <SocialLinks />
         </div>
 
-        <p className="mt-7 text-small text-bark-soft">
-          <a href={`mailto:${site.contact.email}`} className="link-underline tap">
-            {site.contact.email}
-          </a>
-        </p>
+        <p className="mt-7 text-small text-bark-soft">{site.contact.email}</p>
       </Reveal>
     </section>
   )

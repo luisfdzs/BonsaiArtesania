@@ -257,15 +257,13 @@
   gap: 0;
 }
 
+/* La variante silenciosa se diferencia sólo en reposo —sin filete y con tinta
+   secundaria—; al pasar por encima responde igual que el botón principal, para
+   que dos botones juntos no se comporten de dos maneras distintas. El hover lo
+   pone `btn` y aquí no se toca: `.btn:hover` gana por especificidad. */
 @utility btn-quiet {
   border-color: transparent;
   color: var(--color-bark-soft);
-
-  &:hover {
-    background: transparent;
-    border-color: var(--color-line);
-    color: var(--color-bark);
-  }
 }
 
 /* Aparición al entrar en viewport. La hace CSS con scroll-driven animations
