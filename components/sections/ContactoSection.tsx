@@ -38,13 +38,20 @@ export function ContactoSection() {
           >
             Instagram {site.social.instagramHandle}
           </a>
+          {/* El correo era el único de los tres caminos que no parecía pulsable.
+              Ahora es un botón más, con el sobre de Gmail como marca de "esto
+              abre tu correo". El icono se pinta con máscara y no con <img>: así
+              hereda `currentColor` y cambia de color en el hover como el texto. */}
+          <a href={`mailto:${site.contact.email}`} className="btn btn-quiet">
+            <span
+              aria-hidden
+              className="h-4 w-4 bg-current [mask-image:url(/gmail.svg)] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+            />
+            Escribir un correo
+          </a>
         </div>
 
-        <p className="mt-7 text-small text-bark-soft">
-          <a href={`mailto:${site.contact.email}`} className="link-underline tap">
-            {site.contact.email}
-          </a>
-        </p>
+        <p className="mt-7 text-small text-bark-soft">{site.contact.email}</p>
       </Reveal>
     </section>
   )
