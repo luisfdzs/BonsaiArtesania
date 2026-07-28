@@ -249,6 +249,14 @@
   }
 }
 
+/* Mismo botón, pero cuadrado: dentro sólo cabe un icono, y el relleno lateral de
+   `btn` lo dejaría alargado. El icono se dimensiona desde fuera. */
+@utility btn-icon {
+  width: 2.75rem;
+  padding-inline: 0;
+  gap: 0;
+}
+
 @utility btn-quiet {
   border-color: transparent;
   color: var(--color-bark-soft);

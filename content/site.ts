@@ -2,7 +2,8 @@
  * Datos del sitio. Todo lo editable a mano vive en `content/`: quien mantenga la
  * web no debería tener que abrir un componente para cambiar un teléfono.
  *
- * PENDIENTE (Ana): revisar `email` y `whatsapp` — están puestos como marcador.
+ * PENDIENTE (Ana): revisar `email`, `whatsapp` y `social.linkedin` — están
+ * puestos como marcador.
  */
 export const site = {
   name: 'Bonsái',
@@ -16,6 +17,9 @@ export const site = {
   social: {
     instagram: 'https://www.instagram.com/san.bonsai_/',
     instagramHandle: '@san.bonsai_',
+    /** Marcador: falta el perfil real. Poner en `null` si no habrá LinkedIn y el
+     *  botón desaparece solo de toda la web. */
+    linkedin: 'https://www.linkedin.com/in/bonsai-artesania/',
   },
   contact: {
     email: 'hola@bonsaiartesania.es',

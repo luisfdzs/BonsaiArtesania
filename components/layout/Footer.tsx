@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { site } from '@/content/site'
 import { navigation } from '@/lib/navigation'
 import { Leaf } from '@/components/ui/Media'
+import { SocialLinks } from '@/components/ui/SocialLinks'
 
 export function Footer() {
   return (
@@ -17,44 +18,44 @@ export function Footer() {
           <p className="mt-2 text-small text-bark-soft">Hecho a mano en {site.location}.</p>
         </div>
 
-        {/* Las listas del sitio se anuncian siempre con una versalita; ésta era
-            la única que no lo hacía. */}
-        <nav className="md:col-span-3 md:col-start-6" aria-labelledby="pie-navegar">
-          <h2 id="pie-navegar" className="eyebrow">
-            Navegar
-          </h2>
-          <ul className="mt-6 flex flex-col gap-3 text-small">
-            {navigation.map((item) => (
-              <li key={item.href}>
-                <Link href={item.href} className="link-underline tap w-fit">
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        {/* «Navegar» y «Escríbeme» van una al lado de la otra en cualquier
+            ancho —también en móvil, donde antes se apilaban— porque son dos
+            listas cortas: en columna se leen de un vistazo y el pie no se
+            alarga. Sub-rejilla propia para que las dos empiecen a la misma
+            altura sin depender de la de 12 de fuera. */}
+        <div className="grid grid-cols-2 gap-x-8 gap-y-12 sm:col-span-2 md:col-span-7 md:col-start-6">
+          {/* Las listas del sitio se anuncian siempre con una versalita; ésta era
+              la única que no lo hacía. */}
+          <nav aria-labelledby="pie-navegar">
+            <h2 id="pie-navegar" className="eyebrow">
+              Navegar
+            </h2>
+            <ul className="mt-6 flex flex-col gap-3 text-small">
+              {navigation.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className="link-underline tap w-fit">
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
 
-        {/* Un div, no un <nav>: escribir no es navegar. Y sin `aria-labelledby`,
-            que en un div no crea landmark y sólo repetiría el encabezado. */}
-        <div className="md:col-span-3 md:col-start-10">
-          <h2 className="eyebrow">Escríbeme</h2>
-          <ul className="mt-6 flex flex-col gap-3 text-small">
-            <li>
-              <a
-                href={site.social.instagram}
-                target="_blank"
-                rel="noreferrer"
-                className="link-underline tap w-fit"
-              >
-                Instagram {site.social.instagramHandle}
-              </a>
-            </li>
-            <li>
-              <a href={`mailto:${site.contact.email}`} className="link-underline tap w-fit">
-                {site.contact.email}
-              </a>
-            </li>
-          </ul>
+          {/* Un div, no un <nav>: escribir no es navegar. Y sin `aria-labelledby`,
+              que en un div no crea landmark y sólo repetiría el encabezado. */}
+          <div>
+            <h2 className="eyebrow">Escríbeme</h2>
+            <ul className="mt-6 flex flex-col gap-3 text-small">
+              <li>
+                <a href={`mailto:${site.contact.email}`} className="link-underline tap w-fit">
+                  {site.contact.email}
+                </a>
+              </li>
+            </ul>
+            {/* Los perfiles bajan a botones: aquí el logo identifica mejor que
+                el nombre escrito, y el pie deja de ser sólo texto. */}
+            <SocialLinks className="mt-6" />
+          </div>
         </div>
       </div>
 

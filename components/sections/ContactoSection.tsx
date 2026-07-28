@@ -1,5 +1,6 @@
 import { site } from '@/content/site'
 import { Reveal } from '@/components/ui/Reveal'
+import { SocialLinks } from '@/components/ui/SocialLinks'
 import { customOrderMessage, whatsappLink } from '@/lib/contact'
 
 /**
@@ -30,14 +31,10 @@ export function ContactoSection() {
           >
             Escribir por WhatsApp
           </a>
-          <a
-            href={site.social.instagram}
-            target="_blank"
-            rel="noreferrer"
-            className="btn btn-quiet"
-          >
-            Instagram {site.social.instagramHandle}
-          </a>
+          {/* Los perfiles, con el mismo botón que el resto de la web pero con el
+              logo dentro: al lado del de WhatsApp, dos nombres de red escritos
+              competían con la única acción que importa aquí. */}
+          <SocialLinks />
         </div>
 
         <p className="mt-7 text-small text-bark-soft">
