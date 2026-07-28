@@ -4,8 +4,8 @@ import { Leaf } from '@/components/ui/Media'
 
 export function Footer() {
   return (
-    <footer className="page-gutter mt-(--spacing-section) border-t border-line py-14">
-      <div className="flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
+    <footer className="mt-(--spacing-section) border-t border-line">
+      <div className="page-gutter flex flex-col gap-10 py-14 md:flex-row md:items-end md:justify-between">
         <div className="max-w-sm">
           <Leaf className="mb-5 h-6 w-6 text-sage" />
           <p className="font-serif text-lead">{site.tagline}.</p>
@@ -30,9 +30,11 @@ export function Footer() {
         </nav>
       </div>
 
-      <p className="eyebrow mt-14">
-        © {new Date().getFullYear()} {site.nameFull}
-      </p>
+      <div className="w-full border-t border-line py-8">
+        <p className="eyebrow page-gutter text-center">
+          © {new Date().getFullYear()} {site.nameFull}
+        </p>
+      </div>
     </footer>
   )
 }
