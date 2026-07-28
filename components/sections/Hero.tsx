@@ -28,11 +28,11 @@ export function Hero() {
           </h1>
           <p className="mt-8 max-w-md text-bark-soft">{site.intro}</p>
 
-          <div className="mt-11 flex flex-wrap items-center gap-x-8 gap-y-4">
+          <div className="mt-11 flex flex-wrap items-center gap-x-2 gap-y-3">
             <Link href="/tienda" className="btn">
               Ver las piezas
             </Link>
-            <Link href="/encargos" className="link-underline tap text-small">
+            <Link href="/encargos" className="btn btn-quiet">
               Convertir mis flores en joya
             </Link>
           </div>

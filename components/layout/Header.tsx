@@ -95,7 +95,7 @@ export function Header() {
             onClick={() => setOpen(!open)}
             aria-expanded={open}
             aria-controls="menu-movil"
-            className="eyebrow tap text-current md:hidden"
+            className="eyebrow inline-flex items-center justify-center rounded-full border border-current/30 px-4 py-3 text-current transition-colors duration-500 hover:border-current/60 md:hidden"
           >
             {open ? 'Cerrar' : 'Menú'}
           </button>

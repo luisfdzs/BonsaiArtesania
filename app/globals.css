@@ -210,21 +210,24 @@
   }
 }
 
-/* Único botón del sitio: filete fino, sin relleno, que se tiñe de salvia al
-   pasar por encima. Un botón sólido rompería la calma de todo lo demás. */
 @utility btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.6rem;
+  min-height: 2.75rem;
   padding: 0.9rem 2rem;
   border: 1px solid var(--color-line);
   border-radius: 999px;
   font-size: var(--text-small);
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
   color: var(--color-bark);
   background: transparent;
+  cursor: pointer;
   transition:
     background-color 0.6s var(--ease-out-soft),
     border-color 0.6s var(--ease-out-soft),
@@ -234,6 +237,26 @@
     background: var(--color-sage-deep);
     border-color: var(--color-sage-deep);
     color: var(--color-linen);
+  }
+
+  &:disabled,
+  &[aria-disabled='true'] {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: transparent;
+    border-color: var(--color-line);
+    color: var(--color-bark);
+  }
+}
+
+@utility btn-quiet {
+  border-color: transparent;
+  color: var(--color-bark-soft);
+
+  &:hover {
+    background: transparent;
+    border-color: var(--color-line);
+    color: var(--color-bark);
   }
 }
 

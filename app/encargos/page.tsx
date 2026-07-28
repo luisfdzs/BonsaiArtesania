@@ -46,7 +46,7 @@ export default function EncargosPage() {
             Todas se secan. Lo que hago es pararlas justo antes y convertirlas en algo que puedas
             llevar contigo.
           </p>
-          <div className="mt-11 flex flex-wrap items-center gap-x-8 gap-y-4">
+          <div className="mt-11 flex flex-wrap items-center gap-x-2 gap-y-3">
             <a
               href={whatsappLink(customOrderMessage)}
               target="_blank"
@@ -57,7 +57,7 @@ export default function EncargosPage() {
             </a>
             <a
               href={mailtoLink('Encargo especial', customOrderMessage)}
-              className="link-underline tap text-small"
+              className="btn btn-quiet"
             >
               Prefiero el correo
             </a>

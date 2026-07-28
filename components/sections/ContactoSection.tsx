@@ -21,7 +21,7 @@ export function ContactoSection() {
           resulte más cómodo: contesto yo, no hay nadie más al otro lado.
         </p>
 
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-5">
+        <div className="mt-12 flex flex-wrap items-center justify-center gap-x-2 gap-y-3">
           <a
             href={whatsappLink(customOrderMessage)}
             target="_blank"
@@ -34,14 +34,17 @@ export function ContactoSection() {
             href={site.social.instagram}
             target="_blank"
             rel="noreferrer"
-            className="link-underline tap text-small"
+            className="btn btn-quiet"
           >
             Instagram {site.social.instagramHandle}
           </a>
-          <a href={`mailto:${site.contact.email}`} className="link-underline tap text-small">
+        </div>
+
+        <p className="mt-7 text-small text-bark-soft">
+          <a href={`mailto:${site.contact.email}`} className="link-underline tap">
             {site.contact.email}
           </a>
-        </div>
+        </p>
       </Reveal>
     </section>
   )

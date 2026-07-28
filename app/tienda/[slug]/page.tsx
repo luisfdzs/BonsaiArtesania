@@ -75,20 +75,17 @@ export default async function ProductPage({ params }: Params) {
           </dl>
 
           {/* Sin carrito: el pedido se cierra hablando. Ver lib/contact.ts. */}
-          <div className="mt-11 flex flex-col items-start gap-5">
+          <div className="mt-11 flex flex-col gap-2">
             <a href={whatsappLink(message)} target="_blank" rel="noreferrer" className="btn">
               {product.price === null ? 'Pedir presupuesto' : 'Quiero esta pieza'}
             </a>
-            <a
-              href={mailtoLink(`Encargo · ${product.name}`, message)}
-              className="link-underline tap text-small"
-            >
+            <a href={mailtoLink(`Encargo · ${product.name}`, message)} className="btn btn-quiet">
               O escribir por correo
             </a>
-            <p className="text-small text-bark-faint">
-              Hecha a mano bajo pedido: entre 1 y 3 semanas. Envío a toda España.
-            </p>
           </div>
+          <p className="mt-6 text-small text-bark-faint">
+            Hecha a mano bajo pedido: entre 1 y 3 semanas. Envío a toda España.
+          </p>
         </div>
       </article>
 
