@@ -1,0 +1,86 @@
+{
+  "anillo-flor-silvestre": {
+    "src": "/media/anillo-flor-silvestre.webp",
+    "width": 1080,
+    "height": 1440,
+    "blur": "data:image/webp;base64,UklGRpIAAABXRUJQVlA4IIYAAABQBACdASoQABUAPt1apkyopSOiMAgBEBuJZgCdMoR3A8ABRLDGK1iV7ZwAAPjCQKiYbBqLA8BO0h36Fal9W5ZkbJHyxzYALOpR/Htz14o1hTpEw7UrqgrzEblvvVzu5gbJDI2iAa5GOvS589Z+Jzk6mXWR963OWvfz8mjv074ZqbXqVTYAAA=="
+  },
+  "anillo-luna": {
+    "src": "/media/anillo-luna.webp",
+    "width": 1080,
+    "height": 1440,
+    "blur": "data:image/webp;base64,UklGRqAAAABXRUJQVlA4IJQAAABwBACdASoQABUAPt1apkyopSOiMAgBEBuJZACdMoRwAB61oBav7huiKeLaAAD+21xVXwm2CN9p+PiBD8Y4CtJAPVPsbXMi3rPQmPXZwv/8QijJrWp14NXZyY9USGYxe2Nah/QaCAGSMv+jyW5PxJfQQW4NCJ9U7se2Z33h5YDS+gvYacMgT8uA9TfOJ4X+9160/cAA"
+  },
+  "anillos-de-campo": {
+    "src": "/media/anillos-de-campo.webp",
+    "width": 1080,
+    "height": 1350,
+    "blur": "data:image/webp;base64,UklGRpwAAABXRUJQVlA4IJAAAABQBACdASoQABQAPt1apkyopSOiMAgBEBuJYgCdL1ABrdnY6vX/1pQ6ERB0APysSrtH5chsIrtBVtvX2Dyx3MrimBH6USIonuYmLur5e+0o3/qYdAcmH4JediGjqPIWcyA42YZFVMfGftbLIfV700P0IE8fZa6D9vC7SA+123WaajiHsEwmEWxmIq0uLlFAAAA="
+  },
+  "colgante-camafeo": {
+    "src": "/media/colgante-camafeo.webp",
+    "width": 1080,
+    "height": 1329,
+    "blur": "data:image/webp;base64,UklGRpgAAABXRUJQVlA4IIwAAADwAwCdASoQABQAPt1apkyopSOiMAgBEBuJYgCdMoABpBTNEqu9HssAAPz5QhqZClmmq8NAJRHug6HVRYnwRsU1CkZtJqqybKoQCq2YheIerdeJJRPH571DrS6pK42GgJO+imiKqLuyDlFFvtVTCnwz9koj9ttWPmXx9FKx7fWnBNrEu3+5kB27vEAAAA=="
+  },
+  "colgante-hoja": {
+    "src": "/media/colgante-hoja.webp",
+    "width": 1080,
+    "height": 1440,
+    "blur": "data:image/webp;base64,UklGRqwAAABXRUJQVlA4IKAAAABwBACdASoQABUAPt1apkyopSOiMAgBEBuJbACdLwAB7bYE+nsmyVXM46cf3AD+uD5adt3zDH6SW1kJsGQjAgdNain/rDgPrLls4lbncvRpFN/hLWwYYyVg2l71fl/kL9PckGBoplsOPr6UKBkcEu4L5ZQTm5WaO7NaxNW3CqmI1Cj259JbZap1wijZfkbVl0mrsxC6dzTm/8Gca9wNKAAA"
+  },
+  "colgante-lavanda": {
+    "src": "/media/colgante-lavanda.webp",
+    "width": 1080,
+    "height": 1350,
+    "blur": "data:image/webp;base64,UklGRmwAAABXRUJQVlA4IGAAAACQAwCdASoQABQAPt1apkyopSOiMAgBEBuJZwAARdXpmmJ1VSGAAP3fJkFrVS8s0/aZgWtVvP2KfMas12RLqIUUfIGeD8MV3mEZnPXuEr7w3Vqwlx5fdT4Sx53nOxqQgAA="
+  },
+  "encargos-gotas": {
+    "src": "/media/encargos-gotas.webp",
+    "width": 1080,
+    "height": 1350,
+    "blur": "data:image/webp;base64,UklGRrIAAABXRUJQVlA4IKYAAACQBACdASoQABQAPt1apkyopSOiMAgBEBuJZACdGaA//4C/K5b3i09KBnUE4gAA/snjBs2aSOynsrW4Qkxm+NDVxZOFhrFIkXb8d4Vb43V7jWVvpvWsK78sTM4VJYJF9cgRK/0lYm2TOhg3FZJiOghzLz8ganqb5UbocyNNr2KGiGj1mYQV5CPykyxzzmlbSK+ODAoPAa85TWhK5W5cVY3ZTAVrAAAA"
+  },
+  "pendientes-arco-margaritas": {
+    "src": "/media/pendientes-arco-margaritas.webp",
+    "width": 1080,
+    "height": 1350,
+    "blur": "data:image/webp;base64,UklGRoYAAABXRUJQVlA4IHoAAACwAwCdASoQABQAPt1apkyopSOiMAgBEBuJQAALbEZc3uAUuThVwAD+3pXfKAJpPko62CcwhNh988GTBSu9xsT8paPcSb+X6+3efG/GDUKzE+hIleKTNjCLTS9TnzfcVkIvWruXX1VIXA9nvP7o78oesDK6lPnjPR8AAA=="
+  },
+  "pendientes-farolillo": {
+    "src": "/media/pendientes-farolillo.webp",
+    "width": 1080,
+    "height": 1440,
+    "blur": "data:image/webp;base64,UklGRpwAAABXRUJQVlA4IJAAAABwBACdASoQABUAPt1apkyopSOiMAgBEBuJZgCdMoCGABuqc31vqYntSZPyoAD+Frkg9gsfmSWT3HFjfsI7Eahx+qZI1qmld0ZknRTPZZYmkiNLwVMWtIwdbzW2YgGJCHlUPmE4/Fe1UvGUbfKYKTiGiZ6je5dEIavzcu7nP1snT55LyNa8jQIhosGf5WuBoAA="
+  },
+  "pendientes-helecho": {
+    "src": "/media/pendientes-helecho.webp",
+    "width": 1080,
+    "height": 1350,
+    "blur": "data:image/webp;base64,UklGRoAAAABXRUJQVlA4IHQAAADQAwCdASoQABQAPt1apkyopSOiMAgBEBuJYwC7ACIjwPJ3dWKfVuAA/lWx2hTYdSN7F8W6kO+EqfB8PlY4BjOqNCr0/WPhkHnLWNGM9A032QrnOufSr1taj9AC37iJGBNXW+ye0hLr74vImvv1sLpSYvnAAA=="
+  },
+  "pendientes-margarita": {
+    "src": "/media/pendientes-margarita.webp",
+    "width": 1080,
+    "height": 1350,
+    "blur": "data:image/webp;base64,UklGRlAAAABXRUJQVlA4IEQAAAAQBACdASoQABQAPt1apkyopSOiMAgBEBuJZQAAW+m/Fv1m7b9lCkc1AAD+jBkCSs0zLgtt5BL/huyQTWeSnh2DlbPAAA=="
+  },
+  "portada-hojas": {
+    "src": "/media/portada-hojas.webp",
+    "width": 1080,
+    "height": 1440,
+    "blur": "data:image/webp;base64,UklGRqwAAABXRUJQVlA4IKAAAACQBACdASoQABUAPt1apkyopSOiMAgBEBuJaAC7MoKO2PoASxnOnUYhZoi9G9AA/kG8V+qP4NQ8TU0kPdyQ1eBONi0jFJWMxIKgsKPb5+QUqNo1/HsrKT9tpA2oR1k0NM6vFr6eRpjN9/AmRlX+2nAWGcrJQoZ50fXfCaM+zXMUx2hoX8MtgFlqN2WCSPo2E9zoOF6+ArUhSy6STJ34AAAA"
+  },
+  "taller-manos": {
+    "src": "/media/taller-manos.webp",
+    "width": 1080,
+    "height": 1350,
+    "blur": "data:image/webp;base64,UklGRo4AAABXRUJQVlA4IIIAAAAwBACdASoQABQAPt1apkyopSOiMAgBEBuJYgCdMoAzAMcJXXc3jXpqa0AA99v5hlS5tVCWUMyxNrGrXiWWCFlXbKuzknqKWoZdnB+yRy46FfncpktzekMyDHWgscH6NzfjYp9KeyyjunTA7SFGeYA+5/iy8/O8AwzOjMrRC22w+AAA"
+  },
+  "vuestras-flores": {
+    "src": "/media/vuestras-flores.webp",
+    "width": 1080,
+    "height": 1350,
+    "blur": "data:image/webp;base64,UklGRrAAAABXRUJQVlA4IKQAAADQBACdASoQABQAPt1apkyopSOiMAgBEBuJbACdMoRwAdAdEBE0aOD/0uy0bEUoAAD2gv75sDtxeo9cf+OAPRw/xXrFLJqG0KTuSRo2ImJmnhYjlrzz3rAUW6UvhGixmt3JS+BTf4F9cWRIuZH1wG9MFUO1qAMP9c7zU1LRdhyA3iYqtEWiIcUc+ZrExiSwg5zrIm23IDKVnNO5HZSmlHN9Y8AAAA=="
+  }
+}
