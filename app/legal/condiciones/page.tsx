@@ -33,6 +33,12 @@ export default function CondicionesPage() {
         Los precios están en euros e incluyen los impuestos aplicables. El importe final, con los
         gastos de envío, se muestra antes de confirmar el pedido.
       </p>
+      <p>
+        <strong>De momento no se paga en la web.</strong> Al enviar tu petición desde el carrito no
+        se te cobra nada: queda registrada, las piezas se te reservan y Ana te escribe para
+        confirmarla y acordar cómo pagarla. La compra no queda cerrada hasta ese momento, así que
+        hasta entonces puedes echarte atrás sin dar ninguna explicación y sin coste.
+      </p>
 
       <h2>Envíos</h2>
       <ul>
