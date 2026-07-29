@@ -61,7 +61,10 @@ export default async function ProductPage({ params }: Params) {
           />
         </div>
 
-        <div className="md:col-span-5 md:sticky md:top-32 md:self-start">
+        {/* Sin `sticky`: la imagen es más alta que esta columna, así que al fijarla
+            el texto se quedaba quieto mientras la foto seguía subiendo. La ficha se
+            lee mejor como un bloque único que se desplaza a la vez. */}
+        <div className="md:col-span-5">
           <p className="eyebrow">{product.summary}</p>
           <h1 className="mt-5 font-serif text-title">{product.name}</h1>
           <p className="mt-5 text-lead text-bark-soft">{formatPrice(product.price)}</p>
@@ -80,7 +83,9 @@ export default async function ProductPage({ params }: Params) {
           {/* Con la tienda cerrada, cualquier pieza se encarga hablando: es como
               funcionaba la web antes de tener carrito, así que no se pierde nada.
               Una pieza con precio se compra: el carrito es la acción principal y
-              los dos iconos quedan como vía secundaria para preguntar dudas.
+              los dos iconos quedan como vía secundaria para preguntar dudas. Los
+              tres botones son ya sin rótulo, así que lo que marca la jerarquía es
+              el tamaño —el del carrito es mayor— y el orden.
               Las piezas a medida no tienen precio cerrado y no pasan por el
               carrito, así que ahí escribir sigue siendo la única acción. */}
           {product.price === null || !shopOpen ? (
