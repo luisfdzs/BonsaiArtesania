@@ -30,10 +30,10 @@ export function Hero() {
 
           <div className="mt-11 flex flex-wrap items-center gap-x-2 gap-y-3">
             <Link href="/tienda" className="btn">
-              Ver las piezas
+              Joyas Bonsái
             </Link>
             <Link href="/encargos" className="btn btn-quiet">
-              Convertir mis flores en joya
+              Joyas personalizadas
             </Link>
           </div>
         </div>
