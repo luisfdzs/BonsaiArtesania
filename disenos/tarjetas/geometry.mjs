@@ -26,14 +26,29 @@ export const SAFE_BOX = {
   y2: CANVAS_H - BLEED - SAFE,
 }
 
+/**
+ * Cuánto baja el QR respecto al centro de la tarjeta.
+ *
+ * A 0 porque la cara B centra las dos cosas —el QR y la columna de texto— en el
+ * mismo eje, el centro de la tarjeta, y así el aire de arriba y el de abajo
+ * salen iguales sin compensar nada. Lo que se mueve para cuadrar el bloque es
+ * `URL_Y` en `build-card.mjs`, no el QR.
+ *
+ * Se queda como parámetro y no se borra porque el QR no siempre podrá estar
+ * centrado: si algún día la columna de texto crece hasta no caber simétrica, es
+ * aquí donde toca desplazarlo.
+ */
+export const QR_DROP = 0
+
 export const QR = {
   size: 22,
   modules: 33,
   quietZone: 3,
-  /** A 8 mm del corte izquierdo, centrado en la altura de la tarjeta. */
+  /** A 8 mm del corte izquierdo, centrado en la altura de la tarjeta salvo que
+   *  `QR_DROP` lo desplace. */
   x: BLEED + 8,
   get y() {
-    return BLEED + (TRIM_H - this.size) / 2
+    return BLEED + (TRIM_H - this.size) / 2 + QR_DROP
   },
 }
 

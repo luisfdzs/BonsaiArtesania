@@ -43,6 +43,10 @@ const URL = 'bonsaiartesania.com'
 const INSTAGRAM = '@san.bonsai_'
 /** El mismo buzón que `content/site.ts`: el papel y la web dicen lo mismo. */
 const EMAIL = 'bonsai@bonsaiartesania.com'
+/** Agrupado de tres en dos en dos, como se lee un móvil español en voz alta.
+ *  Ojo: NO es el número de `content/site.ts` (`34658170562`), que es el que usa
+ *  el botón de WhatsApp de la web. Los dos son intencionados y distintos. */
+const WHATSAPP = '+34 660 26 98 72'
 const W = CANVAS_W
 const H = CANVAS_H
 /** Todas las posiciones se cuentan desde el corte: `B + 8` es «a 8 mm del
@@ -139,6 +143,23 @@ ${wordmarkArch(ARCH_X, ARCH_Y, ARCH_H, C.bark)}
 // --- Cara B --------------------------------------------------------------
 // El QR es el motivo de la tarjeta, así que manda en la composición: ocupa el
 // alto útil y el texto se le pone al lado, no encima.
+//
+// La columna entera cuelga de `URL_Y`, y las demás líneas se cuentan desde ahí.
+// Es a propósito: lo que hay que dejar cuadrado es la *tinta* del bloque —no sus
+// líneas base—, y la tinta no se puede calcular a mano porque depende de los
+// ascendentes de cada tipografía. Así que `URL_Y` se ajusta midiendo el PNG ya
+// rasterizado hasta que el centro de la tinta cae en el centro de la tarjeta, y
+// el QR va centrado en la tarjeta también (`QR_DROP` a 0). Con los dos centrados
+// en el mismo eje, el aire de arriba y el de abajo salen iguales solos.
+//
+// Si se añade o se quita una línea, hay que volver a medir y mover `URL_Y`.
+const ROW = 5.6
+const URL_Y = B + 18.92
+const LINE_Y = URL_Y + 3.6
+const IG_Y = URL_Y + 3.6 + ROW
+const EMAIL_Y = IG_Y + ROW
+const WHATSAPP_Y = EMAIL_Y + ROW
+
 const { grid, maskIndex } = qrMatrix(`https://${URL}`)
 const QR_SIZE = QR.size
 const QR_X = QR.x
@@ -153,17 +174,16 @@ const back = doc(`  <rect width="${W}" height="${H}" fill="${C.linenDeep}"/>
     rx="1.6" fill="${C.linen}"/>
   <path d="${qrPath(grid, { size: QR_SIZE, x: QR_X, y: QR_Y })}" fill="${C.bark}"/>
 
-  <text x="${TEXT_X}" y="${B + 17.4}" font-family="Jost" font-weight="300" font-size="2.3"
-    fill="${C.barkFaint}" letter-spacing="0.41">ESCANEA Y MÍRALAS</text>
-
-  <text x="${TEXT_X}" y="${B + 25.8}" font-family="Cormorant Garamond" font-weight="400" font-size="5.1"
+  <text x="${TEXT_X}" y="${URL_Y}" font-family="Cormorant Garamond" font-weight="400" font-size="5.1"
     fill="${C.bark}">${URL}</text>
 
-  <line x1="${TEXT_X}" y1="${B + 29.4}" x2="${TEXT_X + 20}" y2="${B + 29.4}" stroke="${C.line}" stroke-width="0.28"/>
+  <line x1="${TEXT_X}" y1="${LINE_Y}" x2="${TEXT_X + 20}" y2="${LINE_Y}" stroke="${C.line}" stroke-width="0.28"/>
 
-  ${contactLine('instagram.svg', INSTAGRAM, { y: B + 35 })}
+  ${contactLine('instagram.svg', INSTAGRAM, { y: IG_Y })}
 
-  ${contactLine('gmail.svg', EMAIL, { y: B + 40.6 })}`)
+  ${contactLine('gmail.svg', EMAIL, { y: EMAIL_Y })}
+
+  ${contactLine('whatsapp.svg', WHATSAPP, { y: WHATSAPP_Y })}`)
 
 mkdirSync(SALIDA, { recursive: true })
 writeFileSync(`${SALIDA}/tarjeta-cara-a.svg`, front)
