@@ -3,6 +3,7 @@ import { Cormorant_Garamond, Jost } from 'next/font/google'
 import { Footer } from '@/components/layout/Footer'
 import { Header } from '@/components/layout/Header'
 import { site } from '@/content/site'
+import { shopOpen } from '@/lib/shop'
 import './globals.css'
 
 /**
@@ -48,7 +49,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es" data-scroll-behavior="smooth" className={`${serif.variable} ${sans.variable}`}>
       <body className="flex min-h-svh flex-col">
-        <Header />
+        {/* El interruptor se lee aquí, en el servidor, y baja como prop: la
+            cabecera es componente de cliente y no ve process.env. */}
+        <Header shopOpen={shopOpen} />
         <main id="main" className="flex-1">
           {children}
         </main>

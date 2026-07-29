@@ -12,7 +12,7 @@ import { Wordmark } from './Wordmark'
  * más: el menú en móvil y saber si se ha hecho scroll (para pasar de transparente
  * sobre el hero a fondo lino).
  */
-export function Header() {
+export function Header({ shopOpen }: { shopOpen: boolean }) {
   const pathname = usePathname()
   const [scrolled, setScrolled] = useState(false)
 
@@ -114,12 +114,16 @@ export function Header() {
                 merece la pena por una cifra. Cuando se active PPR se podrá
                 streamear el contador sin perder el shell estático. */}
             <span className="ml-3 flex items-center gap-6 border-l border-current/20 pl-6">
-              <Link
-                href="/carrito"
-                className="link-underline tap text-small tracking-wide opacity-70 transition-opacity duration-500 hover:opacity-100"
-              >
-                Carrito
-              </Link>
+              {/* Sin tienda abierta no hay carrito que enseñar. «Cuenta» sí se
+                  queda: quien ya tenga una debe poder entrar a ver sus pedidos. */}
+              {shopOpen && (
+                <Link
+                  href="/carrito"
+                  className="link-underline tap text-small tracking-wide opacity-70 transition-opacity duration-500 hover:opacity-100"
+                >
+                  Carrito
+                </Link>
+              )}
               <Link
                 href="/cuenta"
                 className="link-underline tap text-small tracking-wide opacity-70 transition-opacity duration-500 hover:opacity-100"
@@ -162,14 +166,20 @@ export function Header() {
             </Link>
           ))}
 
+          {shopOpen && (
+            <Link
+              href="/carrito"
+              className="mt-4 border-t border-line pt-7 font-serif text-title"
+              onClick={() => setOpen(false)}
+            >
+              Carrito
+            </Link>
+          )}
           <Link
-            href="/carrito"
-            className="mt-4 border-t border-line pt-7 font-serif text-title"
+            href="/cuenta"
+            className={cn('font-serif text-title', !shopOpen && 'mt-4 border-t border-line pt-7')}
             onClick={() => setOpen(false)}
           >
-            Carrito
-          </Link>
-          <Link href="/cuenta" className="font-serif text-title" onClick={() => setOpen(false)}>
             Cuenta
           </Link>
         </nav>

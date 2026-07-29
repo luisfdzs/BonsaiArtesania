@@ -8,6 +8,7 @@ import { auth } from '@/auth'
 import { getProduct } from '@/content/products'
 import { GUEST_COOKIE } from '@/lib/cart'
 import { carts } from '@/lib/schema'
+import { shopOpen } from '@/lib/shop'
 
 /**
  * Acciones del carrito. Funcionan con y sin cuenta: si no hay sesión se crea un
@@ -41,6 +42,11 @@ async function ownerFilter(): Promise<{ userId: ObjectId } | { guestId: string }
 }
 
 export async function addToCart(formData: FormData): Promise<void> {
+  // Con la tienda cerrada no se llena el carrito. La comprobación va aquí y no
+  // sólo en la ficha: esconder el botón no protege nada, porque una acción de
+  // servidor es un endpoint al que se puede llamar directamente.
+  if (!shopOpen) return
+
   const slug = String(formData.get('slug') ?? '')
   const product = getProduct(slug)
 

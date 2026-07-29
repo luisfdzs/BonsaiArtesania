@@ -6,6 +6,7 @@ import { auth } from '@/auth'
 import { Checkout } from '@/components/comprar/Checkout'
 import { readCart } from '@/lib/cart'
 import { addresses, formatCents } from '@/lib/schema'
+import { shopOpen } from '@/lib/shop'
 
 export const metadata: Metadata = {
   title: 'Finalizar compra',
@@ -13,6 +14,10 @@ export const metadata: Metadata = {
 }
 
 export default async function ComprarPage() {
+  // Con la tienda cerrada no hay nada que finalizar. Al carrito, que es donde se
+  // explica por qué.
+  if (!shopOpen) redirect('/carrito')
+
   const session = await auth()
   // Aquí sí hace falta cuenta: el pedido tiene que quedar asociado a alguien para
   // que el cliente pueda consultarlo después. Hasta este punto se navega sin ella.

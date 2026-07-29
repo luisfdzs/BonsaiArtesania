@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { readCart } from '@/lib/cart'
 import { formatCents } from '@/lib/schema'
+import { shopOpen } from '@/lib/shop'
 import { missingForFreeShippingCents } from '@/lib/shipping'
 import { removeFromCart, setQty } from './actions'
 
@@ -11,6 +12,28 @@ export const metadata: Metadata = {
 }
 
 export default async function CarritoPage() {
+  // La tienda cerrada no tiene carrito. Se explica en lugar de dar un 404: quien
+  // llegue aquí desde un enlace guardado merece saber qué ha pasado.
+  if (!shopOpen) {
+    return (
+      <div className="page-gutter pt-16 md:pt-24">
+        <h1 className="font-serif text-title">La tienda abre pronto</h1>
+        <p className="mt-6 max-w-md text-bark-soft">
+          Todavía no se puede comprar directamente desde la web. Cada pieza se sigue encargando
+          hablando, que es como Ana trabaja hoy: escríbele y lo organizáis.
+        </p>
+        <div className="mt-10 flex flex-col gap-2 sm:flex-row">
+          <Link href="/tienda" className="btn">
+            Ver las piezas
+          </Link>
+          <Link href="/#contacto" className="btn btn-quiet">
+            Escribir a Ana
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
   const cart = await readCart()
   const missing = missingForFreeShippingCents(cart.subtotalCents)
 

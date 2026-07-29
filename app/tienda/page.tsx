@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { ProductCard } from '@/components/sections/ProductCard'
 import { Reveal } from '@/components/ui/Reveal'
 import { categories, productsByCategory } from '@/content/products'
+import { shopOpen } from '@/lib/shop'
 
 export const metadata: Metadata = {
   title: 'Tienda',
@@ -21,6 +22,15 @@ export default function TiendaPage() {
           Cada pieza está hecha a mano y es irrepetible: la flor que ves en la foto es exactamente
           la que recibes. Si algo se ha agotado, casi siempre puedo hacer otra parecida.
         </p>
+
+        {/* Mientras la tienda esté cerrada conviene decirlo aquí y no dejar
+            que se descubra al llegar a la ficha y no encontrar botón. */}
+        {!shopOpen && (
+          <p className="mt-8 bg-petal-soft p-5 text-small text-bark-soft">
+            Todavía no se puede comprar directamente desde la web: cada pieza se encarga hablando.
+            Escríbeme por WhatsApp o por correo y lo organizamos.
+          </p>
+        )}
       </header>
 
       {categories.map((category) => {

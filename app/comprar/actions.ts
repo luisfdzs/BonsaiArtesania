@@ -6,6 +6,7 @@ import { auth } from '@/auth'
 import { readCart } from '@/lib/cart'
 import { nextOrderNumber } from '@/lib/orders'
 import { addresses, carts, orders, type OrderDoc } from '@/lib/schema'
+import { shopOpen } from '@/lib/shop'
 import { reserveStock } from '@/lib/stock'
 import { sendOrderEmails } from '@/lib/email'
 
@@ -32,6 +33,13 @@ export type CheckoutState = {
  * impide que un pedido no pagado parezca pagado.
  */
 export async function placeOrder(_prev: CheckoutState, formData: FormData): Promise<CheckoutState> {
+  // Primera comprobación de todas: con la tienda cerrada no se cierra ningún
+  // pedido. Es la última línea de defensa contra el cobro simulado, y por eso va
+  // en la acción y no sólo en la página.
+  if (!shopOpen) {
+    return { error: 'La tienda no está abierta todavía. Escríbeme y lo vemos por mensaje.' }
+  }
+
   const session = await auth()
   if (!session?.user?.id) return { error: 'Tienes que entrar para poder comprar.' }
 

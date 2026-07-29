@@ -8,6 +8,7 @@ import { Media } from '@/components/ui/Media'
 import { Reveal } from '@/components/ui/Reveal'
 import { formatPrice, getProduct, products } from '@/content/products'
 import { orderMessage } from '@/lib/contact'
+import { shopOpen } from '@/lib/shop'
 
 type Params = { params: Promise<{ slug: string }> }
 
@@ -76,15 +77,17 @@ export default async function ProductPage({ params }: Params) {
             <dd className="mt-3 text-small">{product.materials.join(' · ')}</dd>
           </dl>
 
-          {/* Una pieza con precio se compra: el carrito es la acción principal y
+          {/* Con la tienda cerrada, cualquier pieza se encarga hablando: es como
+              funcionaba la web antes de tener carrito, así que no se pierde nada.
+              Una pieza con precio se compra: el carrito es la acción principal y
               los dos iconos quedan como vía secundaria para preguntar dudas.
               Las piezas a medida no tienen precio cerrado y no pasan por el
               carrito, así que ahí escribir sigue siendo la única acción. */}
-          {product.price === null ? (
+          {product.price === null || !shopOpen ? (
             <ContactButtons
               message={message}
               subject={`Encargo · ${product.name}`}
-              action="Pedir presupuesto"
+              action={product.price === null ? 'Pedir presupuesto' : 'Encargar esta pieza'}
               className="mt-11"
             />
           ) : (
