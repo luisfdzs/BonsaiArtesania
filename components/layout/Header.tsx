@@ -181,35 +181,32 @@ export function Header({ shopOpen }: { shopOpen: boolean }) {
             </Link>
           ))}
 
-          {/* `w-full` sólo en la entrada que lleva el filete: con `items-center`
-              los hijos se encogen a su texto, y el filete quedaría del ancho de
-              la palabra en lugar de cruzar el panel.
+          {/* Sin texto también aquí, como en la barra. Los dos iconos van juntos
+              en una sola fila y no uno debajo del otro: apilados romperían el
+              ritmo de las cuatro palabras de arriba, y en fila repiten el mismo
+              gesto que en escritorio.
 
-              Aquí el icono acompaña a la palabra en vez de sustituirla: las otras
-              cuatro entradas del panel son palabras, y dos dibujos solos al final
-              habría que adivinarlos. El tamaño va en `em` para que siga a la
-              tipografía del panel si algún día cambia. */}
-          {shopOpen && (
-            <Link
-              href="/carrito"
-              className="mt-4 flex w-full items-center justify-center gap-3 border-t border-line pt-7 font-serif text-title"
-              onClick={() => setOpen(false)}
-            >
-              <CartIcon className="h-[0.8em] w-[0.8em]" />
-              Carrito
-            </Link>
-          )}
-          <Link
-            href="/cuenta"
-            className={cn(
-              'flex items-center justify-center gap-3 font-serif text-title',
-              !shopOpen && 'mt-4 w-full border-t border-line pt-7',
+              El filete lo pone esta fila y no los enlaces: así cruza el panel
+              entero —`w-full`; con `items-center` un hijo se encoge a su
+              contenido— y queda igual con tienda abierta o cerrada.
+
+              Más grandes que en la barra (28px) y con `p-2`: aquí se toca con
+              el dedo, no se apunta con el ratón. */}
+          <span className="mt-4 flex w-full items-center justify-center gap-8 border-t border-line pt-5">
+            {shopOpen && (
+              <Link
+                href="/carrito"
+                aria-label="Carrito"
+                className="p-2"
+                onClick={() => setOpen(false)}
+              >
+                <CartIcon className="h-7 w-7" />
+              </Link>
             )}
-            onClick={() => setOpen(false)}
-          >
-            <AccountIcon className="h-[0.8em] w-[0.8em]" />
-            Cuenta
-          </Link>
+            <Link href="/cuenta" aria-label="Cuenta" className="p-2" onClick={() => setOpen(false)}>
+              <AccountIcon className="h-7 w-7" />
+            </Link>
+          </span>
         </nav>
       </div>
     </>
