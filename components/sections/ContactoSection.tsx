@@ -1,7 +1,7 @@
 import { site } from '@/content/site'
 import { ContactButtons } from '@/components/ui/ContactButtons'
 import { Reveal } from '@/components/ui/Reveal'
-import { customOrderMessage } from '@/lib/contact'
+import { customOrderMessage, whatsappDisplay } from '@/lib/contact'
 
 /**
  * Cierre del sitio. No hay formulario: Ana ya conversa con sus clientas por
@@ -35,7 +35,16 @@ export function ContactoSection() {
           className="mt-12 justify-center"
         />
 
-        <p className="mt-7 text-small text-bark-soft">{site.contact.email}</p>
+        {/* Los tres, escritos. Debajo de tres logos sólo estaba el correo, así
+            que el número y el perfil eran los únicos datos que no se podían
+            copiar, dictar por teléfono ni buscar a mano: el logo sirve para
+            pulsar, no para apuntar. Mismo orden que los botones de arriba, para
+            que cada texto caiga bajo el suyo. */}
+        <ul className="mt-7 flex flex-wrap justify-center gap-x-6 gap-y-1 text-small text-bark-soft">
+          <li>{whatsappDisplay}</li>
+          <li>{site.contact.email}</li>
+          <li>{site.social.instagramHandle}</li>
+        </ul>
       </Reveal>
     </section>
   )

@@ -10,6 +10,17 @@ export function whatsappLink(message: string): string {
   return `https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent(message)}`
 }
 
+/**
+ * El mismo número del enlace, escrito como se lee en voz alta. El enlace lo
+ * necesita seguido y sin signos, y una persona no: en vez de guardar el número
+ * dos veces —y arriesgarse a que sólo se corrija uno—, se escribe desde el que
+ * ya hay en `content/site.ts`.
+ */
+export const whatsappDisplay = site.contact.whatsapp.replace(
+  /^(\d{2})(\d{3})(\d{2})(\d{2})(\d{2})$/,
+  '+$1 $2 $3 $4 $5',
+)
+
 export function mailtoLink(subject: string, body: string): string {
   const params = new URLSearchParams({ subject, body })
   return `mailto:${site.contact.email}?${params.toString()}`

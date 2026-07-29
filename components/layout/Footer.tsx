@@ -7,16 +7,17 @@ import { site } from '@/content/site'
  * viaja fijo con la página. Quitado el bloque, la web termina donde termina la
  * conversación.
  *
- * Sin filete y sin el margen de sección de antes: los dos estaban dimensionados
- * para separar un bloque de tres columnas, y con una sola línea abrían un claro
- * blanco enorme detrás de la banda de Contacto. El aire que queda —`py-16`— es
- * el mismo con el que abren las páginas por arriba, así que la firma cierra a
- * la altura a la que todo empieza.
+ * Sin el margen de sección de antes —hasta 12rem, dimensionado para separar un
+ * bloque de tres columnas— la firma cierra con el mismo aire con el que abren
+ * las páginas por arriba. El filete sí vuelve: sin él, la firma quedaba suelta
+ * detrás de la banda de Contacto, como si se hubiera caído de la sección. Va
+ * dentro del margen lateral, como todas las líneas horizontales de la web, y no
+ * de borde a borde de la ventana.
  */
 export function Footer() {
   return (
-    <footer className="py-16">
-      <p className="eyebrow page-gutter text-center">
+    <footer className="page-gutter pt-16">
+      <p className="eyebrow border-t border-line py-8 text-center">
         © {new Date().getFullYear()} {site.nameFull}
       </p>
     </footer>

@@ -26,11 +26,12 @@ export default function HomePage() {
 
         {/* Seguir a la tienda es lo que toca después de mirar las tres piezas,
             no antes: arriba, junto al encabezado, el enlace invitaba a saltarse
-            justo lo que la sección venía a enseñar. De ancho completo porque
-            aquí ya no compite con nada —cierra la sección— y porque así el
-            pulgar lo encuentra sin apuntar. */}
-        <Reveal className="mt-16">
-          <Link href="/tienda" className="btn w-full">
+            justo lo que la sección venía a enseñar. Lo que ocupa el ancho es la
+            fila, no el botón: centrado bajo la rejilla se ve desde cualquier
+            columna, y estirarlo hasta el borde le habría dado un tamaño que no
+            tiene ningún otro botón de la web. */}
+        <Reveal className="mt-16 flex justify-center">
+          <Link href="/tienda" className="btn">
             Ver todas las piezas
           </Link>
         </Reveal>
