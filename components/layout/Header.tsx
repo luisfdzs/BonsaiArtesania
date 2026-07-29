@@ -152,9 +152,18 @@ export function Header({ shopOpen }: { shopOpen: boolean }) {
       <div
         id="menu-movil"
         hidden={!open}
-        className="page-gutter fixed inset-0 top-20 z-40 bg-linen md:hidden"
+        // Sin utilidad de `display` a propósito: el atributo `hidden` es quien
+        // apaga el panel, y un `flex` aquí discutiría con él. El centrado lo pone
+        // el <nav>, que estira a todo el alto disponible.
+        className="page-gutter fixed inset-0 top-20 z-40 overflow-y-auto bg-linen md:hidden"
       >
-        <nav className="flex flex-col gap-7 pt-12" aria-label="Principal">
+        {/* `min-h-full` en vez de `h-full`: con el menú centrado basta para llenar
+            el panel, pero si algún día las entradas no caben en pantallas bajas
+            crece y el `overflow-y-auto` de arriba las deja alcanzables. */}
+        <nav
+          className="flex min-h-full flex-col items-center justify-center gap-7 py-12 text-center"
+          aria-label="Principal"
+        >
           {navigation.map((item) => (
             <Link
               key={item.href}
@@ -166,10 +175,13 @@ export function Header({ shopOpen }: { shopOpen: boolean }) {
             </Link>
           ))}
 
+          {/* `w-full` sólo en la entrada que lleva el filete: con `items-center`
+              los hijos se encogen a su texto, y el filete quedaría del ancho de
+              la palabra en lugar de cruzar el panel. */}
           {shopOpen && (
             <Link
               href="/carrito"
-              className="mt-4 border-t border-line pt-7 font-serif text-title"
+              className="mt-4 w-full border-t border-line pt-7 font-serif text-title"
               onClick={() => setOpen(false)}
             >
               Carrito
@@ -177,7 +189,10 @@ export function Header({ shopOpen }: { shopOpen: boolean }) {
           )}
           <Link
             href="/cuenta"
-            className={cn('font-serif text-title', !shopOpen && 'mt-4 border-t border-line pt-7')}
+            className={cn(
+              'font-serif text-title',
+              !shopOpen && 'mt-4 w-full border-t border-line pt-7',
+            )}
             onClick={() => setOpen(false)}
           >
             Cuenta
