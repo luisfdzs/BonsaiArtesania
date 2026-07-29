@@ -112,7 +112,12 @@ export type OrderDoc = {
     totalCents: number
   }
   payment: {
-    provider: 'stripe' | 'transferencia' | 'bizum'
+    /**
+     * `simulado` marca los pedidos creados mientras el cobro es un placeholder:
+     * la interfaz dice al cliente que ha pagado, pero no se ha cobrado nada. Es lo
+     * que permite distinguirlos de los reales cuando se conecte Stripe.
+     */
+    provider: 'stripe' | 'transferencia' | 'bizum' | 'simulado'
     status: 'pendiente' | 'pagado' | 'fallido' | 'reembolsado'
     /** Identificador del intento de cobro en la pasarela. Nunca datos de tarjeta. */
     intentId?: string | null

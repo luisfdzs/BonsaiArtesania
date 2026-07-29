@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ProductCard } from '@/components/sections/ProductCard'
+import { AddToCart } from '@/components/tienda/AddToCart'
 import { Media } from '@/components/ui/Media'
 import { Reveal } from '@/components/ui/Reveal'
 import { formatPrice, getProduct, products } from '@/content/products'
@@ -74,13 +75,18 @@ export default async function ProductPage({ params }: Params) {
             <dd className="mt-3 text-small">{product.materials.join(' · ')}</dd>
           </dl>
 
-          {/* Sin carrito: el pedido se cierra hablando. Ver lib/contact.ts. */}
+          {/* Las piezas a medida no tienen precio cerrado, así que no pasan por el
+              carrito: se siguen acordando hablando. Ver lib/contact.ts. */}
           <div className="mt-11 flex flex-col gap-2">
-            <a href={whatsappLink(message)} target="_blank" rel="noreferrer" className="btn">
-              {product.price === null ? 'Pedir presupuesto' : 'Quiero esta pieza'}
-            </a>
+            {product.price === null ? (
+              <a href={whatsappLink(message)} target="_blank" rel="noreferrer" className="btn">
+                Pedir presupuesto
+              </a>
+            ) : (
+              <AddToCart slug={product.slug} />
+            )}
             <a href={mailtoLink(`Encargo · ${product.name}`, message)} className="btn btn-quiet">
-              O escribir por correo
+              O preguntar por correo
             </a>
           </div>
           <p className="mt-6 text-small text-bark-faint">

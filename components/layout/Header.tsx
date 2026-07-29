@@ -103,15 +103,30 @@ export function Header() {
                 </Link>
               )
             })}
-            {/* «Cuenta» va fuera de `navigation` a propósito: ese array es el menú
-                editorial del sitio y quiere quedarse en cuatro entradas. Esto es
-                una herramienta, no una sección, y por eso se separa con el filete. */}
-            <Link
-              href="/cuenta"
-              className="link-underline tap ml-3 border-l border-current/20 pl-6 text-small tracking-wide opacity-70 transition-opacity duration-500 hover:opacity-100"
-            >
-              Cuenta
-            </Link>
+            {/* «Carrito» y «Cuenta» van fuera de `navigation` a propósito: ese
+                array es el menú editorial del sitio y quiere quedarse en cuatro
+                entradas. Estas dos son herramientas, no secciones, y por eso se
+                separan con un filete.
+
+                El carrito no muestra el número de piezas: para saberlo habría que
+                consultar la base de datos en el layout raíz, y eso convertiría
+                todas las páginas —portada y tienda incluidas— en dinámicas. No
+                merece la pena por una cifra. Cuando se active PPR se podrá
+                streamear el contador sin perder el shell estático. */}
+            <span className="ml-3 flex items-center gap-6 border-l border-current/20 pl-6">
+              <Link
+                href="/carrito"
+                className="link-underline tap text-small tracking-wide opacity-70 transition-opacity duration-500 hover:opacity-100"
+              >
+                Carrito
+              </Link>
+              <Link
+                href="/cuenta"
+                className="link-underline tap text-small tracking-wide opacity-70 transition-opacity duration-500 hover:opacity-100"
+              >
+                Cuenta
+              </Link>
+            </span>
           </nav>
 
           <button
@@ -148,10 +163,13 @@ export function Header() {
           ))}
 
           <Link
-            href="/cuenta"
+            href="/carrito"
             className="mt-4 border-t border-line pt-7 font-serif text-title"
             onClick={() => setOpen(false)}
           >
+            Carrito
+          </Link>
+          <Link href="/cuenta" className="font-serif text-title" onClick={() => setOpen(false)}>
             Cuenta
           </Link>
         </nav>

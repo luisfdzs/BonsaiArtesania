@@ -142,7 +142,9 @@ const validators = {
         bsonType: 'object',
         required: ['provider', 'status'],
         properties: {
-          provider: { enum: ['stripe', 'transferencia', 'bizum'] },
+          // 'simulado' = pedido creado mientras el cobro es un placeholder. Ver
+          // el aviso en app/comprar/actions.ts.
+          provider: { enum: ['stripe', 'transferencia', 'bizum', 'simulado'] },
           status: { enum: ['pendiente', 'pagado', 'fallido', 'reembolsado'] },
           intentId: { bsonType: ['string', 'null'] },
         },
@@ -230,6 +232,8 @@ try {
     'addresses',
     'carts',
     'orders',
+    // Contador del número de pedido. Un documento por año; ver lib/orders.ts.
+    'counters',
   ]
 
   console.log(`\n  Base: ${DB_NAME}\n`)
