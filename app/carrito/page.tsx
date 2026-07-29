@@ -150,7 +150,8 @@ export default async function CarritoPage() {
             )}
 
             <p className="mt-6 text-small text-bark-faint">
-              Hecha a mano bajo pedido: entre 1 y 3 semanas. Envío a toda España.
+              Hecha a mano bajo pedido: entre 1 y 3 semanas. Envío a toda España. Todavía no se paga
+              en la web: envías la petición y Ana te escribe.
             </p>
           </div>
         </aside>

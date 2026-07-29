@@ -9,7 +9,7 @@ import { addresses, formatCents } from '@/lib/schema'
 import { shopOpen } from '@/lib/shop'
 
 export const metadata: Metadata = {
-  title: 'Finalizar compra',
+  title: 'Confirmar tu petición',
   robots: { index: false, follow: false },
 }
 
@@ -50,7 +50,14 @@ export default async function ComprarPage() {
 
   return (
     <div className="page-gutter pt-16 pb-(--spacing-section) md:pt-24">
-      <h1 className="font-serif text-title">Finalizar compra</h1>
+      <h1 className="font-serif text-title">Confirmar tu petición</h1>
+
+      {/* Dicho antes de que rellene nada, no después: si alguien espera pagar con
+          tarjeta aquí, tiene que enterarse ahora y no al recibir el aviso. */}
+      <p className="mt-6 max-w-lg text-bark-soft">
+        Todavía no se paga por la web. Al enviar la petición te reservo las piezas y te escribo
+        para confirmarla y quedar en cómo pagarla.
+      </p>
 
       <div className="mt-14 grid gap-14 lg:grid-cols-12">
         <div className="lg:col-span-7">

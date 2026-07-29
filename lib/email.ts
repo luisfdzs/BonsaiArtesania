@@ -112,9 +112,9 @@ function addressBlock(order: OrderDoc): string {
 }
 
 function customerBody(order: OrderDoc): string {
-  return `¡Gracias por tu pedido!
+  return `¡Gracias! He recibido tu petición.
 
-Pedido ${order.number}
+Petición ${order.number}
 
 ${itemLines(order)}
 
@@ -122,20 +122,23 @@ Subtotal: ${formatCents(order.totals.subtotalCents)}
 Envío: ${order.totals.shippingCents === 0 ? 'Gratis' : formatCents(order.totals.shippingCents)}
 Total: ${formatCents(order.totals.totalCents)}
 
-Se enviará a:
+Se enviaría a:
 ${addressBlock(order)}
 
-Cada pieza se hace a mano bajo pedido, así que la preparación lleva entre una y
-tres semanas. Te aviso en cuanto salga.
+Te escribo enseguida para confirmarla y quedar en cómo pagarla: de momento no se
+ha cobrado nada, en la web todavía no se paga con tarjeta.
 
-Puedes seguir tu pedido en ${site.url}/cuenta/pedidos
+Cada pieza se hace a mano bajo pedido, así que una vez cerrada la preparación
+lleva entre una y tres semanas. Te aviso en cuanto salga.
+
+Puedes verla en ${site.url}/cuenta/pedidos
 
 Ana · ${site.nameFull}
 ${site.url}`
 }
 
 function shopBody(order: OrderDoc): string {
-  return `Nuevo pedido ${order.number}
+  return `Nueva petición ${order.number}
 
 ${itemLines(order)}
 
@@ -144,8 +147,12 @@ Total: ${formatCents(order.totals.totalCents)}
 Enviar a:
 ${addressBlock(order)}
 
-⚠️ Cobro simulado: este pedido NO se ha cobrado. La pasarela todavía no está
-conectada, así que el estado real es "pendiente de pago".
+⚠️ SIN COBRAR. La pasarela no está conectada: al cliente se le ha dicho que su
+petición queda registrada y que le escribes para confirmarla y cobrarla. Las
+unidades ya están descontadas del stock, así que si no sale adelante hay que
+cancelarla en el taller para devolverlas.
+
+Escríbele tú: ese contacto es el único paso que cierra la venta.
 
 Gestionar: ${site.url}/taller/pedidos/${order.number}`
 }
@@ -167,12 +174,12 @@ export async function sendOrderEmails(order: OrderDoc, customerEmail: string): P
   const messages = [
     {
       to: customerEmail,
-      subject: `Tu pedido ${order.number} · ${site.nameFull}`,
+      subject: `Tu petición ${order.number} · ${site.nameFull}`,
       text: customerBody(order),
     },
     {
       to: site.contact.email,
-      subject: `Nuevo pedido ${order.number}`,
+      subject: `Nueva petición ${order.number} · sin cobrar`,
       text: shopBody(order),
       // Responder al correo del aviso escribe al cliente, que es lo que Ana
       // querrá hacer nueve de cada diez veces.

@@ -20,28 +20,31 @@ export type CheckoutState = {
 }
 
 /**
- * Cierra el pedido.
+ * Registra la petición.
  *
- * ⚠️ EL COBRO ESTÁ SIMULADO. Todavía no hay pasarela: esta acción crea el pedido
- * y la interfaz avisa al cliente de que el pago se ha recibido, pero no se cobra
- * nada. Para que la base de datos no mienta, el pedido se guarda con
+ * ⚠️ NO COBRA NADA. Todavía no hay pasarela, así que esto no es una venta cerrada:
+ * crea el pedido, reserva las unidades y avisa a Ana para que sea ella quien
+ * contacte y cobre. La interfaz se lo dice al cliente con esas palabras y no habla
+ * de ningún pago recibido.
+ *
+ * Para que la base de datos tampoco lo dé por pagado, el pedido se guarda con
  * `payment.provider: 'simulado'`, `payment.status: 'pendiente'` y estado
  * `pendiente_pago`. Así, cuando se conecte Stripe, una consulta distingue sin
- * ambigüedad los pedidos de prueba de los cobrados de verdad.
+ * ambigüedad las peticiones de esta etapa de los pedidos cobrados de verdad.
  *
  * No cambiar esos tres valores sin sustituir de verdad el cobro: son lo único que
  * impide que un pedido no pagado parezca pagado.
  */
 export async function placeOrder(_prev: CheckoutState, formData: FormData): Promise<CheckoutState> {
-  // Primera comprobación de todas: con la tienda cerrada no se cierra ningún
-  // pedido. Es la última línea de defensa contra el cobro simulado, y por eso va
-  // en la acción y no sólo en la página.
+  // Primera comprobación de todas: con la tienda cerrada no se registra ninguna
+  // petición ni se reserva stock. Va en la acción y no sólo en la página porque una
+  // acción de servidor es un endpoint público: ocultar el formulario no la cierra.
   if (!shopOpen) {
     return { error: 'La tienda no está abierta todavía. Escríbeme y lo vemos por mensaje.' }
   }
 
   const session = await auth()
-  if (!session?.user?.id) return { error: 'Tienes que entrar para poder comprar.' }
+  if (!session?.user?.id) return { error: 'Tienes que entrar para poder enviar la petición.' }
 
   const userId = new ObjectId(session.user.id)
 
@@ -120,7 +123,9 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
       status: 'pendiente',
       intentId: null,
     },
-    history: [{ status: 'pendiente_pago', at: now, note: 'Pedido creado con cobro simulado' }],
+    history: [
+      { status: 'pendiente_pago', at: now, note: 'Petición registrada desde la web, sin cobrar' },
+    ],
     createdAt: now,
     updatedAt: now,
   }
