@@ -2,10 +2,11 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ProductCard } from '@/components/sections/ProductCard'
+import { ContactButtons } from '@/components/ui/ContactButtons'
 import { Media } from '@/components/ui/Media'
 import { Reveal } from '@/components/ui/Reveal'
 import { formatPrice, getProduct, products } from '@/content/products'
-import { mailtoLink, orderMessage, whatsappLink } from '@/lib/contact'
+import { orderMessage } from '@/lib/contact'
 
 type Params = { params: Promise<{ slug: string }> }
 
@@ -75,14 +76,12 @@ export default async function ProductPage({ params }: Params) {
           </dl>
 
           {/* Sin carrito: el pedido se cierra hablando. Ver lib/contact.ts. */}
-          <div className="mt-11 flex flex-col gap-2">
-            <a href={whatsappLink(message)} target="_blank" rel="noreferrer" className="btn">
-              {product.price === null ? 'Pedir presupuesto' : 'Quiero esta pieza'}
-            </a>
-            <a href={mailtoLink(`Encargo · ${product.name}`, message)} className="btn btn-quiet">
-              O escribir por correo
-            </a>
-          </div>
+          <ContactButtons
+            message={message}
+            subject={`Encargo · ${product.name}`}
+            action={product.price === null ? 'Pedir presupuesto' : 'Quiero esta pieza'}
+            className="mt-11"
+          />
           <p className="mt-6 text-small text-bark-faint">
             Hecha a mano bajo pedido: entre 1 y 3 semanas. Envío a toda España.
           </p>
