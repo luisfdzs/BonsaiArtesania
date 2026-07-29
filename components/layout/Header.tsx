@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/cn'
 import { navigation } from '@/lib/navigation'
+import { AccountIcon, CartIcon } from './NavIcons'
 import { Wordmark } from './Wordmark'
 
 /**
@@ -106,7 +107,10 @@ export function Header({ shopOpen }: { shopOpen: boolean }) {
             {/* «Carrito» y «Cuenta» van fuera de `navigation` a propósito: ese
                 array es el menú editorial del sitio y quiere quedarse en cuatro
                 entradas. Estas dos son herramientas, no secciones, y por eso se
-                separan con un filete.
+                separan con un filete y se dicen con un icono, no con la palabra.
+
+                Sin `link-underline` en ellas: el filete de ese efecto cruzaría
+                por debajo del dibujo y parecería un error. Basta la opacidad.
 
                 El carrito no muestra el número de piezas: para saberlo habría que
                 consultar la base de datos en el layout raíz, y eso convertiría
@@ -119,16 +123,18 @@ export function Header({ shopOpen }: { shopOpen: boolean }) {
               {shopOpen && (
                 <Link
                   href="/carrito"
-                  className="link-underline tap text-small tracking-wide opacity-70 transition-opacity duration-500 hover:opacity-100"
+                  aria-label="Carrito"
+                  className="tap opacity-70 transition-opacity duration-500 hover:opacity-100"
                 >
-                  Carrito
+                  <CartIcon className="h-5 w-5" />
                 </Link>
               )}
               <Link
                 href="/cuenta"
-                className="link-underline tap text-small tracking-wide opacity-70 transition-opacity duration-500 hover:opacity-100"
+                aria-label="Cuenta"
+                className="tap opacity-70 transition-opacity duration-500 hover:opacity-100"
               >
-                Cuenta
+                <AccountIcon className="h-5 w-5" />
               </Link>
             </span>
           </nav>
@@ -177,24 +183,31 @@ export function Header({ shopOpen }: { shopOpen: boolean }) {
 
           {/* `w-full` sólo en la entrada que lleva el filete: con `items-center`
               los hijos se encogen a su texto, y el filete quedaría del ancho de
-              la palabra en lugar de cruzar el panel. */}
+              la palabra en lugar de cruzar el panel.
+
+              Aquí el icono acompaña a la palabra en vez de sustituirla: las otras
+              cuatro entradas del panel son palabras, y dos dibujos solos al final
+              habría que adivinarlos. El tamaño va en `em` para que siga a la
+              tipografía del panel si algún día cambia. */}
           {shopOpen && (
             <Link
               href="/carrito"
-              className="mt-4 w-full border-t border-line pt-7 font-serif text-title"
+              className="mt-4 flex w-full items-center justify-center gap-3 border-t border-line pt-7 font-serif text-title"
               onClick={() => setOpen(false)}
             >
+              <CartIcon className="h-[0.8em] w-[0.8em]" />
               Carrito
             </Link>
           )}
           <Link
             href="/cuenta"
             className={cn(
-              'font-serif text-title',
+              'flex items-center justify-center gap-3 font-serif text-title',
               !shopOpen && 'mt-4 w-full border-t border-line pt-7',
             )}
             onClick={() => setOpen(false)}
           >
+            <AccountIcon className="h-[0.8em] w-[0.8em]" />
             Cuenta
           </Link>
         </nav>
