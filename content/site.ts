@@ -21,7 +21,10 @@ export const site = {
   contact: {
     /** El mismo buzón que va impreso en las tarjetas (`disenos/tarjetas/`). */
     email: 'bonsai@bonsaiartesania.com',
-    /** Formato internacional sin signos, para el enlace de WhatsApp. */
+    /** Formato internacional sin signos, para el enlace de WhatsApp.
+     *  Ojo: NO es el número impreso en las tarjetas (`disenos/tarjetas/`, que
+     *  lleva el `+34 660 26 98 72`). Si alguno de los dos es un despiste, hay
+     *  que corregirlo aquí y allí a la vez. */
     whatsapp: '34658170562',
   },
 } as const
