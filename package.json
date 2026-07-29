@@ -11,12 +11,17 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "check": "npm run typecheck && npm run lint && prettier --check .",
-    "images": "node scripts/optimize-images.mjs"
+    "images": "node scripts/optimize-images.mjs",
+    "db:setup": "node scripts/db-setup.mjs"
   },
   "dependencies": {
+    "@auth/mongodb-adapter": "^3.11.3",
+    "mongodb": "^6.21.0",
     "next": "^16.2.11",
+    "next-auth": "^5.0.0-beta.32",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.13",

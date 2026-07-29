@@ -103,6 +103,15 @@ export function Header() {
                 </Link>
               )
             })}
+            {/* «Cuenta» va fuera de `navigation` a propósito: ese array es el menú
+                editorial del sitio y quiere quedarse en cuatro entradas. Esto es
+                una herramienta, no una sección, y por eso se separa con el filete. */}
+            <Link
+              href="/cuenta"
+              className="link-underline tap ml-3 border-l border-current/20 pl-6 text-small tracking-wide opacity-70 transition-opacity duration-500 hover:opacity-100"
+            >
+              Cuenta
+            </Link>
           </nav>
 
           <button
@@ -137,6 +146,14 @@ export function Header() {
               {item.label}
             </Link>
           ))}
+
+          <Link
+            href="/cuenta"
+            className="mt-4 border-t border-line pt-7 font-serif text-title"
+            onClick={() => setOpen(false)}
+          >
+            Cuenta
+          </Link>
         </nav>
       </div>
     </>

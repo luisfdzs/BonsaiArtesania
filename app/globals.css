@@ -279,3 +279,53 @@
     }
   }
 }
+
+/* Campos de formulario. Hasta la zona de cuenta el sitio no tenía ninguno, así
+   que aquí es donde entran al sistema. Filete inferior en vez de caja cerrada:
+   pesa menos sobre el lino y es coherente con `link-underline`. */
+@utility field {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 0;
+  border: 0;
+  border-bottom: 1px solid var(--color-line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-bark);
+  font: inherit;
+  transition: border-color 0.6s var(--ease-out-soft);
+
+  &::placeholder {
+    color: var(--color-bark-faint);
+  }
+
+  &:focus {
+    outline: none;
+    border-bottom-color: var(--color-sage-deep);
+  }
+
+  /* `aria-invalid` lo pone el servidor tras validar, así que el estado de error
+     se ve igual con JavaScript desactivado. */
+  &[aria-invalid='true'] {
+    border-bottom-color: var(--color-petal);
+  }
+}
+
+/* Etiqueta sobre el campo, siempre visible: un placeholder que hace de etiqueta
+   desaparece al escribir y deja el formulario sin contexto. */
+@utility field-label {
+  display: block;
+  font-size: var(--text-micro);
+  line-height: var(--text-micro--line-height);
+  letter-spacing: var(--text-micro--letter-spacing);
+  text-transform: uppercase;
+  color: var(--color-bark-faint);
+  margin-bottom: 0.35rem;
+}
+
+@utility field-error {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: var(--text-small);
+  color: var(--color-sage-deep);
+}
