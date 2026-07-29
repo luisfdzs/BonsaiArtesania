@@ -32,8 +32,11 @@ export const legal = {
       purpose: 'Base de datos de cuentas y pedidos',
       location: 'UE (París)',
     },
-    { name: 'Google Ireland Ltd.', purpose: 'Acceso con cuenta de Google', location: 'UE' },
-    { name: 'IONOS SE', purpose: 'Correo electrónico y dominio', location: 'UE (Alemania)' },
+    {
+      name: 'IONOS SE',
+      purpose: 'Correo electrónico (enlaces de acceso y avisos de pedido) y dominio',
+      location: 'UE (Alemania)',
+    },
   ],
 } as const
 

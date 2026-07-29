@@ -16,6 +16,10 @@ export default function PrivacidadPage() {
         Esta web es un taller pequeño. Se recogen los datos mínimos para poder preparar y enviar un
         pedido, y nada más: no hay analítica, ni publicidad, ni perfiles, ni venta de datos a nadie.
       </p>
+      <p>
+        Tampoco hay contraseñas: para entrar se envía un enlace de un solo uso a tu correo, así que
+        aquí no se guarda ninguna clave tuya.
+      </p>
 
       <h2>Quién es el responsable</h2>
       <Holder />
@@ -31,8 +35,13 @@ export default function PrivacidadPage() {
         </thead>
         <tbody>
           <tr>
-            <td>Nombre y correo (de tu cuenta de Google)</td>
-            <td>Crear tu cuenta e identificarte al entrar</td>
+            <td>Correo electrónico</td>
+            <td>Crear tu cuenta, enviarte el enlace para entrar y avisarte de tus pedidos</td>
+            <td>Ejecución del contrato</td>
+          </tr>
+          <tr>
+            <td>Nombre</td>
+            <td>Saber cómo llamarte y a nombre de quién va el paquete</td>
             <td>Ejecución del contrato</td>
           </tr>
           <tr>

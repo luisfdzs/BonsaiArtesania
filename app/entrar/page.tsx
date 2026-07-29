@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { auth, signIn } from '@/auth'
+import { cn } from '@/lib/cn'
 
 export const metadata: Metadata = {
   title: 'Entrar',
@@ -10,41 +12,113 @@ export const metadata: Metadata = {
 }
 
 type Props = {
-  searchParams: Promise<{ volver?: string }>
+  searchParams: Promise<{ volver?: string; modo?: string; error?: string }>
 }
 
+/**
+ * Entrar y crear cuenta.
+ *
+ * Por detrás son lo mismo —se envía un enlace al correo y, si esa dirección no
+ * tenía cuenta, se crea al pulsarlo—, pero se presentan como dos pestañas porque
+ * es lo que la gente espera encontrar. Cambia el texto, no el mecanismo: quien
+ * viene a registrarse no debería tener que deducir que «entrar» también le vale.
+ */
 export default async function EntrarPage({ searchParams }: Props) {
   const session = await auth()
-  const { volver } = await searchParams
+  const { volver, modo, error } = await searchParams
 
   // Ya identificado: no tiene sentido ver el formulario de acceso.
   if (session?.user) redirect(volver ?? '/cuenta')
 
+  const creating = modo === 'crear'
+  const backTo = volver ?? '/cuenta'
+
   return (
-    <div className="page-gutter flex min-h-[70vh] items-center pt-16 md:pt-24">
+    <div className="page-gutter flex min-h-[70vh] items-center pt-16 pb-(--spacing-section) md:pt-24">
       <div className="mx-auto w-full max-w-sm">
-        <h1 className="font-serif text-title">Entrar</h1>
+        <div className="flex gap-8 border-b border-line pb-4">
+          <Link
+            href={`/entrar${volver ? `?volver=${encodeURIComponent(volver)}` : ''}`}
+            aria-current={!creating ? 'page' : undefined}
+            className={cn('tap text-small', creating ? 'text-bark-faint' : 'text-bark')}
+          >
+            Iniciar sesión
+          </Link>
+          <Link
+            href={`/entrar?modo=crear${volver ? `&volver=${encodeURIComponent(volver)}` : ''}`}
+            aria-current={creating ? 'page' : undefined}
+            className={cn('tap text-small', creating ? 'text-bark' : 'text-bark-faint')}
+          >
+            Crear cuenta
+          </Link>
+        </div>
+
+        <h1 className="mt-10 font-serif text-title">
+          {creating ? 'Crear cuenta' : 'Iniciar sesión'}
+        </h1>
+
         <p className="mt-5 text-bark-soft">
-          Con una cuenta guardas tus direcciones de envío y puedes seguir tus pedidos. No hace falta
-          para navegar por la tienda.
+          {creating
+            ? 'Con una cuenta guardas tus direcciones de envío y puedes seguir tus pedidos. Escribe tu correo y te envío un enlace para entrar.'
+            : 'Escribe tu correo y te envío un enlace para entrar. Sin contraseñas que recordar.'}
         </p>
 
+        {error && (
+          <p className="field-error mt-8" role="alert">
+            {error === 'Verification'
+              ? 'Ese enlace ya se ha usado o ha caducado. Pide otro abajo.'
+              : 'No se ha podido enviar el enlace. Comprueba el correo y vuelve a intentarlo.'}
+          </p>
+        )}
+
         <form
-          className="mt-12"
-          action={async () => {
+          className="mt-10"
+          action={async (formData: FormData) => {
             'use server'
-            // El `redirectTo` se pasa aquí y no se lee del cliente en el callback:
-            // así no hay forma de inyectar una URL externa en la redirección.
-            await signIn('google', { redirectTo: volver ?? '/cuenta' })
+            // El destino se fija aquí, en el servidor, a partir de un valor que ya
+            // venía en la URL de esta página: nunca se toma de un campo del
+            // formulario, para que no se pueda inyectar una redirección externa.
+            await signIn('nodemailer', {
+              email: String(formData.get('email') ?? ''),
+              redirectTo: backTo,
+            })
           }}
         >
-          <button type="submit" className="btn w-full">
-            Continuar con Google
+          <label className="field-label" htmlFor="email">
+            Correo
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            autoComplete="email"
+            autoFocus
+            placeholder="tucorreo@ejemplo.com"
+            className="field"
+          />
+
+          <button type="submit" className="btn mt-8 w-full">
+            Enviarme un enlace
           </button>
         </form>
 
         <p className="mt-8 text-small text-bark-faint">
-          Al entrar aceptas que guardemos los datos necesarios para preparar y enviar tus pedidos.
+          {creating ? (
+            <>
+              Al crear la cuenta aceptas las{' '}
+              <Link href="/legal/condiciones" className="link-underline">
+                condiciones de venta
+              </Link>{' '}
+              y la{' '}
+              <Link href="/legal/privacidad" className="link-underline">
+                política de privacidad
+              </Link>
+              .
+            </>
+          ) : (
+            'Si ese correo no tiene cuenta todavía, se creará al pulsar el enlace.'
+          )}
         </p>
       </div>
     </div>

@@ -22,12 +22,16 @@ export const AUTH_COLLECTIONS = ['accounts', 'sessions', 'verification_tokens'] 
 
 export type UserDoc = {
   _id: ObjectId
-  /** Los cuatro primeros campos los escribe el adaptador de Auth.js. */
+  /**
+   * Los cuatro primeros campos los escribe el adaptador de Auth.js.
+   * No hay campo de contraseña, y es a propósito: se entra con un enlace de un
+   * solo uso al correo, así que no existe ninguna clave que guardar ni filtrar.
+   */
   name?: string | null
   email: string
   emailVerified?: Date | null
   image?: string | null
-  /** Perfil propio. Opcional: al registrarse con Google sólo llega nombre y correo. */
+  /** Perfil propio. Opcional: al registrarse por correo sólo se conoce el correo. */
   phone?: string | null
   /** Referencia al cliente en la pasarela. Se rellena en la fase de pago. */
   stripeCustomerId?: string | null

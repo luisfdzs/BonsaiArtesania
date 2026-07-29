@@ -26,10 +26,11 @@ export function ProfileForm({ name, phone, email }: Props) {
       <div>
         <p className="field-label">Correo</p>
         <p className="py-[0.6rem] text-bark-soft">{email}</p>
-        {/* El correo lo fija Google y es la identidad de la cuenta: cambiarlo
-            aquí dejaría la sesión apuntando a un usuario que no existe. */}
+        {/* El correo es la identidad de la cuenta: es a donde se envía el enlace
+            de acceso, así que cambiarlo aquí dejaría a la persona sin poder
+            entrar. Se hace creando una cuenta con la dirección nueva. */}
         <p className="text-small text-bark-faint">
-          Es el correo de tu cuenta de Google y no se puede cambiar desde aquí.
+          Es la dirección a la que se envía tu enlace para entrar, así que no se cambia desde aquí.
         </p>
       </div>
 
