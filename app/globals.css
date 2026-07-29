@@ -85,6 +85,35 @@
   }
 }
 
+/* Al añadir una pieza al carrito, la flor de la joya se deshace: ocho pétalos
+   salen del botón, giran y se apagan. Es el único movimiento «de premio» de la
+   web y dura menos de lo que tarda en llegar la respuesta del servidor, así que
+   celebra el clic sin hacer esperar a nadie. Sale y no vuelve: nada rebota. */
+@keyframes petal-scatter {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg) scale(0.35);
+  }
+  to {
+    transform: translate(calc(-50% + var(--petal-dx)), calc(-50% + var(--petal-dy)))
+      rotate(var(--petal-rot)) scale(1);
+  }
+}
+
+/* El desvanecido espera antes de empezar. Sin esa espera —probado— los pétalos
+   son ya casi invisibles a un tercio del recorrido: la salida usa la curva lenta
+   del sistema, que gasta la mayor parte del tiempo al final, y aplicada a la
+   opacidad la vacía de golpe. Así se ven enteros mientras se abren y sólo se
+   apagan en el último tramo. */
+@keyframes petal-wilt {
+  0%,
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 /* ============================================================================
    Base
    ========================================================================= */
@@ -250,11 +279,58 @@
 }
 
 /* Mismo botón, pero cuadrado: dentro sólo cabe un icono, y el relleno lateral de
-   `btn` lo dejaría alargado. El icono se dimensiona desde fuera. */
+   `btn` lo dejaría alargado. El icono se dimensiona desde fuera.
+   El lado va en una variable, no en un número fijo, porque hay dos tamaños y
+   ajustarlo con utilidades de Tailwind (`w-14`) dependería de quién gane la
+   cascada; una variable con valor por defecto no tiene ese problema. */
 @utility btn-icon {
-  width: 2.75rem;
+  width: var(--btn-icon-size, 2.75rem);
+  min-height: var(--btn-icon-size, 2.75rem);
   padding-inline: 0;
   gap: 0;
+}
+
+/* El tamaño de la acción principal de una página, cuando va sin rótulo: el botón
+   de añadir al carrito de la ficha de pieza. Cuadrado como el normal, pero se
+   distingue a simple vista de los dos iconos de contacto que lleva debajo. */
+@utility btn-icon-lg {
+  --btn-icon-size: 3.5rem;
+}
+
+/* El estallido de pétalos del botón de carrito. Se monta sobre el botón —de ahí
+   el `inset: 0` y el `position: relative` del formulario— y no intercepta ningún
+   clic: si alguien pulsa dos veces seguidas, el segundo llega al botón.
+   El grupo lleva su propia animación, la del desvanecido, y es la que marca el
+   final: los pétalos sólo se mueven, y así hay un único `animationend` con el que
+   desmontarlos. Con `prefers-reduced-motion` la regla de base deja las tres
+   animaciones en 0.01ms, o sea que ni se ven ni se quedan colgadas. */
+@utility petal-burst {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  animation: petal-wilt 1.15s linear both;
+
+  & > i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: block;
+    width: 0.55rem;
+    height: 0.85rem;
+    /* Pétalo: redondo por dos esquinas opuestas y en punta por las otras dos. */
+    border-radius: 100% 0 100% 0;
+    background: var(--color-petal);
+    animation: petal-scatter 0.9s var(--ease-out-soft) both;
+  }
+
+  /* Tres tintas repartidas para que no parezcan confeti del mismo troquel. */
+  & > i:nth-child(3n) {
+    background: var(--color-sage);
+  }
+
+  & > i:nth-child(3n + 1) {
+    background: var(--color-petal-soft);
+  }
 }
 
 /* La variante silenciosa se diferencia sólo en reposo —sin filete y con tinta
