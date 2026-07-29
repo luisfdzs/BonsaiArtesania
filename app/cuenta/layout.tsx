@@ -44,6 +44,9 @@ export default async function CuentaLayout({ children }: { children: React.React
         <Link href="/cuenta/direcciones" className="link-underline tap text-small">
           Direcciones
         </Link>
+        <Link href="/cuenta/privacidad" className="link-underline tap text-small">
+          Datos y privacidad
+        </Link>
       </nav>
 
       <div className="mt-12 max-w-xl pb-(--spacing-section)">{children}</div>

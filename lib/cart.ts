@@ -4,6 +4,7 @@ import { auth } from '@/auth'
 import { getProduct } from '@/content/products'
 import { carts, toCents, type CartDoc } from '@/lib/schema'
 import { shippingCostCents } from '@/lib/shipping'
+import { availabilityFor } from '@/lib/stock'
 
 /**
  * Carrito. Vive en la base de datos, no en la cookie: así sobrevive al cambio de
@@ -23,6 +24,8 @@ export type CartLine = {
   qty: number
   unitPriceCents: number
   lineTotalCents: number
+  /** Unidades que quedan. Menos que `qty` significa que no se puede cerrar así. */
+  available: number
 }
 
 export type Cart = {
@@ -31,6 +34,8 @@ export type Cart = {
   subtotalCents: number
   shippingCents: number
   totalCents: number
+  /** Hay alguna línea que pide más unidades de las que quedan. */
+  hasUnavailable: boolean
 }
 
 const EMPTY: Cart = {
@@ -39,6 +44,7 @@ const EMPTY: Cart = {
   subtotalCents: 0,
   shippingCents: 0,
   totalCents: 0,
+  hasUnavailable: false,
 }
 
 /**
@@ -114,6 +120,8 @@ export async function readCart(): Promise<Cart> {
   const doc = await cartDoc()
   if (!doc || doc.items.length === 0) return EMPTY
 
+  const stock = await availabilityFor(doc.items.map((item) => item.slug))
+
   const lines = doc.items.flatMap((item) => {
     const product = getProduct(item.slug)
     // `price === null` son las piezas a medida: no tienen importe que cobrar y no
@@ -128,19 +136,24 @@ export async function readCart(): Promise<Cart> {
         qty: item.qty,
         unitPriceCents,
         lineTotalCents: unitPriceCents * item.qty,
+        available: stock.get(item.slug) ?? 0,
       },
     ]
   })
 
-  const subtotalCents = lines.reduce((total, line) => total + line.lineTotalCents, 0)
+  // Las líneas sin unidades no suman: el total tiene que cuadrar con lo que se
+  // puede comprar de verdad, no con lo que hay guardado en el carrito.
+  const disponibles = lines.filter((line) => line.available >= line.qty)
+  const subtotalCents = disponibles.reduce((total, line) => total + line.lineTotalCents, 0)
   const shippingCents = shippingCostCents(subtotalCents)
 
   return {
     lines,
-    count: lines.reduce((total, line) => total + line.qty, 0),
+    count: disponibles.reduce((total, line) => total + line.qty, 0),
     subtotalCents,
     shippingCents,
     totalCents: subtotalCents + shippingCents,
+    hasUnavailable: lines.some((line) => line.available < line.qty),
   }
 }
 

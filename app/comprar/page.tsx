@@ -20,6 +20,9 @@ export default async function ComprarPage() {
 
   const cart = await readCart()
   if (cart.lines.length === 0) redirect('/carrito')
+  // Algo se agotó mientras el carrito estaba abierto: se resuelve allí, donde
+  // están los controles para ajustar cantidades o quitar la línea.
+  if (cart.hasUnavailable) redirect('/carrito')
 
   const collection = await addresses()
   const docs = await collection

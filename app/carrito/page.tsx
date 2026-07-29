@@ -44,6 +44,15 @@ export default async function CarritoPage() {
                 <p className="mt-2 text-small text-bark-faint">
                   {formatCents(line.unitPriceCents)} por unidad
                 </p>
+                {/* Piezas únicas: alguien pudo comprarla mientras estaba aquí
+                    guardada. Se avisa en la línea y no suma al total. */}
+                {line.available < line.qty && (
+                  <p className="mt-2 text-small text-sage-deep">
+                    {line.available === 0
+                      ? 'Se ha agotado. Quítala para poder seguir.'
+                      : `Sólo queda${line.available === 1 ? '' : 'n'} ${line.available}. Ajusta la cantidad.`}
+                  </p>
+                )}
               </div>
 
               <div className="flex shrink-0 items-center gap-6">
@@ -107,9 +116,15 @@ export default async function CarritoPage() {
               </p>
             )}
 
-            <Link href="/comprar" className="btn mt-8 w-full">
-              Continuar
-            </Link>
+            {cart.hasUnavailable ? (
+              <p className="btn mt-8 w-full" aria-disabled="true">
+                Revisa el carrito
+              </p>
+            ) : (
+              <Link href="/comprar" className="btn mt-8 w-full">
+                Continuar
+              </Link>
+            )}
 
             <p className="mt-6 text-small text-bark-faint">
               Hecha a mano bajo pedido: entre 1 y 3 semanas. Envío a toda España.
