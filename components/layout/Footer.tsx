@@ -27,16 +27,19 @@ const legalLinks = [
 
 export function Footer() {
   return (
-    <footer className="page-gutter pt-16 pb-8">
+    <footer className="page-gutter pt-16 pb-14">
       {/* El filete lo lleva la firma, no el <footer>: así queda dentro del
           margen lateral. Antes cerraba con `py-8`; ahora sólo abre, porque
-          debajo viene la fila de enlaces. */}
-      <p className="eyebrow border-t border-line pt-8 text-center">
+          debajo viene la fila de enlaces. El aire del cierre va holgado en los
+          tres huecos —filete/firma, firma/legales y legales/borde inferior—
+          porque en versalitas y centrado el bloque se lee como una sola mancha
+          si se aprieta. */}
+      <p className="eyebrow border-t border-line pt-12 text-center">
         © {new Date().getFullYear()} {site.nameFull}
       </p>
 
       <nav
-        className="mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-2"
+        className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2"
         aria-label="Información legal"
       >
         {legalLinks.map((link) => (
