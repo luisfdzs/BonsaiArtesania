@@ -6,10 +6,16 @@ import { site } from '@/content/site'
  * repetía lo mismo que acababa de leerse; el menú, además, ya está arriba y
  * viaja fijo con la página. Quitado el bloque, la web termina donde termina la
  * conversación.
+ *
+ * Sin filete y sin el margen de sección de antes: los dos estaban dimensionados
+ * para separar un bloque de tres columnas, y con una sola línea abrían un claro
+ * blanco enorme detrás de la banda de Contacto. El aire que queda —`py-16`— es
+ * el mismo con el que abren las páginas por arriba, así que la firma cierra a
+ * la altura a la que todo empieza.
  */
 export function Footer() {
   return (
-    <footer className="mt-(--spacing-section) border-t border-line py-8">
+    <footer className="py-16">
       <p className="eyebrow page-gutter text-center">
         © {new Date().getFullYear()} {site.nameFull}
       </p>
