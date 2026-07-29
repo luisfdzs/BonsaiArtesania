@@ -61,7 +61,10 @@ export default async function ProductPage({ params }: Params) {
           />
         </div>
 
-        <div className="md:col-span-5 md:sticky md:top-32 md:self-start">
+        {/* Sin `sticky`: la imagen es más alta que esta columna, así que al fijarla
+            el texto se quedaba quieto mientras la foto seguía subiendo. La ficha se
+            lee mejor como un bloque único que se desplaza a la vez. */}
+        <div className="md:col-span-5">
           <p className="eyebrow">{product.summary}</p>
           <h1 className="mt-5 font-serif text-title">{product.name}</h1>
           <p className="mt-5 text-lead text-bark-soft">{formatPrice(product.price)}</p>
