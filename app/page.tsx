@@ -12,11 +12,8 @@ export default function HomePage() {
       <Hero />
 
       <section className="page-gutter">
-        <div className="flex items-baseline justify-between border-b border-line pb-4">
+        <div className="border-b border-line pb-4">
           <h2 className="eyebrow">Piezas destacadas</h2>
-          <Link href="/tienda" className="link-underline tap text-small">
-            Ver todo
-          </Link>
         </div>
 
         <div className="mt-12 grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
@@ -26,6 +23,18 @@ export default function HomePage() {
             </Reveal>
           ))}
         </div>
+
+        {/* Seguir a la tienda es lo que toca después de mirar las tres piezas,
+            no antes: arriba, junto al encabezado, el enlace invitaba a saltarse
+            justo lo que la sección venía a enseñar. Lo que ocupa el ancho es la
+            fila, no el botón: centrado bajo la rejilla se ve desde cualquier
+            columna, y estirarlo hasta el borde le habría dado un tamaño que no
+            tiene ningún otro botón de la web. */}
+        <Reveal className="mt-16 flex justify-center">
+          <Link href="/tienda" className="btn">
+            Ver todas las piezas
+          </Link>
+        </Reveal>
       </section>
 
       <TallerSection />

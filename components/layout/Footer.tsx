@@ -2,23 +2,22 @@ import Link from 'next/link'
 import { site } from '@/content/site'
 
 /**
- * Sólo la firma. El pie tenía además el lema, un menú y un «Escríbeme» con el
- * correo y el perfil, pero llegaba justo después de la sección de Contacto y
- * repetía lo mismo que acababa de leerse; el menú, además, ya está arriba y
- * viaja fijo con la página. Quitado el bloque, la web termina donde termina la
- * conversación.
+ * La firma y los enlaces legales. El pie tenía además el lema, un menú y un
+ * «Escríbeme» con el correo y el perfil, pero llegaba justo después de la sección
+ * de Contacto y repetía lo mismo que acababa de leerse; el menú, además, ya está
+ * arriba y viaja fijo con la página.
  *
- * Sin filete y sin el margen de sección de antes: los dos estaban dimensionados
- * para separar un bloque de tres columnas, y con una sola línea abrían un claro
- * blanco enorme detrás de la banda de Contacto. El aire que queda —`py-16`— es
- * el mismo con el que abren las páginas por arriba, así que la firma cierra a
- * la altura a la que todo empieza.
- */
-/**
- * Los enlaces legales vuelven a poner algo en el pie, pero por obligación y no por
- * decoración: la LSSI exige que sean accesibles desde cualquier página, y el pie es
- * el único sitio que lo está. Van en versalitas y debajo de la firma para pesar lo
- * menos posible sobre el cierre.
+ * Sin el margen de sección de antes —hasta 12rem, dimensionado para separar un
+ * bloque de tres columnas— el cierre respira con el mismo aire con el que abren
+ * las páginas por arriba. El filete sí vuelve: sin él, la firma quedaba suelta
+ * detrás de la banda de Contacto, como si se hubiera caído de la sección. Va
+ * dentro del margen lateral, como todas las líneas horizontales de la web, y no
+ * de borde a borde de la ventana.
+ *
+ * Lo único que se ha añadido al bloque mínimo son los enlaces legales, y es por
+ * obligación y no por decoración: la LSSI exige que sean accesibles desde
+ * cualquier página, y el pie es el único sitio que lo está en todas. Van en
+ * versalitas y debajo de la firma para pesar lo menos posible sobre el cierre.
  */
 const legalLinks = [
   { href: '/legal/condiciones', label: 'Condiciones de venta' },
@@ -28,8 +27,11 @@ const legalLinks = [
 
 export function Footer() {
   return (
-    <footer className="page-gutter py-16">
-      <p className="eyebrow text-center">
+    <footer className="page-gutter pt-16 pb-8">
+      {/* El filete lo lleva la firma, no el <footer>: así queda dentro del
+          margen lateral. Antes cerraba con `py-8`; ahora sólo abre, porque
+          debajo viene la fila de enlaces. */}
+      <p className="eyebrow border-t border-line pt-8 text-center">
         © {new Date().getFullYear()} {site.nameFull}
       </p>
 
