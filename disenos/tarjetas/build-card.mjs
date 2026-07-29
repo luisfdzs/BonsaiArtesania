@@ -41,8 +41,7 @@ const C = {
 
 const URL = 'bonsaiartesania.com'
 const INSTAGRAM = '@san.bonsai_'
-/** Ojo: `content/site.ts` todavía lleva `hola@bonsaiartesania.es` como marcador.
- *  Aquí manda lo que va impreso, que es lo que Ana va a repartir. */
+/** El mismo buzón que `content/site.ts`: el papel y la web dicen lo mismo. */
 const EMAIL = 'bonsai@bonsaiartesania.com'
 const W = CANVAS_W
 const H = CANVAS_H

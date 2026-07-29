@@ -54,7 +54,6 @@ Si una pieza aún no tiene foto, `image: null` dibuja un marcador degradado en s
 
 ## Pendiente de esta beta
 
-- Correo y WhatsApp de verdad en `content/site.ts` (ahora hay marcadores).
 - Revisar con Ana nombres, precios y textos de las piezas: son una propuesta.
 - No hay carrito ni pasarela: los pedidos se cierran por WhatsApp o correo, con el mensaje ya
   escrito (`lib/contact.ts`). Si más adelante interesa cobrar en la web, el sitio de donde
