@@ -30,9 +30,14 @@ export default function HomePage() {
             fila, no el botón: centrado bajo la rejilla se ve desde cualquier
             columna, y estirarlo hasta el borde le habría dado un tamaño que no
             tiene ningún otro botón de la web. */}
+        {/* «Ver más» a secas basta debajo de la rejilla, donde el destino se
+            entiende por el sitio en el que está el botón. Fuera de contexto no,
+            así que el `aria-label` conserva la frase completa: un lector de
+            pantalla que recorra los enlaces de la página oiría «ver más» sin
+            saber más de qué. */}
         <Reveal className="mt-16 flex justify-center">
-          <Link href="/tienda" className="btn">
-            Ver todas las piezas
+          <Link href="/tienda" className="btn" aria-label="Ver todas las piezas">
+            Ver más
           </Link>
         </Reveal>
       </section>
