@@ -1,8 +1,7 @@
 import { site } from '@/content/site'
+import { ContactButtons } from '@/components/ui/ContactButtons'
 import { Reveal } from '@/components/ui/Reveal'
-import { GmailIcon } from '@/components/ui/SocialIcons'
-import { SocialLinks } from '@/components/ui/SocialLinks'
-import { customOrderMessage, whatsappLink } from '@/lib/contact'
+import { customOrderMessage } from '@/lib/contact'
 
 /**
  * Cierre del sitio. No hay formulario: Ana ya conversa con sus clientas por
@@ -23,27 +22,18 @@ export function ContactoSection() {
           resulte más cómodo: contesto yo, no hay nadie más al otro lado.
         </p>
 
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-x-2 gap-y-3">
-          <a
-            href={whatsappLink(customOrderMessage)}
-            target="_blank"
-            rel="noreferrer"
-            className="btn"
-          >
-            Escribir por WhatsApp
-          </a>
-          {/* El correo era el único de los tres caminos que no parecía pulsable.
-              Va junto al de WhatsApp porque las dos son la misma cosa —escribir—
-              y el sobre de Gmail avisa de que esto abre el correo. */}
-          <a href={`mailto:${site.contact.email}`} className="btn btn-quiet">
-            <GmailIcon className="h-4 w-4" />
-            Escribir un correo
-          </a>
-          {/* Los perfiles, con el mismo botón que el resto de la web pero con el
-              logo dentro: al lado del de WhatsApp, dos nombres de red escritos
-              competían con la única acción que importa aquí. */}
-          <SocialLinks />
-        </div>
+        {/* Los tres caminos, los tres iguales: sólo el logo. Escritos, tres
+            rótulos seguidos pesaban más que el texto que los precede, y ninguno
+            de los tres manda sobre los otros: quien escribe elige por dónde le
+            resulta cómodo, no por cuál está más grande. El nombre accesible lo
+            pone cada botón. */}
+        <ContactButtons
+          message={customOrderMessage}
+          subject="Hola"
+          action="Escribir"
+          withSocial
+          className="mt-12 justify-center"
+        />
 
         <p className="mt-7 text-small text-bark-soft">{site.contact.email}</p>
       </Reveal>

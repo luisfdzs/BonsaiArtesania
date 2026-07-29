@@ -71,10 +71,9 @@ de fuentes en la imprenta.
 ## Si cambia algo
 
 - **El dominio, el Instagram y el correo** se cambian en `build-card.mjs`
-  (`URL`, `INSTAGRAM`, `EMAIL`). Ojo con el correo: las tarjetas dicen
-  `bonsai@bonsaiartesania.com` y `content/site.ts` todavía lleva
-  `hola@bonsaiartesania.es` como marcador. Los dos dominios son de Ana, pero
-  conviene que la web y el papel digan lo mismo.
+  (`URL`, `INSTAGRAM`, `EMAIL`). Van duplicados a propósito respecto a
+  `content/site.ts` —el papel no importa el módulo de la web—, así que al tocar
+  uno hay que tocar el otro: los dos deben decir `bonsai@bonsaiartesania.com`.
 - **El tamaño o la posición del QR**, en `geometry.mjs`. Cada módulo no debería
   bajar de 0.4 mm; `verify-qr.mjs` lo comprueba.
 - **Las tipografías de la web**: reemplazar los dos archivos de `fuentes/`.

@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
+import { ContactButtons } from '@/components/ui/ContactButtons'
 import { Media } from '@/components/ui/Media'
 import { Reveal } from '@/components/ui/Reveal'
-import { customOrderMessage, mailtoLink, whatsappLink } from '@/lib/contact'
+import { customOrderMessage } from '@/lib/contact'
 import { img } from '@/lib/media'
 
 export const metadata: Metadata = {
@@ -46,22 +47,12 @@ export default function EncargosPage() {
             Todas se secan. Lo que hago es pararlas justo antes y convertirlas en algo que puedas
             llevar contigo.
           </p>
-          <div className="mt-11 flex flex-wrap items-center gap-x-2 gap-y-3">
-            <a
-              href={whatsappLink(customOrderMessage)}
-              target="_blank"
-              rel="noreferrer"
-              className="btn"
-            >
-              Contarme mi caso
-            </a>
-            <a
-              href={mailtoLink('Encargo especial', customOrderMessage)}
-              className="btn btn-quiet"
-            >
-              Prefiero el correo
-            </a>
-          </div>
+          <ContactButtons
+            message={customOrderMessage}
+            subject="Encargo especial"
+            action="Contarme mi caso"
+            className="mt-11"
+          />
         </div>
 
         <div className="mx-auto w-full max-w-[24rem] md:col-span-5 md:col-start-8">

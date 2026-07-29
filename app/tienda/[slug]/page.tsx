@@ -3,10 +3,11 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ProductCard } from '@/components/sections/ProductCard'
 import { AddToCart } from '@/components/tienda/AddToCart'
+import { ContactButtons } from '@/components/ui/ContactButtons'
 import { Media } from '@/components/ui/Media'
 import { Reveal } from '@/components/ui/Reveal'
 import { formatPrice, getProduct, products } from '@/content/products'
-import { mailtoLink, orderMessage, whatsappLink } from '@/lib/contact'
+import { orderMessage } from '@/lib/contact'
 
 type Params = { params: Promise<{ slug: string }> }
 
@@ -75,20 +76,30 @@ export default async function ProductPage({ params }: Params) {
             <dd className="mt-3 text-small">{product.materials.join(' · ')}</dd>
           </dl>
 
-          {/* Las piezas a medida no tienen precio cerrado, así que no pasan por el
-              carrito: se siguen acordando hablando. Ver lib/contact.ts. */}
-          <div className="mt-11 flex flex-col gap-2">
-            {product.price === null ? (
-              <a href={whatsappLink(message)} target="_blank" rel="noreferrer" className="btn">
-                Pedir presupuesto
-              </a>
-            ) : (
+          {/* Una pieza con precio se compra: el carrito es la acción principal y
+              los dos iconos quedan como vía secundaria para preguntar dudas.
+              Las piezas a medida no tienen precio cerrado y no pasan por el
+              carrito, así que ahí escribir sigue siendo la única acción. */}
+          {product.price === null ? (
+            <ContactButtons
+              message={message}
+              subject={`Encargo · ${product.name}`}
+              action="Pedir presupuesto"
+              className="mt-11"
+            />
+          ) : (
+            <div className="mt-11 flex flex-col gap-5">
               <AddToCart slug={product.slug} />
-            )}
-            <a href={mailtoLink(`Encargo · ${product.name}`, message)} className="btn btn-quiet">
-              O preguntar por correo
-            </a>
-          </div>
+              <div className="flex items-center gap-4">
+                <span className="eyebrow">¿Alguna duda?</span>
+                <ContactButtons
+                  message={message}
+                  subject={`Encargo · ${product.name}`}
+                  action="Preguntar por esta pieza"
+                />
+              </div>
+            </div>
+          )}
           <p className="mt-6 text-small text-bark-faint">
             Hecha a mano bajo pedido: entre 1 y 3 semanas. Envío a toda España.
           </p>
