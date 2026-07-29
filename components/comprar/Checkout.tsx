@@ -8,13 +8,17 @@ import type { AddressValues } from '@/components/cuenta/AddressForm'
 const initial: CheckoutState = {}
 
 /**
- * Elección de dirección y cierre del pedido.
+ * Elección de dirección y envío de la petición.
  *
- * ⚠️ El texto del aviso final dice que el pago se ha recibido, y **no es cierto**:
- * el cobro está sin conectar. Es un placeholder pedido a propósito para poder
- * probar el flujo completo. El pedido queda guardado como `simulado` para que la
- * base de datos no repita la mentira. Antes de abrir la tienda al público hay que
- * sustituir esto por la pasarela de verdad.
+ * Todavía no hay pasarela, así que aquí **no se cobra nada**, y por eso ni el botón
+ * ni el aviso final mencionan un pago: dicen lo que de verdad ha pasado —la
+ * petición queda registrada y Ana escribe para cerrar pago y envío—. Escrito así, el
+ * texto es cierto tal cual y la tienda puede estar abierta al público sin engañar a
+ * nadie; no es un placeholder que haya que tapar.
+ *
+ * El pedido se guarda como `simulado` / `pendiente_pago` (ver `app/comprar/actions.ts`).
+ * Cuando se conecte el cobro de verdad, este componente es uno de los sitios que
+ * pasa a poder hablar de pago.
  */
 export function Checkout({ addresses }: { addresses: AddressValues[] }) {
   const [state, action, pending] = useActionState(placeOrder, initial)
@@ -75,7 +79,7 @@ export function Checkout({ addresses }: { addresses: AddressValues[] }) {
         )}
 
         <button type="submit" className="btn mt-10 w-full" disabled={pending}>
-          {pending ? 'Procesando…' : 'Pagar y finalizar'}
+          {pending ? 'Enviando…' : 'Enviar mi petición'}
         </button>
       </form>
 
@@ -83,14 +87,15 @@ export function Checkout({ addresses }: { addresses: AddressValues[] }) {
         ref={dialog}
         className="m-auto max-w-md border border-line bg-linen p-10 text-bark backdrop:bg-bark/40"
       >
-        <h2 className="font-serif text-title">¡Gracias!</h2>
+        <h2 className="font-serif text-title">¡Todo listo!</h2>
         <p className="mt-5 text-bark-soft">
-          Hemos recibido tu pago. Tu pedido <strong className="text-bark">{state.number}</strong> ya
-          está en marcha y te llegará enseguida a {state.shippingTo}.
+          Hemos recibido tu petición <strong className="text-bark">{state.number}</strong>. Ana la
+          revisa y te escribe enseguida para confirmarla y quedar en cómo pagarla, con el envío a{' '}
+          {state.shippingTo}.
         </p>
         <p className="mt-4 text-small text-bark-faint">
           Cada pieza se hace a mano bajo pedido, así que la preparación lleva entre 1 y 3 semanas.
-          Te avisaremos cuando salga.
+          Nada está cobrado todavía: eso se cierra hablando con ella.
         </p>
 
         <div className="mt-10 flex flex-col gap-2">

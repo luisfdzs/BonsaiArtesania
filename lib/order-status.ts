@@ -5,7 +5,11 @@ import type { OrderStatus } from '@/lib/schema'
  * `snake_case` y en inglés técnico; esto es lo que se lee en pantalla.
  */
 export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
-  pendiente_pago: 'Pendiente de pago',
+  // El estado en base se llama `pendiente_pago` y así se queda, porque es lo que
+  // es. Pero en pantalla no se le puede llamar así mientras no haya pasarela: el
+  // cliente no ha dejado ningún pago a medias, sólo ha pedido algo y espera que Ana
+  // le escriba. «Sin confirmar» describe eso sin mentir en ninguno de los dos casos.
+  pendiente_pago: 'Sin confirmar',
   pagado: 'Pagado',
   preparando: 'En el taller',
   enviado: 'Enviado',
