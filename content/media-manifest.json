@@ -1,4 +1,10 @@
 {
+  "anillo-ajustable-margarita": {
+    "src": "/media/anillo-ajustable-margarita.webp",
+    "width": 1440,
+    "height": 1920,
+    "blur": "data:image/webp;base64,UklGRqIAAABXRUJQVlA4IJYAAAAwBACdASoQABUAPt1apkyopSOiMAgBEBuJZgCdMoABne1cQgYwrtH1NTgA/RSlyoPya0glZ3H21PRcFtaPmVwBWtfBdNYwXEzC5+3o4c10pbGC6D99oLUps0eV61/CkOCsy0+J7nd2u3rQQi/YG7NPME4Uv7tfYYnWCswO97Cy52oU93bukmqnXAS6QGRZNXMVbypAAAA="
+  },
   "anillo-flor-silvestre": {
     "src": "/media/anillo-flor-silvestre.webp",
     "width": 1080,
@@ -47,6 +53,12 @@
     "height": 1350,
     "blur": "data:image/webp;base64,UklGRoYAAABXRUJQVlA4IHoAAACwAwCdASoQABQAPt1apkyopSOiMAgBEBuJQAALbEZc3uAUuThVwAD+3pXfKAJpPko62CcwhNh988GTBSu9xsT8paPcSb+X6+3efG/GDUKzE+hIleKTNjCLTS9TnzfcVkIvWruXX1VIXA9nvP7o78oesDK6lPnjPR8AAA=="
   },
+  "pendientes-colgantes-margarita": {
+    "src": "/media/pendientes-colgantes-margarita.webp",
+    "width": 1440,
+    "height": 1920,
+    "blur": "data:image/webp;base64,UklGRo4AAABXRUJQVlA4IIIAAAAwBACdASoQABUAPt1apkyopSOiMAgBEBuJYgCdMoADH3v3RioOqJzOWfQA4m1D2qRhRTECpB/iMWux/YmPXIwWbF+rtengzTlsXIpgPq5dz+iJLT3xT+gfJ3SKzQ/8SZ+KXCl5yZenPbxbXk861ThGVU+6mzVgjf68D4NqefkOAAAA"
+  },
   "pendientes-farolillo": {
     "src": "/media/pendientes-farolillo.webp",
     "width": 1080,
@@ -64,6 +76,12 @@
     "width": 1080,
     "height": 1350,
     "blur": "data:image/webp;base64,UklGRlAAAABXRUJQVlA4IEQAAAAQBACdASoQABQAPt1apkyopSOiMAgBEBuJZQAAW+m/Fv1m7b9lCkc1AAD+jBkCSs0zLgtt5BL/huyQTWeSnh2DlbPAAA=="
+  },
+  "pendientes-turmalina": {
+    "src": "/media/pendientes-turmalina.webp",
+    "width": 1440,
+    "height": 1920,
+    "blur": "data:image/webp;base64,UklGRp4AAABXRUJQVlA4IJIAAABwBACdASoQABUAPt1apkyopSOiMAgBEBuJaACdMoR4GBwMe36oY60RpAQE4AD+rNz0d8kjE5S8vAkLixulKF79/inLPCYd6zpFSbQTTPCTy8pTP4Ez0myuVDWpvHRhSDPIlIjfE191M6HAuhDBTEpUH1YzEVhwnEfnreL5jI4ACbSLp/uFuPyRzl6ESROCUQAAAA=="
   },
   "portada-hojas": {
     "src": "/media/portada-hojas.webp",
