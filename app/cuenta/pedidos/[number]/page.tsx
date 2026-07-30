@@ -3,6 +3,7 @@ import { ObjectId } from 'mongodb'
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { getSession } from '@/auth'
+import { ArrowLeftIcon, PinIcon } from '@/components/cuenta/CuentaIcons'
 import { ORDER_STATUS_LABEL } from '@/lib/order-status'
 import { formatCents, orders } from '@/lib/schema'
 
@@ -39,57 +40,71 @@ export default async function PedidoPage({ params }: Params) {
 
   return (
     <section>
-      <Link href="/cuenta/pedidos" className="link-underline tap eyebrow">
-        ← Mis pedidos
-      </Link>
+      <div className="flex justify-center">
+        <Link href="/cuenta/pedidos" className="btn btn-quiet btn-sm">
+          <ArrowLeftIcon className="h-4 w-4" />
+          Mis pedidos
+        </Link>
+      </div>
 
-      <header className="mt-8 flex flex-wrap items-baseline justify-between gap-4">
-        <h2 className="font-serif text-title">{order.number}</h2>
-        <p className="text-small text-bark-soft">{ORDER_STATUS_LABEL[order.status]}</p>
+      <header className="mt-10 flex flex-col items-center">
+        <span className="badge">{ORDER_STATUS_LABEL[order.status]}</span>
+        <h2 className="mt-5 font-serif text-title">{order.number}</h2>
+        <p className="mt-3 text-small text-bark-faint">{dateFormat.format(order.createdAt)}</p>
       </header>
 
-      <p className="mt-3 text-small text-bark-faint">{dateFormat.format(order.createdAt)}</p>
+      {/* Las piezas y las cuentas, dentro de la misma tarjeta: son una sola cosa.
+          Aquí el texto va a los lados —concepto a la izquierda, importe a la
+          derecha— porque es lo que permite recorrer la columna de precios. */}
+      <div className="panel mt-12 text-left">
+        <h3 className="eyebrow text-center">Piezas</h3>
 
-      <ul className="mt-12 flex flex-col">
-        {order.items.map((item) => (
-          <li
-            key={item.slug}
-            className="flex justify-between gap-4 border-b border-line py-5 first:border-t"
-          >
-            <div>
-              <Link href={`/tienda/${item.slug}`} className="link-underline tap">
-                {item.name}
-              </Link>
-              {item.qty > 1 && (
-                <p className="mt-2 text-small text-bark-faint">
-                  {item.qty} × {formatCents(item.unitPriceCents)}
-                </p>
-              )}
-            </div>
-            <p className="shrink-0">{formatCents(item.unitPriceCents * item.qty)}</p>
-          </li>
-        ))}
-      </ul>
+        <ul className="mt-6 flex flex-col">
+          {order.items.map((item) => (
+            <li
+              key={item.slug}
+              className="flex justify-between gap-4 border-b border-line py-5 first:border-t"
+            >
+              <div>
+                <Link href={`/tienda/${item.slug}`} className="link-underline tap">
+                  {item.name}
+                </Link>
+                {item.qty > 1 && (
+                  <p className="mt-2 text-small text-bark-faint">
+                    {item.qty} × {formatCents(item.unitPriceCents)}
+                  </p>
+                )}
+              </div>
+              <p className="shrink-0">{formatCents(item.unitPriceCents * item.qty)}</p>
+            </li>
+          ))}
+        </ul>
 
-      <dl className="mt-8 flex flex-col gap-3">
-        <div className="flex justify-between">
-          <dt className="text-bark-soft">Subtotal</dt>
-          <dd>{formatCents(order.totals.subtotalCents)}</dd>
-        </div>
-        <div className="flex justify-between">
-          <dt className="text-bark-soft">Envío</dt>
-          <dd>
-            {order.totals.shippingCents === 0 ? 'Gratis' : formatCents(order.totals.shippingCents)}
-          </dd>
-        </div>
-        <div className="mt-3 flex justify-between border-t border-line pt-4 text-lead">
-          <dt>Total</dt>
-          <dd>{formatCents(order.totals.totalCents)}</dd>
-        </div>
-      </dl>
+        <dl className="mt-8 flex flex-col gap-3">
+          <div className="flex justify-between">
+            <dt className="text-bark-soft">Subtotal</dt>
+            <dd>{formatCents(order.totals.subtotalCents)}</dd>
+          </div>
+          <div className="flex justify-between">
+            <dt className="text-bark-soft">Envío</dt>
+            <dd>
+              {order.totals.shippingCents === 0
+                ? 'Gratis'
+                : formatCents(order.totals.shippingCents)}
+            </dd>
+          </div>
+          <div className="mt-3 flex justify-between border-t border-line pt-4 text-lead">
+            <dt>Total</dt>
+            <dd>{formatCents(order.totals.totalCents)}</dd>
+          </div>
+        </dl>
+      </div>
 
-      <div className="mt-14 border-t border-line pt-8">
-        <h3 className="eyebrow">Dirección de envío</h3>
+      <div className="panel mt-4">
+        <h3 className="eyebrow flex items-center justify-center gap-2">
+          <PinIcon className="h-3.5 w-3.5" />
+          Dirección de envío
+        </h3>
         {/* Estos datos son la copia guardada con el pedido, no la dirección actual
             del cliente: es a dónde se envió, aunque después la haya cambiado. */}
         <p className="mt-4 text-small text-bark-soft">

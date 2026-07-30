@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { deleteAccount } from '@/app/cuenta/privacidad/actions'
+import { TrashIcon } from '@/components/ui/CartIcons'
 
 /**
  * Borrado de cuenta con confirmación escrita.
@@ -15,7 +16,7 @@ export function DeleteAccount() {
   const ready = confirmation.trim().toUpperCase() === 'BORRAR'
 
   return (
-    <form action={deleteAccount} className="mt-6">
+    <form action={deleteAccount} className="mt-8 flex w-full flex-col items-center">
       <label className="field-label" htmlFor="confirmar">
         Escribe BORRAR para confirmar
       </label>
@@ -28,10 +29,14 @@ export function DeleteAccount() {
         value={confirmation}
         onChange={(event) => setConfirmation(event.target.value)}
         autoComplete="off"
-        className="field max-w-48"
+        // Centrado y en versales: la palabra es una confirmación, no un dato, y
+        // así se ve que es eso lo que se está escribiendo. La comparación ya
+        // mayusculiza, así que vale escribirla en minúsculas.
+        className="field max-w-40 text-center tracking-[0.2em] uppercase"
       />
 
       <button type="submit" className="btn mt-8" disabled={!ready}>
+        <TrashIcon className="h-4 w-4" />
         Borrar mi cuenta
       </button>
     </form>
