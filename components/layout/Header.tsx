@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/cn'
 import { navigation } from '@/lib/navigation'
+import { useActiveSection } from '@/lib/useActiveSection'
 import { AccountIcon, CartIcon, CloseIcon, ContactIcon, HomeIcon, MenuIcon } from './NavIcons'
 import { Wordmark } from './Wordmark'
 
@@ -75,15 +76,8 @@ export function Header({ shopOpen }: { shopOpen: boolean }) {
  */
 function DesktopNav({ pathname, shopOpen }: { pathname: string; shopOpen: boolean }) {
   const [open, setOpen] = useState(false)
-  const [hash, setHash] = useState('')
   const panelRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const onHash = () => setHash(window.location.hash)
-    onHash()
-    window.addEventListener('hashchange', onHash)
-    return () => window.removeEventListener('hashchange', onHash)
-  }, [])
+  const section = useActiveSection()
 
   useEffect(() => setOpen(false), [pathname])
 
@@ -102,17 +96,17 @@ function DesktopNav({ pathname, shopOpen }: { pathname: string; shopOpen: boolea
   }, [open])
 
   const panelItems = navigation.filter((item) => item.href !== '/#contacto')
-  const inPanel = panelItems.some(
-    (item) => !item.href.includes('#') && pathname.startsWith(item.href),
-  )
-  const contactoActive = pathname === '/' && hash === '#contacto'
+  const inPanel =
+    panelItems.some((item) => !item.href.includes('#') && pathname.startsWith(item.href)) ||
+    section === 'taller'
+  const contactoActive = section === 'contacto'
 
   return (
     <nav className="hidden items-center gap-1 md:flex" aria-label="Principal">
       <IconLink
         href="/"
         label="Inicio"
-        active={pathname === '/'}
+        active={pathname === '/' && !section}
         onClick={(event) => {
           if (pathname === '/') {
             event.preventDefault()
@@ -129,7 +123,14 @@ function DesktopNav({ pathname, shopOpen }: { pathname: string; shopOpen: boolea
         </IconLink>
       )}
 
-      <IconLink href="/cuenta" label="Cuenta" active={pathname.startsWith('/cuenta')}>
+      {/* «Entrar» cuenta como parte de Cuenta y no como una página aparte: es
+          el paso previo obligado sin sesión, así que sigue el mismo hueco
+          encendido en vez de apagarlo de golpe. */}
+      <IconLink
+        href="/cuenta"
+        label="Cuenta"
+        active={pathname.startsWith('/cuenta') || pathname.startsWith('/entrar')}
+      >
         <AccountIcon className="h-5 w-5" />
       </IconLink>
 
