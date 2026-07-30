@@ -106,7 +106,7 @@ function DesktopNav({ pathname, shopOpen }: { pathname: string; shopOpen: boolea
       <IconLink
         href="/"
         label="Inicio"
-        active={pathname === '/' && !section}
+        active={pathname === '/' && !section && !open}
         onClick={(event) => {
           if (pathname === '/') {
             event.preventDefault()
@@ -118,7 +118,7 @@ function DesktopNav({ pathname, shopOpen }: { pathname: string; shopOpen: boolea
       </IconLink>
 
       {shopOpen && (
-        <IconLink href="/carrito" label="Carrito" active={pathname === '/carrito'}>
+        <IconLink href="/carrito" label="Carrito" active={pathname === '/carrito' && !open}>
           <CartIcon className="h-5 w-5" />
         </IconLink>
       )}
@@ -129,12 +129,12 @@ function DesktopNav({ pathname, shopOpen }: { pathname: string; shopOpen: boolea
       <IconLink
         href="/cuenta"
         label="Cuenta"
-        active={pathname.startsWith('/cuenta') || pathname.startsWith('/entrar')}
+        active={(pathname.startsWith('/cuenta') || pathname.startsWith('/entrar')) && !open}
       >
         <AccountIcon className="h-5 w-5" />
       </IconLink>
 
-      <IconLink href="/#contacto" label="Contacto" active={contactoActive}>
+      <IconLink href="/#contacto" label="Contacto" active={contactoActive && !open}>
         <ContactIcon className="h-5 w-5" />
       </IconLink>
 

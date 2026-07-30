@@ -112,7 +112,7 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
         <NavSlot
           href="/"
           label="Inicio"
-          active={homeActive}
+          active={homeActive && !open}
           // Estando ya en la portada, Next no navega y el toque no haría nada:
           // quien esté en el pie se quedaría en el pie. La casa debe llevar
           // siempre al principio, igual que la marca de la cabecera, así que ahí
@@ -135,7 +135,7 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
         <NavSlot
           href="/cuenta"
           label="Cuenta"
-          active={pathname.startsWith('/cuenta') || pathname.startsWith('/entrar')}
+          active={(pathname.startsWith('/cuenta') || pathname.startsWith('/entrar')) && !open}
           onClick={close}
         >
           <AccountIcon className="h-6 w-6" />
@@ -148,7 +148,7 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
             // El número también en el nombre accesible: el globo es un dato, no
             // un adorno, y quien no lo ve tiene que enterarse igual.
             label={count ? `Carrito, ${count} ${count === 1 ? 'pieza' : 'piezas'}` : 'Carrito'}
-            active={pathname === '/carrito'}
+            active={pathname === '/carrito' && !open}
             onClick={close}
           >
             <span className="relative">
@@ -166,7 +166,12 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
           </NavSlot>
         )}
 
-        <NavSlot href="/#contacto" label="Contacto" active={contactoActive} onClick={close}>
+        <NavSlot
+          href="/#contacto"
+          label="Contacto"
+          active={contactoActive && !open}
+          onClick={close}
+        >
           <ContactIcon className="h-6 w-6" />
         </NavSlot>
 
