@@ -520,12 +520,18 @@
   }
 }
 
-/* La variante silenciosa se diferencia sólo en reposo —sin filete y con tinta
-   secundaria—; al pasar por encima responde igual que el botón principal, para
-   que dos botones juntos no se comporten de dos maneras distintas. El hover lo
-   pone `btn` y aquí no se toca: `.btn:hover` gana por especificidad. */
+/* La variante silenciosa se diferencia sólo en reposo —filete verde en vez del
+   gris del sistema, y tinta secundaria—; al pasar por encima responde igual que
+   el botón principal, para que dos botones juntos no se comporten de dos maneras
+   distintas. El hover lo pone `btn` y aquí no se toca: `.btn:hover` gana por
+   especificidad.
+   El filete iba en `transparent` y dejaba estos botones sin contorno: se leían
+   como un enlace suelto y no como algo pulsable. Ahora llevan el mismo grosor
+   que `btn` —1px, el borde lo declara `btn` y aquí sólo se cambia el color— en
+   el verde del acento, que es además el color al que va el botón al pasar por
+   encima. */
 @utility btn-quiet {
-  border-color: transparent;
+  border-color: var(--color-sage-deep);
   color: var(--color-bark-soft);
 }
 
