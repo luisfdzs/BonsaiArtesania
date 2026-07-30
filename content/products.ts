@@ -12,7 +12,7 @@ import { img, type Image } from '@/lib/media'
  * nombres, precios y textos son una primera propuesta. Se revisan todos.
  */
 
-export type Category = 'pendientes' | 'anillos' | 'colgantes' | 'encargos'
+export type Category = 'pendientes' | 'anillos' | 'colgantes' | 'pulseras' | 'bordados' | 'encargos'
 
 export type Product = {
   slug: string
@@ -33,6 +33,8 @@ export const categories: { key: Category; label: string; note: string }[] = [
   { key: 'pendientes', label: 'Pendientes', note: 'Ligeros, para llevar cada día' },
   { key: 'anillos', label: 'Anillos', note: 'Una flor entera en la mano' },
   { key: 'colgantes', label: 'Colgantes', note: 'Cerca, sin que se note' },
+  { key: 'pulseras', label: 'Pulseras', note: 'Una flor en la muñeca' },
+  { key: 'bordados', label: 'Bordados', note: 'Bastidor de pared, hilo sobre lino' },
   { key: 'encargos', label: 'A medida', note: 'Tus flores, guardadas para siempre' },
 ]
 
@@ -255,6 +257,421 @@ export const products: Product[] = [
     ],
     materials: ['Resina', 'Flor a elegir', 'Gancho de plata de ley 925'],
     image: img('encargos-gotas', 'Pendientes largos en forma de gota con flores moradas'),
+    featured: false,
+  },
+
+  // ── Piezas traídas del Instagram de Ana (30/07/2026). Nombres tomados del pie
+  //    de foto; precios y textos son propuesta, pendientes de revisar con ella.
+
+  {
+    slug: 'pendientes-hortensia',
+    name: 'Pendientes Hortensia',
+    category: 'pendientes',
+    price: 32,
+    summary: 'Dos hortensias moradas enteras',
+    description: [
+      'Una flor de hortensia entera en cada pendiente, con sus cuatro pétalos y la vena clara del centro. El morado se conserva porque se secan a oscuras.',
+      'Pesan menos de lo que parece: la resina es una capa muy fina sobre el pétalo.',
+    ],
+    materials: ['Resina', 'Hortensia natural seca', 'Gancho de acero'],
+    image: img(
+      'pendientes-hortensia',
+      'Dos pendientes con flores de hortensia morada colgando de una rama',
+    ),
+    featured: false,
+  },
+  {
+    slug: 'pendientes-buganvilla',
+    name: 'Pendientes Buganvilla',
+    category: 'pendientes',
+    price: 30,
+    summary: 'Pétalos de buganvilla a contraluz',
+    description: [
+      'Brácteas de buganvilla, esas hojas finas de color entre naranja y rosa que la planta usa como pétalo. Puestas al sol se vuelven translúcidas y se les ven todos los nervios.',
+    ],
+    materials: ['Resina', 'Buganvilla natural seca', 'Gancho de acero dorado'],
+    image: img(
+      'pendientes-buganvilla',
+      'Pendientes con pétalos de buganvilla naranja colgados de una rama',
+    ),
+    featured: false,
+  },
+  {
+    slug: 'pendientes-aro-mix-floral',
+    name: 'Pendientes Aro Mix Floral',
+    category: 'pendientes',
+    price: 34,
+    summary: 'Aro grande con pétalos de varios colores',
+    description: [
+      'Un aro ancho relleno de recortes de pétalo rosa, lila y amarillo, repartidos sin patrón. Es la pieza más llamativa del taller y la que menos se repite.',
+      'Al ser aro cerrado no engancha el pelo.',
+    ],
+    materials: ['Resina', 'Pétalos secos', 'Gancho de acero dorado'],
+    image: img(
+      'pendientes-aro-mix-floral',
+      'Dos aros de resina con pétalos de colores en la palma de una mano',
+    ),
+    featured: false,
+  },
+  {
+    slug: 'pendientes-helecho-largo',
+    name: 'Pendientes Helecho Largo',
+    category: 'pendientes',
+    price: 34,
+    summary: 'Helecho entero en pieza alargada',
+    description: [
+      'La misma idea que los pendientes de helecho redondos, pero en vertical: el helecho entra completo, de la base a la punta, en una pieza estrecha y larga.',
+      'Se hacen por encargo según el tamaño del helecho que haya secando.',
+    ],
+    materials: ['Resina', 'Helecho natural prensado', 'Gancho de acero dorado'],
+    image: img(
+      'pendientes-helecho-largo',
+      'Pendientes verdes alargados con helecho, colgados de una rama en el bosque',
+    ),
+    featured: false,
+  },
+  {
+    slug: 'pendientes-margarita-amarilla',
+    name: 'Pendientes Margarita Amarilla',
+    category: 'pendientes',
+    price: 28,
+    summary: 'Una margarita amarilla, pequeña',
+    description: [
+      'Del tamaño de una lenteja grande, en amarillo fuerte. Para llevar a diario sin pensar en ellos.',
+    ],
+    materials: ['Resina', 'Margarita amarilla seca', 'Fornitura de acero dorado'],
+    image: img(
+      'pendientes-margarita-amarilla',
+      'Pendiente pequeño con una margarita amarilla puesto en la oreja',
+    ),
+    featured: false,
+  },
+  {
+    slug: 'pendientes-lirio',
+    name: 'Pendientes Lirio',
+    category: 'pendientes',
+    price: 32,
+    summary: 'Flor de lirio en resina cuadrada',
+    description: [
+      'Dos placas cuadradas casi transparentes, con una flor de lirio lila dentro y el tallo cruzando en diagonal. Parecen dos portaobjetos de laboratorio.',
+    ],
+    materials: ['Resina', 'Lirio natural prensado', 'Gancho de acero dorado'],
+    image: img(
+      'pendientes-lirio',
+      'Dos pendientes cuadrados transparentes con flor de lirio lila en una mano',
+    ),
+    featured: false,
+  },
+
+  {
+    slug: 'pendientes-modelos-margarita',
+    name: 'Pendientes Margarita Arco',
+    category: 'pendientes',
+    price: 32,
+    summary: 'Arco transparente con margaritas y hojas',
+    description: [
+      'Dos arcos de resina casi incolora con margaritas blancas y briznas verdes repartidas dentro. Al ponérselos parece que la flor flota.',
+      'Es el modelo de arco del taller, en su versión más clara.',
+    ],
+    materials: ['Resina', 'Margarita y hoja secas', 'Gancho de acero dorado'],
+    image: img(
+      'pendientes-modelos-margarita',
+      'Dos pendientes de arco transparente con margaritas, sobre un tronco',
+    ),
+    featured: false,
+  },
+  {
+    slug: 'anillos-piedras-color',
+    name: 'Anillos Piedra de Color',
+    category: 'anillos',
+    price: 26,
+    summary: 'Resina teñida, sin flor, en tres colores',
+    description: [
+      'Piedra rectangular de resina teñida sobre montura ajustable de acero inoxidable. Hay amarillo, verde y rojo.',
+      'Precio por unidad. También se hacen en plateado.',
+    ],
+    materials: ['Resina', 'Pigmento', 'Acero inoxidable ajustable'],
+    image: img(
+      'anillos-piedras-color',
+      'Tres anillos dorados con piedras de resina amarilla, verde y roja sobre una rama',
+    ),
+    featured: false,
+  },
+  {
+    slug: 'anillo-ipomoea',
+    name: 'Anillo Ipomoea',
+    category: 'anillos',
+    price: 30,
+    summary: 'Campanilla morada en montura fina',
+    description: [
+      'Una flor de campanilla —Ipomoea purpurea, la que trepa por las tapias— dentro de una piedra pequeña y redonda. Dura una mañana en la planta y años en la resina.',
+      'Disponible también en dorado.',
+    ],
+    materials: ['Resina', 'Ipomoea purpurea seca', 'Montura ajustable'],
+    image: img('anillo-ipomoea', 'Anillo con una flor morada en la mano, sobre un girasol'),
+    featured: false,
+  },
+  {
+    slug: 'anillos-petalos',
+    name: 'Anillos de Pétalos',
+    category: 'anillos',
+    price: 26,
+    summary: 'Rosa, fresia y caléndula, uno por dedo',
+    description: [
+      'Piedras ovaladas hechas con pétalos de rosa, fresia y caléndula. Cada anillo sale de una flor distinta, así que no hay dos del mismo tono.',
+      'Todos ajustables. Precio por unidad.',
+    ],
+    materials: ['Resina', 'Pétalos de rosa, fresia y caléndula', 'Montura ajustable'],
+    image: img(
+      'anillos-petalos',
+      'Cuatro anillos con piedras ámbar y moradas puestos en los dedos, sobre corteza',
+    ),
+    featured: false,
+  },
+  {
+    slug: 'anillo-ambar',
+    name: 'Anillo Ámbar',
+    category: 'anillos',
+    price: 30,
+    summary: 'Una piedra del color de la miel',
+    description: [
+      'Resina en tono ámbar con flor seca dentro, montada en anillo fino. Es el que mejor queda con la piel tostada del verano.',
+    ],
+    materials: ['Resina', 'Flor seca', 'Montura ajustable dorada'],
+    image: img('anillo-ambar', 'Anillo con piedra ámbar en una mano entre espigas de campo'),
+    featured: false,
+  },
+  {
+    slug: 'anillos-camafeo',
+    name: 'Anillos Camafeo',
+    category: 'anillos',
+    price: 32,
+    summary: 'Óvalo grande, tres versiones',
+    description: [
+      'La montura de camafeo, ovalada y ancha, con tres rellenos distintos: pétalo morado, flor blanca sobre fondo claro y ámbar.',
+      'Dime cuál quieres; si dudas, te mando fotos de los que haya hechos.',
+    ],
+    materials: ['Resina', 'Flor y pétalo secos', 'Montura ovalada ajustable'],
+    image: img(
+      'anillos-camafeo',
+      'Tres anillos ovalados morado, blanco y ámbar sobre conos de madera',
+    ),
+    featured: false,
+  },
+
+  {
+    slug: 'colgante-siempreviva',
+    name: 'Colgante Siempreviva',
+    category: 'colgantes',
+    price: 32,
+    summary: 'Siempreviva y artemisa, muy pequeño',
+    description: [
+      'Una siempreviva granate con una ramita de artemisa, en una gota diminuta colgada de cadena fina. Se ve de cerca y no antes.',
+      'Se hace también con clavel, en rojo más abierto.',
+    ],
+    materials: ['Resina', 'Siempreviva y artemisa secas', 'Cadena fina dorada'],
+    image: img('colgante-siempreviva', 'Colgante pequeño con una flor granate sobre el hombro'),
+    featured: false,
+  },
+  {
+    slug: 'colgantes-hexagono-lavanda',
+    name: 'Colgantes Hexágono Lavanda',
+    category: 'colgantes',
+    price: 32,
+    summary: 'Hexágono azul con lavanda dentro',
+    description: [
+      'Montura hexagonal con lavanda sobre fondo azul lavanda, en tres intensidades según cuánta flor lleve dentro.',
+      'Se entrega con cadena dorada de 45 cm.',
+    ],
+    materials: ['Resina', 'Lavanda seca', 'Montura hexagonal dorada'],
+    image: img(
+      'colgantes-hexagono-lavanda',
+      'Tres colgantes hexagonales azules con lavanda seca sobre lino',
+    ),
+    featured: false,
+  },
+  {
+    slug: 'conjunto-hexagono-morado',
+    name: 'Conjunto Hexágono Morado',
+    category: 'colgantes',
+    price: 58,
+    summary: 'Colgante y pendientes a juego',
+    description: [
+      'Juego de colgante y pendientes en montura hexagonal dorada, con la misma flor morada en las tres piezas.',
+      'Se venden juntos o por separado, y también en plateado. El precio es del conjunto.',
+    ],
+    materials: ['Resina', 'Flor morada seca', 'Montura hexagonal dorada'],
+    image: img(
+      'conjunto-hexagono-morado',
+      'Colgante y pendientes hexagonales con flores moradas sobre un plato de madera',
+    ),
+    featured: false,
+  },
+  {
+    slug: 'conjunto-petalos-rosa',
+    name: 'Conjunto Pétalos de Rosa',
+    category: 'colgantes',
+    price: 62,
+    summary: 'Colgante, pendientes y anillo en crema',
+    description: [
+      'Hecho con pétalos de rosa clara, que al secarse se quedan en un crema muy pálido con vetas. Colgante redondo, pendientes hexagonales y anillo ovalado.',
+      'Disponible en conjunto y por separado. El precio es del conjunto completo.',
+    ],
+    materials: ['Resina', 'Pétalos de rosa secos', 'Montura dorada'],
+    image: img(
+      'conjunto-petalos-rosa',
+      'Colgante, pendientes y anillo con pétalos claros sobre conos de madera',
+    ),
+    featured: false,
+  },
+
+  {
+    slug: 'pulsera-hexagono',
+    name: 'Pulsera Hexágono',
+    category: 'pulseras',
+    price: 28,
+    summary: 'Cadena fina con hexágono de flor',
+    description: [
+      'La misma montura hexagonal de los colgantes, en cadena de pulsera. Queda plana sobre la muñeca y no gira.',
+      'Precio por unidad. Hay tres rellenos distintos.',
+    ],
+    materials: ['Resina', 'Flor seca', 'Cadena de acero dorado'],
+    image: img(
+      'pulsera-hexagono',
+      'Tres pulseras de cadena dorada con hexágonos de resina y flores',
+    ),
+    featured: false,
+  },
+  {
+    slug: 'pulsera-margarita-naranja',
+    name: 'Pulsera Margarita Naranja',
+    category: 'pulseras',
+    price: 26,
+    summary: 'Una margarita naranja al sol',
+    description: [
+      'Margarita naranja entera en una pieza redonda, sobre cadena fina. Al llevarla puesta el sol la atraviesa y proyecta el color en la piel.',
+    ],
+    materials: ['Resina', 'Margarita naranja seca', 'Cadena de acero dorado'],
+    image: img(
+      'pulsera-margarita-naranja',
+      'Pulsera con una margarita naranja en la muñeca, al sol',
+    ),
+    featured: false,
+  },
+  {
+    slug: 'pulsera-margarita-blanca',
+    name: 'Pulsera Margarita Blanca',
+    category: 'pulseras',
+    price: 26,
+    summary: 'La misma, en blanco y rosa',
+    description: [
+      'Versión en blanco de la pulsera de margarita, con el centro amarillo y un halo rosado en los pétalos.',
+    ],
+    materials: ['Resina', 'Margarita seca', 'Cadena de acero dorado'],
+    image: img(
+      'pulsera-margarita-blanca',
+      'Pulsera con una margarita blanca en la muñeca sobre musgo',
+    ),
+    featured: false,
+  },
+  {
+    slug: 'pulsera-piedras',
+    name: 'Pulsera Piedra de Color',
+    category: 'pulseras',
+    price: 28,
+    summary: 'Tres piedras engarzadas en la cadena',
+    description: [
+      'Tres piedras redondas —azul, ámbar y verde— repartidas a lo largo de la cadena, cada una con flor dentro.',
+      'También se hace con una sola piedra, si lo prefieres más discreto.',
+    ],
+    materials: ['Resina', 'Flor seca', 'Cadena de acero dorado'],
+    image: img(
+      'pulsera-piedras',
+      'Pulseras con piedras azul, ámbar y verde sobre madera, con lavanda seca',
+    ),
+    featured: false,
+  },
+
+  {
+    slug: 'bordado-lavanda',
+    name: 'Bordado Lavanda',
+    category: 'bordados',
+    price: 42,
+    summary: 'Tres ramas de lavanda y su nombre',
+    description: [
+      'Bordado a mano sobre lino crudo, montado en bastidor de madera para colgar tal cual. Tres ramas de lavanda y la palabra escrita a punto de cadeneta.',
+      'Bastidor de 15 cm. Cada uno se borda al encargo, así que admite otro nombre o otra flor.',
+    ],
+    materials: ['Lino', 'Hilo de algodón', 'Bastidor de madera de 15 cm'],
+    image: img(
+      'bordado-lavanda',
+      'Bastidor con lavanda bordada y la palabra lavanda, con luz cálida',
+    ),
+    featured: false,
+  },
+  {
+    slug: 'bordado-calendula',
+    name: 'Bordado Caléndula',
+    category: 'bordados',
+    price: 42,
+    summary: 'Caléndulas amarillas sobre lino',
+    description: [
+      'Dos caléndulas abiertas con sus hojas, bordadas en amarillo y verde, con el nombre debajo.',
+      'Bastidor de 15 cm, listo para colgar.',
+    ],
+    materials: ['Lino', 'Hilo de algodón', 'Bastidor de madera de 15 cm'],
+    image: img(
+      'bordado-calendula',
+      'Bastidor con caléndulas amarillas bordadas y la palabra caléndula',
+    ),
+    featured: false,
+  },
+  {
+    slug: 'bordado-camelia',
+    name: 'Bordado Camelia',
+    category: 'bordados',
+    price: 42,
+    summary: 'La flor de Galicia, a línea',
+    description: [
+      'Una camelia bordada casi sólo con el contorno, en rosa y verde muy suaves, con el nombre debajo.',
+      'Bastidor de 15 cm, listo para colgar.',
+    ],
+    materials: ['Lino', 'Hilo de algodón', 'Bastidor de madera de 15 cm'],
+    image: img('bordado-camelia', 'Bastidor con una camelia rosa bordada y la palabra camelia'),
+    featured: false,
+  },
+  {
+    slug: 'bordado-toxo',
+    name: 'Bordado Toxo',
+    category: 'bordados',
+    price: 42,
+    summary: 'Toxo en flor, en amarillo',
+    description: [
+      'El toxo del monte gallego, con sus flores amarillas y sus espinas, bordado en una rama larga con el nombre en galego.',
+      'Bastidor de 15 cm, listo para colgar.',
+    ],
+    materials: ['Lino', 'Hilo de algodón', 'Bastidor de madera de 15 cm'],
+    image: img(
+      'bordado-toxo',
+      'Bastidor con una rama de toxo bordada en amarillo y la palabra toxo',
+    ),
+    featured: false,
+  },
+  {
+    slug: 'bordado-rostro',
+    name: 'Bordado Rostro',
+    category: 'bordados',
+    price: 48,
+    summary: 'Un retrato a línea, con color',
+    description: [
+      'Un rostro de mujer bordado de una sola línea continua, con manchas de color suelto en el pelo y los ojos. Es la pieza menos botánica del taller.',
+      'Bastidor de 20 cm. Se puede bordar a partir de una foto tuya.',
+    ],
+    materials: ['Lino', 'Hilo de algodón', 'Bastidor de madera de 20 cm'],
+    image: img(
+      'bordado-rostro',
+      'Bastidor con el rostro de una mujer bordado a línea, en una estantería de libros',
+    ),
     featured: false,
   },
 ]
