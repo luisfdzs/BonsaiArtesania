@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
-import { ProductCard } from '@/components/sections/ProductCard'
-import { Reveal } from '@/components/ui/Reveal'
-import { categories, productsByCategory } from '@/content/products'
+import Link from 'next/link'
+import { CategoryNav } from '@/components/tienda/CategoryNav'
+import { ProductGrid } from '@/components/tienda/ProductGrid'
+import { categories, PREVIEW_SIZE, productsByCategory } from '@/content/products'
 import { shopOpen } from '@/lib/shop'
 
 export const metadata: Metadata = {
@@ -10,8 +11,11 @@ export const metadata: Metadata = {
 }
 
 /**
- * Catálogo completo, agrupado por familia. Con este número de piezas un filtro
- * sería más trabajo para el visitante que scroll: se ve todo de una pasada.
+ * Catálogo completo, agrupado por familia. Con el archivo entero publicado ya no
+ * cabe todo de una pasada, así que cada familia enseña aquí sus primeras
+ * {@link PREVIEW_SIZE} piezas y el resto vive en su propia subsección
+ * (`/tienda/categoria/<familia>`). La portada de la tienda queda como un índice
+ * con muestra, no como un scroll de cien fotos.
  */
 export default function TiendaPage() {
   return (
@@ -33,24 +37,38 @@ export default function TiendaPage() {
         )}
       </header>
 
-      {categories.map((category) => {
+      <CategoryNav className="mt-12" />
+
+      {categories.map((category, categoryIndex) => {
         const items = productsByCategory(category.key)
         if (items.length === 0) return null
 
+        const shown = items.slice(0, PREVIEW_SIZE)
+        const rest = items.length - shown.length
+
         return (
           <section key={category.key} className="mt-(--spacing-section)">
-            <div className="flex items-baseline justify-between border-b border-line pb-4">
-              <h2 className="eyebrow">{category.label}</h2>
-              <p className="text-small text-bark-faint">{category.note}</p>
+            <div className="flex items-baseline justify-between gap-6 border-b border-line pb-4">
+              {/* El título es el enlace a la subsección: quien ya sabe qué busca
+                  no tiene que bajar hasta el botón del final. */}
+              <h2 className="eyebrow">
+                <Link href={`/tienda/categoria/${category.key}`} className="link-underline tap">
+                  {category.label}
+                </Link>
+              </h2>
+              <p className="text-right text-small text-bark-faint">{category.note}</p>
             </div>
 
-            <div className="mt-12 grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
-              {items.map((product, index) => (
-                <Reveal key={product.slug} step={index % 3}>
-                  <ProductCard product={product} />
-                </Reveal>
-              ))}
-            </div>
+            <ProductGrid items={shown} priority={categoryIndex === 0} />
+
+            {rest > 0 && (
+              <div className="mt-14 flex justify-center">
+                <Link href={`/tienda/categoria/${category.key}`} className="btn">
+                  Ver más {category.plural}
+                  <span className="text-bark-faint">({rest})</span>
+                </Link>
+              </div>
+            )}
           </section>
         )
       })}
