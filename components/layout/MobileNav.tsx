@@ -167,10 +167,11 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
           aria-expanded={open}
           aria-controls="menu-movil"
           aria-label={open ? 'Cerrar el menú' : 'Más secciones'}
-          className={cn(slotClass, open || inPanel ? 'opacity-100' : 'opacity-55')}
+          className={cn(slotClass, slotState(open || inPanel))}
         >
-          {open ? <CloseIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
-          <Dot active={open || inPanel} />
+          <Halo active={open || inPanel}>
+            {open ? <CloseIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
+          </Halo>
         </button>
       </nav>
     </>
@@ -180,9 +181,18 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
 /**
  * El hueco de cada icono. Reparte el ancho a partes iguales y estira a todo el
  * alto de la barra: lo que se toca es la celda entera, no el dibujo de 24px.
+ *
+ * El activo va en salvia —el verde con el que responden los botones del sitio— y
+ * los demás en tinta al 55%. Con el color a secas no bastaba: a 24px y con trazo
+ * de 1,5px, el salvia contra el gris de los apagados hay que buscarlo. Así que el
+ * verde se dice también en el fondo, con una pastilla del mismo salvia muy
+ * rebajado, que es exactamente el gesto de los botones —relleno salvia y no sólo
+ * un cambio de tinta— trasladado a un icono.
  */
 const slotClass =
-  'relative flex flex-1 flex-col items-center justify-center gap-1.5 text-bark transition-opacity duration-500'
+  'relative flex flex-1 flex-col items-center justify-center transition-[color,opacity] duration-500'
+
+const slotState = (active: boolean) => (active ? 'text-sage-deep' : 'text-bark opacity-55')
 
 function NavSlot({
   href,
@@ -203,29 +213,30 @@ function NavSlot({
       aria-label={label}
       aria-current={active ? 'page' : undefined}
       onClick={onClick}
-      className={cn(slotClass, active ? 'opacity-100' : 'opacity-55')}
+      className={cn(slotClass, slotState(active))}
     >
-      {children}
-      <Dot active={active} />
+      <Halo active={active}>{children}</Halo>
     </Link>
   )
 }
 
 /**
- * La marca de «estás aquí»: un punto de pétalo debajo del icono. La opacidad sola
- * no basta para señalar dónde se está —a este tamaño la diferencia entre 0.55 y 1
- * se lee como un icono más gordo, no como el activo—, y un color distinto en el
- * dibujo pelearía con el resto. El punto ocupa sitio siempre, activo o no, para
- * que los iconos no salten al cambiar de página.
+ * La pastilla de fondo del icono activo. Mide lo mismo en todos los huecos, con
+ * fondo o sin él, para que ningún icono se mueva al cambiar de página.
+ *
+ * El salvia va rebajado al 12%: lo justo para que el hueco se lea como
+ * seleccionado sin que el dibujo pierda contraste contra su propio fondo. Redonda
+ * como los botones del sitio, que son todos de borde redondo.
  */
-function Dot({ active }: { active: boolean }) {
+function Halo({ active, children }: { active: boolean; children: React.ReactNode }) {
   return (
     <span
-      aria-hidden
       className={cn(
-        'h-1 w-1 rounded-full transition-colors duration-500',
-        active ? 'bg-petal' : 'bg-transparent',
+        'flex h-10 w-10 items-center justify-center rounded-full transition-colors duration-500',
+        active && 'bg-sage-deep/12',
       )}
-    />
+    >
+      {children}
+    </span>
   )
 }

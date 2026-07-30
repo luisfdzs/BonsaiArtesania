@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { ObjectId } from 'mongodb'
 import { redirect } from 'next/navigation'
-import { auth } from '@/auth'
+import { getSession } from '@/auth'
 import { ProfileForm } from '@/components/cuenta/ProfileForm'
 import { users } from '@/lib/schema'
 
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 }
 
 export default async function CuentaPage() {
-  const session = await auth()
+  const session = await getSession()
   if (!session?.user?.id) redirect('/entrar?volver=/cuenta')
 
   const collection = await users()
