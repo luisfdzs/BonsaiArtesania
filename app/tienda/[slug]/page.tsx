@@ -6,7 +6,7 @@ import { AddToCart } from '@/components/tienda/AddToCart'
 import { ContactButtons } from '@/components/ui/ContactButtons'
 import { Media } from '@/components/ui/Media'
 import { Reveal } from '@/components/ui/Reveal'
-import { formatPrice, getProduct, products } from '@/content/products'
+import { formatPrice, getCategoryInfo, getProduct, products } from '@/content/products'
 import { orderMessage } from '@/lib/contact'
 import { shopOpen } from '@/lib/shop'
 
@@ -35,6 +35,7 @@ export default async function ProductPage({ params }: Params) {
   if (!product) notFound()
 
   const message = orderMessage(product.name)
+  const category = getCategoryInfo(product.category)
   // Tres sugerencias de la misma familia; si la familia es corta, se completa con
   // el resto del catálogo antes que dejar el bloque a medias.
   const related = products
@@ -46,9 +47,22 @@ export default async function ProductPage({ params }: Params) {
 
   return (
     <div className="page-gutter pt-10 md:pt-16">
-      <Link href="/tienda" className="link-underline tap eyebrow">
-        ← Tienda
-      </Link>
+      {/* La vuelta atrás lleva a la familia de la pieza, no a la portada de la
+          tienda: desde que cada familia tiene subsección propia, ahí es de donde
+          se viene casi siempre y donde están las piezas parecidas. */}
+      <nav aria-label="Migas" className="flex flex-wrap items-baseline gap-3 eyebrow">
+        <Link href="/tienda" className="link-underline tap">
+          ← Tienda
+        </Link>
+        {category && (
+          <>
+            <span aria-hidden>·</span>
+            <Link href={`/tienda/categoria/${category.key}`} className="link-underline tap">
+              {category.label}
+            </Link>
+          </>
+        )}
+      </nav>
 
       <article className="mt-10 grid gap-14 md:grid-cols-12 md:gap-12">
         <div className="md:col-span-7">
