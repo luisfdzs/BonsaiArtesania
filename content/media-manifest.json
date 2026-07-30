@@ -5,23 +5,83 @@
     "height": 1920,
     "blur": "data:image/webp;base64,UklGRqIAAABXRUJQVlA4IJYAAAAwBACdASoQABUAPt1apkyopSOiMAgBEBuJZgCdMoABne1cQgYwrtH1NTgA/RSlyoPya0glZ3H21PRcFtaPmVwBWtfBdNYwXEzC5+3o4c10pbGC6D99oLUps0eV61/CkOCsy0+J7nd2u3rQQi/YG7NPME4Uv7tfYYnWCswO97Cy52oU93bukmqnXAS6QGRZNXMVbypAAAA="
   },
+  "anillo-ambar": {
+    "src": "/media/anillo-ambar.webp",
+    "width": 1440,
+    "height": 1800,
+    "blur": "data:image/webp;base64,UklGRo4AAABXRUJQVlA4IIIAAAAwBACdASoQABQAPt1apkyopSOiMAgBEBuJYgCdMoAlsRIKYk32aDbgQ8gA99v4tQz09OWT2UO8jgeYsSbfmsCyvMroauxW2mIq0a01Wj0MKLbipMP8oKY2nJ6JyIlMzaBNW4wAbTEA2Its7WcWSLmFChllWXic/gJSGxjD6Ep5vQAA"
+  },
   "anillo-flor-silvestre": {
     "src": "/media/anillo-flor-silvestre.webp",
-    "width": 1080,
-    "height": 1440,
-    "blur": "data:image/webp;base64,UklGRpIAAABXRUJQVlA4IIYAAABQBACdASoQABUAPt1apkyopSOiMAgBEBuJZgCdMoR3A8ABRLDGK1iV7ZwAAPjCQKiYbBqLA8BO0h36Fal9W5ZkbJHyxzYALOpR/Htz14o1hTpEw7UrqgrzEblvvVzu5gbJDI2iAa5GOvS589Z+Jzk6mXWR963OWvfz8mjv074ZqbXqVTYAAA=="
+    "width": 1440,
+    "height": 1920,
+    "blur": "data:image/webp;base64,UklGRpIAAABXRUJQVlA4IIYAAABwBACdASoQABUAPt1apkyopSOiMAgBEBuJZgCdMoR3A8ABRLDGKxOw1akzgAD4wkComGwaiwPATtId+hWpfVuWZGyR8sc2ACzqUfx7c9eKNYU6RMO1K6oKs4uHTVBSD8AXTwfhG1NKafipONX8y6Qu+nVoh48w7mUvrA4CvGz2Ie8xifAAAA=="
+  },
+  "anillo-ipomoea": {
+    "src": "/media/anillo-ipomoea.webp",
+    "width": 1440,
+    "height": 1920,
+    "blur": "data:image/webp;base64,UklGRrAAAABXRUJQVlA4IKQAAACQBACdASoQABUAPt1apkyopSOiMAgBEBuJbACdLpWIkDaDn+kpWdfordMh9hgAzjSFyAMMQgPRSsjZ4je3AgJ5r5pZAgfilt+8dwER9rb92ngQt/hg6zvcjbbg9qEz0fshPqIvRPGf3+f0u7cZ6sFonXhTIZupQs5aHO9YzMWHjpeB6Nz756uqGTOQFsvHQrYbd5EOU9mXkGnkHJ5L+zeBOlUAAA=="
   },
   "anillo-luna": {
     "src": "/media/anillo-luna.webp",
-    "width": 1080,
-    "height": 1440,
-    "blur": "data:image/webp;base64,UklGRqAAAABXRUJQVlA4IJQAAABwBACdASoQABUAPt1apkyopSOiMAgBEBuJZACdMoRwAB61oBav7huiKeLaAAD+21xVXwm2CN9p+PiBD8Y4CtJAPVPsbXMi3rPQmPXZwv/8QijJrWp14NXZyY9USGYxe2Nah/QaCAGSMv+jyW5PxJfQQW4NCJ9U7se2Z33h5YDS+gvYacMgT8uA9TfOJ4X+9160/cAA"
+    "width": 1440,
+    "height": 1920,
+    "blur": "data:image/webp;base64,UklGRqAAAABXRUJQVlA4IJQAAABwBACdASoQABUAPt1apkyopSOiMAgBEBuJYgCdMoRwAB61oBilkrCS988+QAD+21xVXwm2CN9p+PiBD0tOteZMEvOhbOGM2QwT9zj126CcUrkPMbMoH3GIeK7G4t8QIyHu9bL4xClF6Jf9RmKKJvZ2OZCcX2S0lG11ZcV0n256/ut/vsaVW5+rZcDvhJ74XohryaAA"
+  },
+  "anillos-camafeo": {
+    "src": "/media/anillos-camafeo.webp",
+    "width": 1440,
+    "height": 1800,
+    "blur": "data:image/webp;base64,UklGRpwAAABXRUJQVlA4IJAAAABwBACdASoQABQAPt1apkyopSOiMAgBEBuJZgCdMoFWAAUBF/J8jBb/x1LFJAD+ryhtSVC2wwWGv6XAokoBi9nCBelFTTMF43C66l9YK9KQl1BHMB43np2gQ0ITqWuAOSHSHGJYsxL4jCMfVDEIj6qLeBsiSanrYALdJAMuYy5PFNgXpR3Hg94T6SOJJEMAAAA="
   },
   "anillos-de-campo": {
     "src": "/media/anillos-de-campo.webp",
     "width": 1080,
     "height": 1350,
     "blur": "data:image/webp;base64,UklGRpwAAABXRUJQVlA4IJAAAABQBACdASoQABQAPt1apkyopSOiMAgBEBuJYgCdL1ABrdnY6vX/1pQ6ERB0APysSrtH5chsIrtBVtvX2Dyx3MrimBH6USIonuYmLur5e+0o3/qYdAcmH4JediGjqPIWcyA42YZFVMfGftbLIfV700P0IE8fZa6D9vC7SA+123WaajiHsEwmEWxmIq0uLlFAAAA="
+  },
+  "anillos-petalos": {
+    "src": "/media/anillos-petalos.webp",
+    "width": 1440,
+    "height": 1800,
+    "blur": "data:image/webp;base64,UklGRp4AAABXRUJQVlA4IJIAAACQBACdASoQABQAPt1apkyopSOiMAgBEBuJagCdMoR3AkgBMC4QfFLxeE95q7wA/k2unCIn9LQ8VrxU8moFbb8sL938XOkINctSzbyo76qehZ+DtH7/LSzng5GdTIn0viyBeCMYq7obvMYhcO3lyLkHuX5+LV8r4Qi4VlzR3y0lii1KpdaaVuNkG1x7QwXtZAAAAA=="
+  },
+  "anillos-piedras-color": {
+    "src": "/media/anillos-piedras-color.webp",
+    "width": 1440,
+    "height": 1800,
+    "blur": "data:image/webp;base64,UklGRngAAABXRUJQVlA4IGwAAADQAwCdASoQABQAPt1cp0yopSOiMAgBEBuJZQBUfoY6KZ/Hhb6ZjgAA/uNL13nOr3roJmeXkHLwkmsTViO33kQd8Ft61VJeqw2jrgSWKqdWUDlawswRltgymSde+1YPa0dcVvQkA4fGYu3G4AA="
+  },
+  "bordado-calendula": {
+    "src": "/media/bordado-calendula.webp",
+    "width": 1440,
+    "height": 1800,
+    "blur": "data:image/webp;base64,UklGRpAAAABXRUJQVlA4IIQAAABwBACdASoQABQAPt1apkyopSOiMAgBEBuJaACdMoR3ACHoOwvkdnYAtxy/gAD+6e0DbSxalheryae7mU+3/i+naEyNhLEYCMZkh8PFt20og3Ps5/vY7pybaSoSY/Db4/mh/41dtqNK+TjvP95Z+OV5esxclWYduuI8ypycjIww2LuAAAA="
+  },
+  "bordado-camelia": {
+    "src": "/media/bordado-camelia.webp",
+    "width": 1440,
+    "height": 1800,
+    "blur": "data:image/webp;base64,UklGRpAAAABXRUJQVlA4IIQAAABQBACdASoQABQAPt1ap0yopSOiMAgBEBuJZgCdMoR3AB5nmXmCtPt32MMAAP7jBA5Na40xKV52xtyfaWbYb4kCSd3GTKzzB3HrlzliOjcvie9E5SORwxJd3V69UvR/0S/IANGMwI1eEtpVvhfbSUnk18h950/QhGvMihppbSWRcLg0AAA="
+  },
+  "bordado-lavanda": {
+    "src": "/media/bordado-lavanda.webp",
+    "width": 1440,
+    "height": 1795,
+    "blur": "data:image/webp;base64,UklGRoAAAABXRUJQVlA4IHQAAADQBACdASoQABQAPt1cpkyopSOiMAgBEBuJaACdMoMYPYEGA//4CrwG5J1OSYGTAAD+40B2N2WFaqejUHXKa1Bte1qoy7y6Bak9zsPQ0oc/joN4TOqsf8D9Ocv33Qan9m+o0wwFojK9GI2o93unsI4kjgAAAA=="
+  },
+  "bordado-rostro": {
+    "src": "/media/bordado-rostro.webp",
+    "width": 1440,
+    "height": 1800,
+    "blur": "data:image/webp;base64,UklGRoIAAABXRUJQVlA4IHYAAADQAwCdASoQABQAPt1cp0yopSOiMAgBEBuJQBOmUABpxNEBoVgfXoAA/qNvwYdLgSVzAvqJnmnkYFfqapWV6dLcUvLbPW6Jd6+sYUVU/u36ywr/lfaEXBDZQyeVXMmNzVs4pDxpYAOMuIG1jfwV0Qfu+onr7AAA"
+  },
+  "bordado-toxo": {
+    "src": "/media/bordado-toxo.webp",
+    "width": 1440,
+    "height": 1800,
+    "blur": "data:image/webp;base64,UklGRn4AAABXRUJQVlA4IHIAAAAQBACdASoQABQAPt1apkyopSOiMAgBEBuJZgCdMoR4N1/AQLcb7yNDAAD+6//VNf8kssu7f14WGmRIKgLArg/bMmKmNzEhyGNk2vgUCqnNTkeiFHkl/o/fcRGr+sUYC/IgcB7jGp+yyBqFMauuR1jwAAA="
   },
   "colgante-camafeo": {
     "src": "/media/colgante-camafeo.webp",
@@ -31,15 +91,39 @@
   },
   "colgante-hoja": {
     "src": "/media/colgante-hoja.webp",
-    "width": 1080,
-    "height": 1440,
-    "blur": "data:image/webp;base64,UklGRqwAAABXRUJQVlA4IKAAAABwBACdASoQABUAPt1apkyopSOiMAgBEBuJbACdLwAB7bYE+nsmyVXM46cf3AD+uD5adt3zDH6SW1kJsGQjAgdNain/rDgPrLls4lbncvRpFN/hLWwYYyVg2l71fl/kL9PckGBoplsOPr6UKBkcEu4L5ZQTm5WaO7NaxNW3CqmI1Cj259JbZap1wijZfkbVl0mrsxC6dzTm/8Gca9wNKAAA"
+    "width": 1440,
+    "height": 1920,
+    "blur": "data:image/webp;base64,UklGRqoAAABXRUJQVlA4IJ4AAABwBACdASoQABUAPt1apkyopSOiMAgBEBuJbACdLwAB7bYE+nrZwzEnz8r7WAD+uD5bfsqLPAZT/rsaKGevuciLe+djbJhqRPT/HPv3NVH4VnBP7JGXofXTeM350CtmeTuep+lyEE1mf4iYt9OMHniieIBdzP/rQMi9Y4zVtwqpiNoi+HFqvXEt5efQb5fRuetj8G0fkcBZz/BnGhAAAA=="
   },
   "colgante-lavanda": {
     "src": "/media/colgante-lavanda.webp",
     "width": 1080,
     "height": 1350,
     "blur": "data:image/webp;base64,UklGRmwAAABXRUJQVlA4IGAAAACQAwCdASoQABQAPt1apkyopSOiMAgBEBuJZwAARdXpmmJ1VSGAAP3fJkFrVS8s0/aZgWtVvP2KfMas12RLqIUUfIGeD8MV3mEZnPXuEr7w3Vqwlx5fdT4Sx53nOxqQgAA="
+  },
+  "colgante-siempreviva": {
+    "src": "/media/colgante-siempreviva.webp",
+    "width": 1440,
+    "height": 1800,
+    "blur": "data:image/webp;base64,UklGRpQAAABXRUJQVlA4IIgAAADwBACdASoQABQAPt1apkyopSOiMAgBEBuJYgCdMoM200h1lKd5UGz6VbyJdTVJF3AA/tFsOHlSAB8Gr/9iCnFfPlihKpiypDCPy0msCinoxU8Pv4iCgclloB6+QgT/p6Mdv5P5he1BjG3H1e1avPtIM1ZNmikyknlMfYsHUQFt4Hqp+N5ZujQA"
+  },
+  "colgantes-hexagono-lavanda": {
+    "src": "/media/colgantes-hexagono-lavanda.webp",
+    "width": 1440,
+    "height": 1800,
+    "blur": "data:image/webp;base64,UklGRm4AAABXRUJQVlA4IGIAAACQAwCdASoQABQAPt1apkyopSOiMAgBEBuJZwAARdXpmmJ1VhxAAP3fJkFrVS8s0/aZgWtVvRIPqK54Abtpx8UiqLvLgaOMx6dzvRUFFor71Gcxke+/8vuqS8YmUHBOAQAAAA=="
+  },
+  "conjunto-hexagono-morado": {
+    "src": "/media/conjunto-hexagono-morado.webp",
+    "width": 1440,
+    "height": 1800,
+    "blur": "data:image/webp;base64,UklGRm4AAABXRUJQVlA4IGIAAADwAwCdASoQABQAPt1apkyopSOiMAgBEBuJZQCdACPzVBSEQGKYi+aIAOHwfBTN31BuESCddmLBdeqtkJKpr38siyvSm/03LWAqxVd03mty+YX5MtO8YAZBVnKco7aknwAAAA=="
+  },
+  "conjunto-petalos-rosa": {
+    "src": "/media/conjunto-petalos-rosa.webp",
+    "width": 1440,
+    "height": 1920,
+    "blur": "data:image/webp;base64,UklGRpAAAABXRUJQVlA4IIQAAADwAwCdASoQABUAPt1apkyopSOiMAgBEBuJQBOgBA8bcqHVLnakyZIAAP7sw7rq/Wl2W4q0eNaaFC1waDm4Xah9IfLTiAB7gpUtGChfXC5HeWIM5x8QzSBWC9D64jDWQdjv+X3aQ7fI2Dp6rzBq4/C9ZLcyCIEjCGdOpvxjHexDn4MAAAA="
   },
   "encargos-gotas": {
     "src": "/media/encargos-gotas.webp",
@@ -53,6 +137,18 @@
     "height": 1350,
     "blur": "data:image/webp;base64,UklGRoYAAABXRUJQVlA4IHoAAACwAwCdASoQABQAPt1apkyopSOiMAgBEBuJQAALbEZc3uAUuThVwAD+3pXfKAJpPko62CcwhNh988GTBSu9xsT8paPcSb+X6+3efG/GDUKzE+hIleKTNjCLTS9TnzfcVkIvWruXX1VIXA9nvP7o78oesDK6lPnjPR8AAA=="
   },
+  "pendientes-aro-mix-floral": {
+    "src": "/media/pendientes-aro-mix-floral.webp",
+    "width": 1440,
+    "height": 1800,
+    "blur": "data:image/webp;base64,UklGRpIAAABXRUJQVlA4IIYAAAAQBACdASoQABQAPt1apkyopSOiMAgBEBuJZACdAYv0zquSrp09MMhRAAD33zLCydLDRXGpdQ0NFBGV3c+5igYnU7Ue6CK64Ciu2QZjZrzX19g6M3/nG8x00ATEatrzoCXBoFjBMaSoKFE1T5H9iffMOiUwG12ZqUzMoRXRIKLS/H1K6AAAAA=="
+  },
+  "pendientes-buganvilla": {
+    "src": "/media/pendientes-buganvilla.webp",
+    "width": 1440,
+    "height": 1920,
+    "blur": "data:image/webp;base64,UklGRqwAAABXRUJQVlA4IKAAAABQBACdASoQABUAPt1apkyopSOiMAgBEBuJaAC7MoKO2At6UceTsu57J7qAAP5CtbHHZbIMAv3AlTnGRzPrG0i6y/DvDteDexfd/Yhfb/YRJwcLW7zEMBTjK3qGiFcSG8ZJHEhh/9uLzQ6Ameedm+2JldpEt7X6sOdA9ErDPjaXJP7yTPO3PeDgOOJkkesU4JbmcFzcIfjtsdnCUoS3sAAA"
+  },
   "pendientes-colgantes-margarita": {
     "src": "/media/pendientes-colgantes-margarita.webp",
     "width": 1440,
@@ -61,9 +157,15 @@
   },
   "pendientes-farolillo": {
     "src": "/media/pendientes-farolillo.webp",
-    "width": 1080,
-    "height": 1440,
-    "blur": "data:image/webp;base64,UklGRpwAAABXRUJQVlA4IJAAAABwBACdASoQABUAPt1apkyopSOiMAgBEBuJZgCdMoCGABuqc31vqYntSZPyoAD+Frkg9gsfmSWT3HFjfsI7Eahx+qZI1qmld0ZknRTPZZYmkiNLwVMWtIwdbzW2YgGJCHlUPmE4/Fe1UvGUbfKYKTiGiZ6je5dEIavzcu7nP1snT55LyNa8jQIhosGf5WuBoAA="
+    "width": 1440,
+    "height": 1920,
+    "blur": "data:image/webp;base64,UklGRpwAAABXRUJQVlA4IJAAAABQBACdASoQABUAPt1apkyopSOiMAgBEBuJZgCdMoACjst9ZkkitxcwudAAAP4WuSD2Cx+ZJZPccWN+wjsRqHJQd2zChen+CGczyjS3yS3YmT5eSYNtwLwgZVT01SwL7ndY49xFLYsCx6pzGAa9EXIpZmEChsu+xf83oKvXKe5WvkDDit2swOC1wEiwiKvTQAA="
+  },
+  "pendientes-helecho-largo": {
+    "src": "/media/pendientes-helecho-largo.webp",
+    "width": 1440,
+    "height": 1801,
+    "blur": "data:image/webp;base64,UklGRpQAAABXRUJQVlA4IIgAAADwAwCdASoQABQAPt1apkyopSOiMAgBEBuJYgC7ABtodjSUjYjKxBwAAP08XZ4f4YtgfOt7zNudcIjBmGAZIGQ0TtZC2szENymet8XvdazvZFNMsoXM00ABQawJKPccoUKP3NRzq3Pedx+RxdJkX//qKpwypI6d2cVqnd3/OHhKOsZAd5FHxAAA"
   },
   "pendientes-helecho": {
     "src": "/media/pendientes-helecho.webp",
@@ -71,11 +173,35 @@
     "height": 1350,
     "blur": "data:image/webp;base64,UklGRoAAAABXRUJQVlA4IHQAAADQAwCdASoQABQAPt1apkyopSOiMAgBEBuJYwC7ACIjwPJ3dWKfVuAA/lWx2hTYdSN7F8W6kO+EqfB8PlY4BjOqNCr0/WPhkHnLWNGM9A032QrnOufSr1taj9AC37iJGBNXW+ye0hLr74vImvv1sLpSYvnAAA=="
   },
+  "pendientes-hortensia": {
+    "src": "/media/pendientes-hortensia.webp",
+    "width": 1440,
+    "height": 1910,
+    "blur": "data:image/webp;base64,UklGRqQAAABXRUJQVlA4IJgAAABQBACdASoQABUAPt1apkyopSOiMAgBEBuJbACdMoRwAdCISrs2Mjq3wo6AAPQNScViywtVoegHGTrUsCC2oiYhlX1nJP07oA3mNovh9xfDFEoxZkay99sM/v8jf1J7xcJ5GDwsdEPRzSYyBf5UfrGayWqU6nSu3iLl+MkZdpjNtyOpLXFUXem9t2iTkwoxU7I3j/I9IQoAAA=="
+  },
+  "pendientes-lirio": {
+    "src": "/media/pendientes-lirio.webp",
+    "width": 1440,
+    "height": 1800,
+    "blur": "data:image/webp;base64,UklGRpwAAABXRUJQVlA4IJAAAACQBACdASoQABQAPt1apkyopSOiMAgBEBuJZgCdMoRwAdEAn4wGIY32kH73F5AAygCb3hK938cIJ2kM7BBqRrbbMl6NcFPkJTO/f003sF/Jd6ZfkI/kIwRujT68SRSTC/UQXoftTDbvK+txf5aVrULG8pZm3xLeJFN4xBoKdDKbVeUHhqx1r/fFtXNNh6WieAA="
+  },
+  "pendientes-margarita-amarilla": {
+    "src": "/media/pendientes-margarita-amarilla.webp",
+    "width": 1440,
+    "height": 1800,
+    "blur": "data:image/webp;base64,UklGRqQAAABXRUJQVlA4IJgAAABwBACdASoQABQAPt1apkyopSOiMAgBEBuJZACdMoRwACA0q3NcvBMLSgCAgAD2WHqZf6F3z9hJRJXxo7ZWfKfyoXLRZwisPjxqUxozIRy0SrMNmdcJletFPHy+Hfp8x2f0a6weM5hnsIMMOQm+5//H/jEOt/fWLXlrdEqi1itVPjjWx5U84RBu6jG6SREVeQ5KQJfIBUAAAA=="
+  },
   "pendientes-margarita": {
     "src": "/media/pendientes-margarita.webp",
     "width": 1080,
     "height": 1350,
     "blur": "data:image/webp;base64,UklGRlAAAABXRUJQVlA4IEQAAAAQBACdASoQABQAPt1apkyopSOiMAgBEBuJZQAAW+m/Fv1m7b9lCkc1AAD+jBkCSs0zLgtt5BL/huyQTWeSnh2DlbPAAA=="
+  },
+  "pendientes-modelos-margarita": {
+    "src": "/media/pendientes-modelos-margarita.webp",
+    "width": 1440,
+    "height": 1920,
+    "blur": "data:image/webp;base64,UklGRowAAABXRUJQVlA4IIAAAAAQBACdASoQABUAPt1apkyopSOiMAgBEBuJQBOgA9gj5VG3TloJa/BzoAD+2fgcJ9K/LPdjtxLDMKVnY024GxYHmBUBWfp7OfVbEFAiEtflpFzW+76crONU0xDsYTSTmUUWA5f3qJghPONas4T3vXngaKjYdE5X7aZT4LSYMUcAAA=="
   },
   "pendientes-turmalina": {
     "src": "/media/pendientes-turmalina.webp",
@@ -88,6 +214,30 @@
     "width": 1080,
     "height": 1440,
     "blur": "data:image/webp;base64,UklGRqwAAABXRUJQVlA4IKAAAACQBACdASoQABUAPt1apkyopSOiMAgBEBuJaAC7MoKO2PoASxnOnUYhZoi9G9AA/kG8V+qP4NQ8TU0kPdyQ1eBONi0jFJWMxIKgsKPb5+QUqNo1/HsrKT9tpA2oR1k0NM6vFr6eRpjN9/AmRlX+2nAWGcrJQoZ50fXfCaM+zXMUx2hoX8MtgFlqN2WCSPo2E9zoOF6+ArUhSy6STJ34AAAA"
+  },
+  "pulsera-hexagono": {
+    "src": "/media/pulsera-hexagono.webp",
+    "width": 1440,
+    "height": 1800,
+    "blur": "data:image/webp;base64,UklGRm4AAABXRUJQVlA4IGIAAADQAwCdASoQABQAPt1cpkyopSOiMAgBEBuJQBOmUAA9sck8MZnSjNAA/mfKFidlr/6JnEWk4eK59l9ADcbAl2NMkWDDRA3TclaP95d1CXqoJar79CRnxH9VdDwEIJ/c2wAAAA=="
+  },
+  "pulsera-margarita-blanca": {
+    "src": "/media/pulsera-margarita-blanca.webp",
+    "width": 1440,
+    "height": 1800,
+    "blur": "data:image/webp;base64,UklGRpIAAABXRUJQVlA4IIYAAABQBACdASoQABQAPt1apkyopSOiMAgBEBuJZgCdMoBOAB3aqSxaOD4lOU4AAP04FqWvEa8LHQJa6f0LtAhZWQ7IIMhOZDG7gBBDexGtQ2WVllg9L9Vssfr05sAwV11HavV0Th4tQnMWfnwD7nwOO43iFWprSP8ZrKFj9x2DHtQ8RawziiwAAA=="
+  },
+  "pulsera-margarita-naranja": {
+    "src": "/media/pulsera-margarita-naranja.webp",
+    "width": 1440,
+    "height": 1800,
+    "blur": "data:image/webp;base64,UklGRo4AAABXRUJQVlA4IIIAAAAwBACdASoQABQAPt1apkyopSOiMAgBEBuJaACdMoRwAB0y0YX23IFJ0d4A9y6+IBZjNiwFfNURNNhgsEL9FbSN+lhzDiQkVVqtNVBoUX6ngsIXdvL4T1WdZrvHb1yPjvb7fz2LdQPgvbpe3wfm1eKxmAuMf60B41IgogXKo9C0jAAA"
+  },
+  "pulsera-piedras": {
+    "src": "/media/pulsera-piedras.webp",
+    "width": 1440,
+    "height": 1800,
+    "blur": "data:image/webp;base64,UklGRp4AAABXRUJQVlA4IJIAAABQBACdASoQABQAPt1apkyopSOiMAgBEBuJYgCdL1ABOdFnoMsvIVxu4HYAAPysSqjUc4gFLitS+oyiKuzftR+dAJXm9GhzKhkRUbhBQWVBURAY3mNIgp6tYjPbJemzk162JTHeY5UXp92tlivRnIyos5qmwHg4VrZjxtfTu2jQ7U6WAvIVGWtSrw4OZu4YjQz4AA=="
   },
   "taller-manos": {
     "src": "/media/taller-manos.webp",
