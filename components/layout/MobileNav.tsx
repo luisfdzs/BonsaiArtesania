@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/cn'
 import { navigation } from '@/lib/navigation'
+import { useActiveSection } from '@/lib/useActiveSection'
 import { useCartCount } from './CartCount'
 import { AccountIcon, CartIcon, CloseIcon, ContactIcon, HomeIcon, MenuIcon } from './NavIcons'
 
@@ -54,18 +55,13 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
 
   const close = () => setOpenedAt(null)
 
-  // «Contacto» es una sección de la portada, no una ruta: el `pathname` nunca
-  // dice si se está mirando ahí. Se sigue el hash a mano —al montar y en cada
-  // cambio— para que su hueco se marque igual que los demás en vez de quedarse
-  // siempre apagado.
-  const [hash, setHash] = useState('')
-  useEffect(() => {
-    const onHash = () => setHash(window.location.hash)
-    onHash()
-    window.addEventListener('hashchange', onHash)
-    return () => window.removeEventListener('hashchange', onHash)
-  }, [])
-  const contactoActive = pathname === '/' && hash === '#contacto'
+  // La sección de la portada en la que se está, tratada igual que una ruta
+  // —ver `useActiveSection`—. Inicio sólo se enciende sin ninguna sección
+  // activa: si no, al entrar en Contacto se encenderían los dos huecos a la
+  // vez, que es peor que marcar sólo el que toca.
+  const section = useActiveSection()
+  const homeActive = pathname === '/' && !section
+  const contactoActive = section === 'contacto'
 
   // «Contacto» sale de la barra con su propio icono; las otras tres entradas del
   // menú del sitio son las que se despliegan. Se derivan de `navigation` en vez
@@ -74,12 +70,10 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
 
   // Estando en Tienda o en Encargos, ninguno de los cinco iconos diría dónde
   // está: la sección vive detrás del menú. Así que el que la guarda se marca
-  // como activo, y la barra nunca queda sin señalar la página. «El taller» es un
-  // ancla de la portada sin hueco propio en la barra, así que no necesita este
-  // seguimiento —a diferencia de Contacto, que sí tiene el suyo—.
-  const inPanel = panelItems.some(
-    (item) => !item.href.includes('#') && pathname.startsWith(item.href),
-  )
+  // como activo, y la barra nunca queda sin señalar la página.
+  const inPanel =
+    panelItems.some((item) => !item.href.includes('#') && pathname.startsWith(item.href)) ||
+    section === 'taller'
 
   return (
     <>
@@ -118,7 +112,7 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
         <NavSlot
           href="/"
           label="Inicio"
-          active={pathname === '/'}
+          active={homeActive}
           // Estando ya en la portada, Next no navega y el toque no haría nada:
           // quien esté en el pie se quedaría en el pie. La casa debe llevar
           // siempre al principio, igual que la marca de la cabecera, así que ahí
@@ -135,10 +129,13 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
           <HomeIcon className="h-6 w-6" />
         </NavSlot>
 
+        {/* «Entrar» cuenta como parte de Cuenta y no como una página aparte: es
+            el paso previo obligado sin sesión, y quien lo ve tiene que seguir
+            leyendo el mismo hueco encendido, no uno apagado de golpe. */}
         <NavSlot
           href="/cuenta"
           label="Cuenta"
-          active={pathname.startsWith('/cuenta')}
+          active={pathname.startsWith('/cuenta') || pathname.startsWith('/entrar')}
           onClick={close}
         >
           <AccountIcon className="h-6 w-6" />
