@@ -53,6 +53,13 @@
   --spacing-gutter: clamp(1.5rem, 5vw, 5rem);
   --spacing-section: clamp(5rem, 12vw, 12rem);
 
+  /* Alto de la barra de navegación inferior de móvil. Vive en el sistema porque
+     lo usan tres sitios que tienen que cuadrar al píxel: la barra, el panel que
+     se abre justo encima y el hueco que el <body> se reserva debajo del pie.
+     El `env()` es la franja del gesto de inicio del iPhone: sin sumarla, los
+     iconos caen debajo de la rayita del sistema. */
+  --spacing-nav-mobile: calc(4rem + env(safe-area-inset-bottom));
+
   /* --- Movimiento --------------------------------------------------------
      Nada rebota, nada corre. Todo entra como se posa un pétalo: lento y con
      desaceleración larga. */
@@ -122,8 +129,8 @@
   /* La cabecera flota sobre el hero a sangre: mientras no se ha hecho scroll el
      texto pasa a color lino para tener contraste sobre la foto. Se resuelve con
      :has() — el header no necesita saber en qué página está, sólo si hay un hero
-     debajo. Se aplica a la BARRA, no a todo el <header>: el panel del menú móvil
-     también vive dentro y va sobre fondo lino. */
+     debajo. Se aplica a la BARRA y no a todo el <header> porque dentro hay
+     además el enlace de «saltar al contenido», que va sobre tinta. */
   header[data-top='true'] .header-bar {
     color: var(--color-bark);
   }
@@ -160,6 +167,16 @@
   :focus-visible {
     outline: 1px solid var(--color-sage-deep);
     outline-offset: 4px;
+  }
+
+  /* La barra de navegación de móvil va fija sobre el contenido, así que el
+     documento se reserva su alto por debajo del pie. Sin esto la firma y los
+     enlaces legales quedan tapados justo en el final de la página, que es donde
+     más se nota. Sólo por debajo de `md`, que es donde existe la barra. */
+  @media (width < 48rem) {
+    body {
+      padding-bottom: var(--spacing-nav-mobile);
+    }
   }
 
   img,
@@ -237,6 +254,29 @@
     inset-inline: -0.25rem;
     inset-block: -0.4rem;
   }
+}
+
+/* El contador de piezas, en la esquina del icono de carrito de la barra de
+   móvil. Va como utilidad y no como un puñado de clases sueltas porque el dígito
+   necesita un tamaño de fuera de la escala del sistema: la escala arranca en
+   11px con 0.18em de interletraje, y con ese interletraje el número se descentra
+   dentro del círculo. Una excepción así conviene tenerla escrita en un sitio. */
+@utility cart-badge {
+  position: absolute;
+  top: -0.35rem;
+  right: -0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.05rem;
+  height: 1.05rem;
+  padding-inline: 0.2rem;
+  border-radius: 999px;
+  background: var(--color-sage-deep);
+  color: var(--color-linen);
+  font-size: 0.625rem;
+  line-height: 1;
+  letter-spacing: 0;
 }
 
 @utility btn {
