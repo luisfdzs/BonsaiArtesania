@@ -2,7 +2,9 @@
 
 import { useState } from 'react'
 import { deleteAddress } from '@/app/cuenta/actions'
+import { TrashIcon } from '@/components/ui/CartIcons'
 import { AddressForm, type AddressValues } from './AddressForm'
+import { PencilIcon, PinIcon, PlusIcon } from './CuentaIcons'
 
 /**
  * Lista de direcciones con edición en línea. Cliente porque hay que recordar qué
@@ -15,46 +17,44 @@ export function AddressList({ items }: { items: AddressValues[] }) {
   return (
     <div>
       {items.length === 0 && open !== 'nueva' && (
-        <p className="text-bark-soft">
-          Todavía no tienes ninguna dirección guardada. Añade una y el próximo pedido irá más
-          rápido.
-        </p>
+        <div className="panel flex flex-col items-center">
+          <PinIcon className="h-8 w-8 text-bark-faint" />
+          <p className="mt-6 text-bark-soft">
+            Todavía no tienes ninguna dirección guardada. Añade una y el próximo pedido irá más
+            rápido.
+          </p>
+        </div>
       )}
 
-      <ul className="flex flex-col gap-px">
+      <ul className="flex flex-col gap-4">
         {items.map((address) => (
-          <li key={address.id} className="border-b border-line py-6 first:border-t">
+          <li key={address.id} className="panel">
             {open === address.id ? (
               <AddressForm values={address} onDone={() => setOpen(null)} />
             ) : (
-              <div className="flex items-start justify-between gap-6">
-                <div>
-                  <p className="flex items-center gap-3">
-                    {address.alias}
-                    {address.isDefault && (
-                      <span className="eyebrow rounded-full bg-petal-soft px-2 py-1 text-bark-soft">
-                        Por defecto
-                      </span>
-                    )}
-                  </p>
-                  <p className="mt-2 text-small text-bark-soft">
-                    {address.recipient}
-                    <br />
-                    {address.line1}
-                    {address.line2 ? `, ${address.line2}` : ''}
-                    <br />
-                    {address.postalCode} {address.city} ({address.province})
-                    <br />
-                    {address.phone}
-                  </p>
-                </div>
+              <div className="flex flex-col items-center">
+                <p className="font-serif text-lead">{address.alias}</p>
 
-                <div className="flex shrink-0 flex-col items-end gap-2">
+                {address.isDefault && <span className="badge mt-3">Por defecto</span>}
+
+                <p className="mt-4 text-small text-bark-soft">
+                  {address.recipient}
+                  <br />
+                  {address.line1}
+                  {address.line2 ? `, ${address.line2}` : ''}
+                  <br />
+                  {address.postalCode} {address.city} ({address.province})
+                  <br />
+                  {address.phone}
+                </p>
+
+                <div className="mt-6 flex flex-wrap justify-center gap-2 border-t border-line pt-6">
                   <button
                     type="button"
-                    className="link-underline tap text-small"
+                    className="btn btn-quiet btn-sm"
                     onClick={() => setOpen(address.id ?? null)}
                   >
+                    <PencilIcon className="h-4 w-4" />
                     Editar
                   </button>
 
@@ -62,7 +62,8 @@ export function AddressList({ items }: { items: AddressValues[] }) {
                       acción de servidor normal y funciona sin JavaScript. */}
                   <form action={deleteAddress}>
                     <input type="hidden" name="id" value={address.id} />
-                    <button type="submit" className="link-underline tap text-small text-bark-faint">
+                    <button type="submit" className="btn btn-quiet btn-sm">
+                      <TrashIcon className="h-4 w-4" />
                       Borrar
                     </button>
                   </form>
@@ -73,11 +74,14 @@ export function AddressList({ items }: { items: AddressValues[] }) {
         ))}
       </ul>
 
-      <div className="mt-10">
+      <div className="mt-6">
         {open === 'nueva' ? (
-          <AddressForm onDone={() => setOpen(null)} />
+          <div className="panel">
+            <AddressForm onDone={() => setOpen(null)} />
+          </div>
         ) : (
           <button type="button" className="btn" onClick={() => setOpen('nueva')}>
+            <PlusIcon className="h-4 w-4" />
             Añadir dirección
           </button>
         )}

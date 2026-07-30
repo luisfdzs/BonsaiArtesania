@@ -3,6 +3,7 @@ import { ObjectId } from 'mongodb'
 import { redirect } from 'next/navigation'
 import { getSession } from '@/auth'
 import { AddressList } from '@/components/cuenta/AddressList'
+import { SectionIntro } from '@/components/cuenta/SectionIntro'
 import { addresses } from '@/lib/schema'
 
 export const metadata: Metadata = {
@@ -38,9 +39,9 @@ export default async function DireccionesPage() {
 
   return (
     <section>
-      <p className="text-bark-soft">
+      <SectionIntro title="Tus direcciones">
         Puedes guardar varias —casa, trabajo, la de un regalo— y elegir cuál usar al comprar.
-      </p>
+      </SectionIntro>
 
       <div className="mt-12">
         <AddressList items={items} />

@@ -2,6 +2,8 @@
 
 import { useActionState } from 'react'
 import { updateProfile, type ActionState } from '@/app/cuenta/actions'
+import { MailIcon } from '@/components/cuenta/CuentaIcons'
+import { CheckIcon } from '@/components/ui/CartIcons'
 import { Field } from '@/components/ui/Field'
 
 type Props = {
@@ -17,14 +19,22 @@ const initial: ActionState = {}
  * que permite pintar errores y el estado «guardando» sin recargar. Sin JS el
  * formulario sigue enviándose y la acción responde igual: los errores llegarían
  * en la siguiente carga.
+ *
+ * `text-left` a propósito dentro de una zona centrada: los rótulos y lo que se
+ * escribe van alineados a la izquierda —un campo con el texto centrado se lee
+ * mal mientras se teclea—. Lo que se centra es el encabezado de la sección y la
+ * fila del botón, que es lo que da la simetría.
  */
 export function ProfileForm({ name, phone, email }: Props) {
   const [state, action, pending] = useActionState(updateProfile, initial)
 
   return (
-    <form action={action} className="flex flex-col gap-8">
+    <form action={action} className="panel flex flex-col gap-8 text-left">
       <div>
-        <p className="field-label">Correo</p>
+        <p className="field-label flex items-center gap-2">
+          <MailIcon className="h-3.5 w-3.5" />
+          Correo
+        </p>
         <p className="py-[0.6rem] text-bark-soft">{email}</p>
         {/* El correo es la identidad de la cuenta: es a donde se envía el enlace
             de acceso, así que cambiarlo aquí dejaría a la persona sin poder
@@ -52,13 +62,16 @@ export function ProfileForm({ name, phone, email }: Props) {
         error={state.errors?.phone}
       />
 
-      <div className="flex items-center gap-6">
+      <div className="flex flex-col items-center gap-3 border-t border-line pt-8">
         <button type="submit" className="btn" disabled={pending}>
+          <CheckIcon className="h-4 w-4" />
           {pending ? 'Guardando…' : 'Guardar'}
         </button>
 
-        {/* `role="status"` para que el lector de pantalla anuncie el resultado. */}
-        <span role="status" className="text-small text-bark-soft">
+        {/* `role="status"` para que el lector de pantalla anuncie el resultado.
+            El hueco se reserva siempre: si apareciera al guardar, empujaría el
+            botón hacia arriba justo después de pulsarlo. */}
+        <span role="status" className="block min-h-5 text-small text-sage-deep">
           {state.ok && !pending ? 'Guardado.' : ''}
         </span>
       </div>

@@ -517,6 +517,55 @@
   color: var(--color-bark-soft);
 }
 
+/* El mismo botón a media voz: acciones de dentro de una tarjeta —editar una
+   dirección, cancelar un formulario— que no deben competir con la acción
+   principal de la página. Sólo cambian el alto, el relleno y el hueco del icono;
+   el color y el hover los sigue poniendo `btn`. */
+@utility btn-sm {
+  min-height: 2.25rem;
+  padding: 0.4rem 1.15rem;
+  gap: 0.45rem;
+}
+
+/* Tarjeta de la zona de cuenta: un pedido, una dirección, un bloque de ajustes.
+   Antes eran filas separadas por un filete de 1px; con varias seguidas la página
+   se leía como una tabla. Una caja con esquina redonda y un fondo apenas más
+   cálido que el lino agrupa cada cosa sin añadir peso. */
+@utility panel {
+  border: 1px solid var(--color-line);
+  border-radius: 1.25rem;
+  background: color-mix(in srgb, var(--color-linen-deep) 45%, transparent);
+  padding: clamp(1.5rem, 4vw, 2.25rem);
+  transition:
+    border-color 0.6s var(--ease-out-soft),
+    background-color 0.6s var(--ease-out-soft);
+}
+
+/* Cuando la tarjeta es un enlace, al pasar por encima se calienta un poco. */
+@utility panel-link {
+  &:hover {
+    border-color: var(--color-sage);
+    background: color-mix(in srgb, var(--color-linen-deep) 85%, transparent);
+  }
+}
+
+/* Etiqueta redonda para un estado: el del pedido, o la dirección por defecto.
+   Una sola tinta para todos los estados a propósito: colorear «cancelado» en
+   rojo daría a la interfaz un tono de alarma que esta tienda no tiene. */
+@utility badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  background: var(--color-petal-soft);
+  color: var(--color-bark-soft);
+  font-size: var(--text-micro);
+  line-height: var(--text-micro--line-height);
+  letter-spacing: var(--text-micro--letter-spacing);
+  text-transform: uppercase;
+}
+
 /* Aparición al entrar en viewport. La hace CSS con scroll-driven animations
    (cero JS); si el navegador no las soporta, el contenido simplemente se ve
    — nunca contenido invisible por una animación que no corre. */
