@@ -22,8 +22,8 @@ export const whatsappDisplay = site.contact.whatsapp.replace(
 )
 
 export function mailtoLink(subject: string, body: string): string {
-  const params = new URLSearchParams({ subject, body })
-  return `mailto:${site.contact.email}?${params.toString()}`
+  const params = [`subject=${encodeURIComponent(subject)}`, `body=${encodeURIComponent(body)}`]
+  return `mailto:${site.contact.email}?${params.join('&')}`
 }
 
 export function orderMessage(productName: string): string {
