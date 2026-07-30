@@ -42,12 +42,16 @@ export default async function CarritoPage() {
 
   if (cart.lines.length === 0) {
     return (
-      <div className="page-gutter pt-16 text-center md:pt-24">
-        <h1 className="font-serif text-title">Tu carrito</h1>
-        <p className="mt-6 text-bark-soft">Todavía no has añadido ninguna pieza.</p>
-        <Link href="/tienda" className="btn mt-10">
-          Tienda
-        </Link>
+      // Igual que el 404: con tan poco contenido, pegarlo arriba deja la
+      // pantalla medio vacía, así que se centra en los dos ejes.
+      <div className="page-gutter grid min-h-[60svh] place-items-center py-24 text-center">
+        <div>
+          <h1 className="font-serif text-title">Tu carrito</h1>
+          <p className="mt-6 text-bark-soft">Todavía no has añadido ninguna pieza.</p>
+          <Link href="/tienda" className="btn mt-10">
+            Tienda
+          </Link>
+        </div>
       </div>
     )
   }
