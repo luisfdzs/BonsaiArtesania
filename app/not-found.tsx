@@ -12,9 +12,14 @@ export default function NotFound() {
         {/* La misma casa de la barra de navegación en lugar del rótulo: sin
             texto el botón se queda redondo, así que se le quita el relleno
             ancho y se le iguala el ancho al alto. El destino lo dice ahora
-            `aria-label`. */}
-        <Link href="/" aria-label="Volver al inicio" className="btn mt-10 w-11 px-0">
-          <HomeIcon className="h-5 w-5" />
+            `aria-label`.
+
+            Y algo más grande que el alto normal de `btn` (44px): es la única
+            salida de la página, y en una pantalla con tres líneas de texto y
+            nada más un círculo del tamaño mínimo se lee como un detalle en vez
+            de como la acción. */}
+        <Link href="/" aria-label="Volver al inicio" className="btn mt-10 h-14 w-14 px-0">
+          <HomeIcon className="h-6 w-6" />
         </Link>
       </div>
     </div>
