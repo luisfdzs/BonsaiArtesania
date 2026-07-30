@@ -42,11 +42,11 @@ export default async function CarritoPage() {
 
   if (cart.lines.length === 0) {
     return (
-      <div className="page-gutter pt-16 md:pt-24">
+      <div className="page-gutter pt-16 text-center md:pt-24">
         <h1 className="font-serif text-title">Tu carrito</h1>
         <p className="mt-6 text-bark-soft">Todavía no has añadido ninguna pieza.</p>
         <Link href="/tienda" className="btn mt-10">
-          Ver la tienda
+          Tienda
         </Link>
       </div>
     )
