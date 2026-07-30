@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { NavPending } from '@/components/ui/NavPending'
 import { cn } from '@/lib/cn'
 import { navigation } from '@/lib/navigation'
 import { useActiveSection } from '@/lib/useActiveSection'
@@ -139,6 +140,9 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
           onClick={close}
         >
           <AccountIcon className="h-6 w-6" />
+          {/* Cuenta es el único hueco que espera de verdad: los demás llevan a
+              páginas ya generadas. Ver `NavPending`. */}
+          <NavPending label="Abriendo tu cuenta" />
         </NavSlot>
 
         {/* Sin tienda abierta no hay carrito que enseñar, como en la cabecera. */}

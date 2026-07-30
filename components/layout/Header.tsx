@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
+import { NavPending } from '@/components/ui/NavPending'
 import { cn } from '@/lib/cn'
 import { navigation } from '@/lib/navigation'
 import { useActiveSection } from '@/lib/useActiveSection'
@@ -132,6 +133,9 @@ function DesktopNav({ pathname, shopOpen }: { pathname: string; shopOpen: boolea
         active={(pathname.startsWith('/cuenta') || pathname.startsWith('/entrar')) && !open}
       >
         <AccountIcon className="h-5 w-5" />
+        {/* Cuenta es el único icono que espera de verdad: los demás llevan a
+            páginas ya generadas. Ver `NavPending`. */}
+        <NavPending label="Abriendo tu cuenta" />
       </IconLink>
 
       <IconLink href="/#contacto" label="Contacto" active={contactoActive && !open}>
