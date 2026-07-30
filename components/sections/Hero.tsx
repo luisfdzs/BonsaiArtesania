@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { Media } from '@/components/ui/Media'
 import { site } from '@/content/site'
 import { img } from '@/lib/media'
@@ -18,8 +17,8 @@ export function Hero() {
         className="pointer-events-none absolute -top-40 right-[-10%] h-[38rem] w-[38rem] rounded-full bg-[radial-gradient(circle,var(--color-petal-soft)_0%,transparent_65%)] opacity-70 blur-3xl"
       />
 
-      <div className="relative grid items-center gap-14 md:grid-cols-12 md:gap-10">
-        <div className="animate-bloom md:col-span-6">
+      <div className="relative grid grid-cols-12 items-center gap-6 md:gap-10">
+        <div className="animate-bloom col-span-7 md:col-span-6">
           <p className="eyebrow">Hecho a mano en {site.location}</p>
           <h1 className="mt-7 font-serif text-display">
             Flores que
@@ -27,20 +26,13 @@ export function Hero() {
             no se marchitan
           </h1>
           <p className="mt-8 max-w-md text-bark-soft">{site.intro}</p>
-
-          <div className="mt-11 flex flex-wrap items-center gap-x-2 gap-y-3">
-            <Link href="/tienda" className="btn">
-              Joyas Bonsái
-            </Link>
-            <Link href="/encargos" className="btn btn-quiet">
-              Joyas personalizadas
-            </Link>
-          </div>
         </div>
 
         {/* El arco se limita en ancho: a pantalla completa, un 3/4 sin tope crece
-            tanto que empuja todo lo demás fuera de la primera vista. */}
-        <div className="animate-bloom mx-auto w-full max-w-[24rem] [animation-delay:220ms] md:col-span-5 md:col-start-8">
+            tanto que empuja todo lo demás fuera de la primera vista. En móvil
+            comparte fila con el texto —no va debajo— para que la portada quede
+            igual de compacta que en escritorio. */}
+        <div className="animate-bloom col-span-5 mx-auto w-full [animation-delay:220ms] md:col-span-5 md:col-start-8 md:max-w-[24rem]">
           <Media
             image={img(
               'portada-hojas',

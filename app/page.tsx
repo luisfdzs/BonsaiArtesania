@@ -35,9 +35,12 @@ export default function HomePage() {
             así que el `aria-label` conserva la frase completa: un lector de
             pantalla que recorra los enlaces de la página oiría «ver más» sin
             saber más de qué. */}
-        <Reveal className="mt-16 flex justify-center">
+        <Reveal className="mt-16 flex flex-wrap justify-center gap-x-2 gap-y-3">
           <Link href="/tienda" className="btn" aria-label="Ver todas las piezas">
             Ver más
+          </Link>
+          <Link href="/encargos" className="btn btn-quiet">
+            Personalizar
           </Link>
         </Reveal>
       </section>
