@@ -70,7 +70,11 @@ export function Header({ shopOpen }: { shopOpen: boolean }) {
           Saltar al contenido
         </a>
 
-        <div className="header-bar page-gutter flex h-20 items-center justify-between gap-6 md:h-24">
+        {/* En móvil la barra sólo lleva la marca —los iconos viven abajo, en
+            `MobileNav`—, así que va centrada en vez de pegada a la izquierda
+            con medio ancho de barra vacío al lado. A partir de `md` aparece
+            `DesktopNav` y vuelve el reparto a los extremos. */}
+        <div className="header-bar page-gutter flex h-20 items-center justify-center gap-6 md:h-24 md:justify-between">
           <Link
             href="/"
             aria-label="Bonsái Artesanía, inicio"
