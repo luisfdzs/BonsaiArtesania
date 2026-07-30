@@ -12,7 +12,7 @@ const pasos = [
 export function TallerSection() {
   return (
     <section id="taller" className="page-gutter pt-(--spacing-section)">
-      <div className="grid gap-14 md:grid-cols-12 md:gap-12">
+      <div className="grid gap-14 md:grid-cols-12 md:items-center md:gap-12">
         <Reveal className="md:col-span-5">
           <Media
             image={img('taller-manos', 'Una mano con anillos de resina entre espigas de campo')}
@@ -22,22 +22,22 @@ export function TallerSection() {
           />
         </Reveal>
 
-        <div className="md:col-span-6 md:col-start-7">
+        <div className="text-center md:col-span-6 md:col-start-7">
           <Reveal>
             <h2 className="eyebrow">El taller</h2>
             <p className="mt-7 font-serif text-title">
               Cada pieza tarda semanas en estar lista, y sólo existe una vez.
             </p>
-            <p className="mt-7 max-w-prose text-bark-soft">
+            <p className="mx-auto mt-7 max-w-prose text-bark-soft">
               Soy Ana. Recojo las flores, las seco, las coloco de una en una y las guardo en resina.
               No hay moldes en serie ni dos piezas iguales: la flor decide cómo va a quedar y yo la
               acompaño.
             </p>
           </Reveal>
 
-          <ol className="mt-14 grid gap-x-10 gap-y-9 sm:grid-cols-2">
+          <ol className="mt-14 grid items-center gap-x-10 gap-y-9 sm:grid-cols-2">
             {pasos.map((paso, index) => (
-              <Reveal as="li" key={paso.n} step={index}>
+              <Reveal as="li" key={paso.n} step={index} className="text-center">
                 <p className="eyebrow text-sage-deep">{paso.n}</p>
                 <h3 className="mt-3 font-serif text-lead">{paso.titulo}</h3>
                 <p className="mt-1 text-small text-bark-soft">{paso.texto}</p>
