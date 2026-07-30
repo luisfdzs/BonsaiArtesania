@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { auth, signOut } from '@/auth'
+import { getSession, signOut } from '@/auth'
 
 /**
  * Guarda de toda la zona de cuenta. Se hace aquí, en un layout de servidor, y no
@@ -10,7 +10,7 @@ import { auth, signOut } from '@/auth'
  * las rutas hijas presentes y futuras.
  */
 export default async function CuentaLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth()
+  const session = await getSession()
 
   if (!session?.user) redirect('/entrar?volver=/cuenta')
 

@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import NextAuth from 'next-auth'
 import Nodemailer from 'next-auth/providers/nodemailer'
 import { MongoDBAdapter } from '@auth/mongodb-adapter'
@@ -76,3 +77,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
 })
+
+/**
+ * La sesión de **esta** petición, leída una sola vez.
+ *
+ * `auth()` va a la base de datos cada vez que se llama —es el precio de tener las
+ * sesiones ahí y poder cerrarlas de verdad—, y en la zona de cuenta se llamaba dos
+ * veces por navegación: una en el layout, que hace de guarda, y otra en la página,
+ * que necesita el id. Con `cache` de React la segunda llamada devuelve lo que trajo
+ * la primera, así que la consulta se hace una vez por petición y no una por sitio
+ * donde hace falta. La caché vive y muere con la petición: no hay riesgo de servir
+ * la sesión de otra persona.
+ *
+ * Se llama a `auth()` desde dentro de una función propia en vez de envolverlo
+ * directamente porque `auth` tiene varias firmas —también sirve de envoltorio de
+ * route handlers— y `cache` se quedaría con una sola.
+ */
+export const getSession = cache(() => auth())

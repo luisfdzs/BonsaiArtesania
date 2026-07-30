@@ -121,6 +121,88 @@
   }
 }
 
+/* La espera: una flor que crece. Todo el ciclo dura lo mismo para cada pieza y
+   lo que cambia es en qué tramo le toca, así que la vuelta entera —tallo, hojas,
+   pétalos, corazón— cabe en una sola duración y no hay nada que sincronizar a
+   mano. Cada pieza se apaga en el último 12% para que la siguiente vuelta empiece
+   otra vez desde la tierra y no desde una flor ya abierta. Ver FlowerLoader. */
+/* La espera tarda en aparecer a propósito. Ver `flower-wait`. */
+@keyframes flower-wait {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes flower-stem {
+  0% {
+    opacity: 1;
+    stroke-dashoffset: 30;
+  }
+  28%,
+  88% {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+  100% {
+    opacity: 0;
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes flower-leaf {
+  0%,
+  22% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  45%,
+  88% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+@keyframes flower-petal {
+  0%,
+  40% {
+    opacity: 0;
+    transform: scale(0.12);
+  }
+  70%,
+  88% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+@keyframes flower-heart {
+  0%,
+  62% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  78%,
+  88% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
 /* ============================================================================
    Base
    ========================================================================= */
@@ -370,6 +452,59 @@
 
   & > i:nth-child(3n + 1) {
     background: var(--color-petal-soft);
+  }
+}
+
+/* La espera no se ve enseguida: 180ms de retardo antes de empezar a aparecer.
+   Medido en producción, el carrito tarda unos 110ms en responder; sin este
+   retardo la flor sería un parpadeo, que molesta más que un hueco quieto. Sólo
+   asoma cuando la espera es de verdad —conexión mala, arranque en frío de la
+   función— y entonces se agradece. `both` es lo que la mantiene invisible durante
+   el retardo en vez de mostrarla y luego reiniciarla. */
+@utility flower-wait {
+  animation: flower-wait 400ms var(--ease-out-soft) 180ms both;
+}
+
+/* La flor de la espera. Las piezas van con clases propias dentro y no con
+   utilidades en el JSX porque lo que las mueve son cuatro animaciones que sólo
+   tienen sentido juntas; suelto, cada trozo no significa nada.
+
+   `transform-box: view-box` es obligatorio: sin él, un `transform-origin` en
+   píxeles dentro de un SVG se mide contra la caja del propio trazo y los pétalos
+   se abrirían cada uno por su cuenta en vez de desde el centro de la flor. */
+@utility flower {
+  & .flower-stem {
+    stroke-dasharray: 30;
+    animation: flower-stem 2.8s var(--ease-out-soft) infinite both;
+  }
+
+  & .flower-leaf,
+  & .flower-petal,
+  & .flower-heart {
+    transform-box: view-box;
+  }
+
+  /* Cada hoja se despliega desde donde nace, no desde el centro del dibujo. */
+  & .flower-leaf {
+    transform-origin: 20px 47px;
+    animation: flower-leaf 2.8s var(--ease-out-soft) infinite both;
+  }
+
+  & .flower-leaf + .flower-leaf {
+    transform-origin: 20px 42px;
+  }
+
+  /* El retardo de cada pétalo lo pone el componente, como los del estallido del
+     botón de carrito: aquí no se puede contar con `nth-of-type`, porque cada
+     elipse va sola dentro de su grupo girado y todas serían la primera. */
+  & .flower-petal {
+    transform-origin: 20px 21px;
+    animation: flower-petal 2.8s var(--ease-out-soft) infinite both;
+  }
+
+  & .flower-heart {
+    transform-origin: 20px 21px;
+    animation: flower-heart 2.8s var(--ease-out-soft) infinite both;
   }
 }
 
