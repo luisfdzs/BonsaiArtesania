@@ -54,6 +54,19 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
 
   const close = () => setOpenedAt(null)
 
+  // «Contacto» es una sección de la portada, no una ruta: el `pathname` nunca
+  // dice si se está mirando ahí. Se sigue el hash a mano —al montar y en cada
+  // cambio— para que su hueco se marque igual que los demás en vez de quedarse
+  // siempre apagado.
+  const [hash, setHash] = useState('')
+  useEffect(() => {
+    const onHash = () => setHash(window.location.hash)
+    onHash()
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
+  const contactoActive = pathname === '/' && hash === '#contacto'
+
   // «Contacto» sale de la barra con su propio icono; las otras tres entradas del
   // menú del sitio son las que se despliegan. Se derivan de `navigation` en vez
   // de repetirse aquí: el menú tiene que decir lo mismo en móvil y en escritorio.
@@ -62,7 +75,8 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
   // Estando en Tienda o en Encargos, ninguno de los cinco iconos diría dónde
   // está: la sección vive detrás del menú. Así que el que la guarda se marca
   // como activo, y la barra nunca queda sin señalar la página. «El taller» es un
-  // ancla de la portada y por eso no entra —ver el comentario de Contacto—.
+  // ancla de la portada sin hueco propio en la barra, así que no necesita este
+  // seguimiento —a diferencia de Contacto, que sí tiene el suyo—.
   const inPanel = panelItems.some(
     (item) => !item.href.includes('#') && pathname.startsWith(item.href),
   )
@@ -155,9 +169,7 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
           </NavSlot>
         )}
 
-        {/* Las anclas de la portada no se marcan como activas: estando en el
-            inicio se marcarían dos a la vez, y eso es peor que no marcar nada. */}
-        <NavSlot href="/#contacto" label="Contacto" active={false} onClick={close}>
+        <NavSlot href="/#contacto" label="Contacto" active={contactoActive} onClick={close}>
           <ContactIcon className="h-6 w-6" />
         </NavSlot>
 
@@ -169,9 +181,7 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
           aria-label={open ? 'Cerrar el menú' : 'Más secciones'}
           className={cn(slotClass, slotState(open || inPanel))}
         >
-          <Halo active={open || inPanel}>
-            {open ? <CloseIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
-          </Halo>
+          {open ? <CloseIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
         </button>
       </nav>
     </>
@@ -180,19 +190,22 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
 
 /**
  * El hueco de cada icono. Reparte el ancho a partes iguales y estira a todo el
- * alto de la barra: lo que se toca es la celda entera, no el dibujo de 24px.
+ * alto de la barra —gracias al `items-stretch` del `<nav>`—, así que el propio
+ * hueco ya mide la celda entera: no hace falta una pastilla aparte de tamaño
+ * fijo.
  *
  * El activo va en salvia —el verde con el que responden los botones del sitio— y
  * los demás en tinta al 55%. Con el color a secas no bastaba: a 24px y con trazo
  * de 1,5px, el salvia contra el gris de los apagados hay que buscarlo. Así que el
- * verde se dice también en el fondo, con una pastilla del mismo salvia muy
- * rebajado, que es exactamente el gesto de los botones —relleno salvia y no sólo
- * un cambio de tinta— trasladado a un icono.
+ * verde se dice también en el fondo, con un cuadrado del mismo salvia muy
+ * rebajado que ocupa la celda entera —cuadrado y no redondo a propósito, para que
+ * la sección activa se lea como un hueco de la barra y no como un botón suelto—.
  */
 const slotClass =
-  'relative flex flex-1 flex-col items-center justify-center transition-[color,opacity] duration-500'
+  'relative flex flex-1 flex-col items-center justify-center transition-colors duration-500'
 
-const slotState = (active: boolean) => (active ? 'text-sage-deep' : 'text-bark opacity-55')
+const slotState = (active: boolean) =>
+  active ? 'bg-sage-deep/12 text-sage-deep' : 'text-bark opacity-55'
 
 function NavSlot({
   href,
@@ -215,28 +228,7 @@ function NavSlot({
       onClick={onClick}
       className={cn(slotClass, slotState(active))}
     >
-      <Halo active={active}>{children}</Halo>
-    </Link>
-  )
-}
-
-/**
- * La pastilla de fondo del icono activo. Mide lo mismo en todos los huecos, con
- * fondo o sin él, para que ningún icono se mueva al cambiar de página.
- *
- * El salvia va rebajado al 12%: lo justo para que el hueco se lea como
- * seleccionado sin que el dibujo pierda contraste contra su propio fondo. Redonda
- * como los botones del sitio, que son todos de borde redondo.
- */
-function Halo({ active, children }: { active: boolean; children: React.ReactNode }) {
-  return (
-    <span
-      className={cn(
-        'flex h-10 w-10 items-center justify-center rounded-full transition-colors duration-500',
-        active && 'bg-sage-deep/12',
-      )}
-    >
       {children}
-    </span>
+    </Link>
   )
 }

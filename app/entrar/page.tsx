@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { auth, signIn } from '@/auth'
 import { cn } from '@/lib/cn'
+import { SendIcon } from '@/components/ui/SocialIcons'
 
 export const metadata: Metadata = {
   title: 'Entrar',
@@ -35,8 +36,8 @@ export default async function EntrarPage({ searchParams }: Props) {
 
   return (
     <div className="page-gutter flex min-h-[70vh] items-center pt-16 pb-(--spacing-section) md:pt-24">
-      <div className="mx-auto w-full max-w-sm">
-        <div className="flex gap-8 border-b border-line pb-4">
+      <div className="mx-auto w-full max-w-sm text-center">
+        <div className="flex justify-center gap-8 border-b border-line pb-4">
           <Link
             href={`/entrar${volver ? `?volver=${encodeURIComponent(volver)}` : ''}`}
             aria-current={!creating ? 'page' : undefined}
@@ -93,13 +94,17 @@ export default async function EntrarPage({ searchParams }: Props) {
             type="email"
             required
             autoComplete="email"
-            autoFocus
             placeholder="tucorreo@ejemplo.com"
-            className="field"
+            className="field text-center"
           />
 
-          <button type="submit" className="btn mt-8 w-full">
-            Enviarme un enlace
+          <button
+            type="submit"
+            aria-label="Enviarme un enlace"
+            title="Enviarme un enlace"
+            className="btn btn-icon btn-icon-lg mt-8"
+          >
+            <SendIcon className="h-5 w-5" />
           </button>
         </form>
 

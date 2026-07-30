@@ -2,19 +2,17 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/cn'
 import { navigation } from '@/lib/navigation'
-import { AccountIcon, CartIcon } from './NavIcons'
+import { AccountIcon, CartIcon, CloseIcon, ContactIcon, HomeIcon, MenuIcon } from './NavIcons'
 import { Wordmark } from './Wordmark'
 
 /**
- * Necesita JS por una sola cosa: saber si se ha hecho scroll, para pasar de
- * transparente sobre el hero a fondo lino.
- *
- * En móvil la cabecera es sólo la marca. La navegación se fue abajo, a la barra
- * fija de `MobileNav`, y con ella el botón «Menú» y el panel a pantalla completa
- * que vivían aquí.
+ * Necesita JS por dos cosas: saber si se ha hecho scroll, para pasar de
+ * transparente sobre el hero a fondo lino, y llevar el mismo menú de iconos que
+ * `MobileNav` —inicio, cuenta, carrito, contacto y un desplegable «Más» con las
+ * secciones editoriales— para que el sitio se navegue igual en cualquier tamaño.
  */
 export function Header({ shopOpen }: { shopOpen: boolean }) {
   const pathname = usePathname()
@@ -61,10 +59,104 @@ export function Header({ shopOpen }: { shopOpen: boolean }) {
           <Wordmark className="h-7 md:h-9" />
         </Link>
 
-        <nav className="hidden items-center gap-9 md:flex" aria-label="Principal">
-          {navigation.map((item) => {
-            // Las anclas de la portada no se marcan como activas: estando en el
-            // inicio se marcarían dos a la vez, y eso es peor que no marcar nada.
+        <DesktopNav pathname={pathname} shopOpen={shopOpen} />
+      </div>
+    </header>
+  )
+}
+
+/**
+ * El mismo repertorio que `MobileNav`, en horizontal: inicio, cuenta, carrito y
+ * contacto son iconos con el mismo cuadrado salvia de activo, y las tres
+ * secciones editoriales que no caben aquí (Tienda, Encargos, El taller) viven
+ * detrás de «Más». Antes el escritorio tenía su propio menú de texto porque
+ * había sitio de sobra para las cuatro entradas de `navigation`; ahora dice lo
+ * mismo que el móvil en vez de decirlo distinto.
+ */
+function DesktopNav({ pathname, shopOpen }: { pathname: string; shopOpen: boolean }) {
+  const [open, setOpen] = useState(false)
+  const [hash, setHash] = useState('')
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const onHash = () => setHash(window.location.hash)
+    onHash()
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
+
+  useEffect(() => setOpen(false), [pathname])
+
+  useEffect(() => {
+    if (!open) return
+    const onKey = (event: KeyboardEvent) => event.key === 'Escape' && setOpen(false)
+    const onClick = (event: MouseEvent) => {
+      if (panelRef.current && !panelRef.current.contains(event.target as Node)) setOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    window.addEventListener('click', onClick)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      window.removeEventListener('click', onClick)
+    }
+  }, [open])
+
+  const panelItems = navigation.filter((item) => item.href !== '/#contacto')
+  const inPanel = panelItems.some(
+    (item) => !item.href.includes('#') && pathname.startsWith(item.href),
+  )
+  const contactoActive = pathname === '/' && hash === '#contacto'
+
+  return (
+    <nav className="hidden items-center gap-1 md:flex" aria-label="Principal">
+      <IconLink
+        href="/"
+        label="Inicio"
+        active={pathname === '/'}
+        onClick={(event) => {
+          if (pathname === '/') {
+            event.preventDefault()
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+          }
+        }}
+      >
+        <HomeIcon className="h-5 w-5" />
+      </IconLink>
+
+      {shopOpen && (
+        <IconLink href="/carrito" label="Carrito" active={pathname === '/carrito'}>
+          <CartIcon className="h-5 w-5" />
+        </IconLink>
+      )}
+
+      <IconLink href="/cuenta" label="Cuenta" active={pathname.startsWith('/cuenta')}>
+        <AccountIcon className="h-5 w-5" />
+      </IconLink>
+
+      <IconLink href="/#contacto" label="Contacto" active={contactoActive}>
+        <ContactIcon className="h-5 w-5" />
+      </IconLink>
+
+      <div ref={panelRef} className="relative">
+        <button
+          type="button"
+          onClick={() => setOpen((value) => !value)}
+          aria-expanded={open}
+          aria-controls="menu-escritorio"
+          aria-label={open ? 'Cerrar el menú' : 'Más secciones'}
+          className={cn(iconClass, iconState(open || inPanel))}
+        >
+          {open ? <CloseIcon className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
+        </button>
+
+        {/* `hidden` y no un `return` condicional: así el botón conserva
+            `aria-controls` apuntando a un nodo que siempre existe. */}
+        <div
+          id="menu-escritorio"
+          hidden={!open}
+          className="absolute top-full right-0 z-50 mt-2 min-w-40 border border-line bg-linen py-2 shadow-lg"
+        >
+          {panelItems.map((item) => {
             const isSection = item.href.includes('#')
             const active = !isSection && pathname.startsWith(item.href)
             return (
@@ -72,50 +164,61 @@ export function Header({ shopOpen }: { shopOpen: boolean }) {
                 key={item.href}
                 href={item.href}
                 aria-current={active ? 'page' : undefined}
+                onClick={() => setOpen(false)}
                 className={cn(
-                  'link-underline tap text-small tracking-wide transition-opacity duration-500',
-                  active ? 'opacity-100' : 'opacity-70 hover:opacity-100',
+                  'block px-4 py-2 text-small tracking-wide whitespace-nowrap transition-colors duration-500',
+                  active ? 'bg-sage-deep/12 text-sage-deep' : 'text-bark opacity-70 hover:opacity-100 hover:bg-sage-deep/12',
                 )}
               >
                 {item.label}
               </Link>
             )
           })}
-          {/* «Carrito» y «Cuenta» van fuera de `navigation` a propósito: ese
-              array es el menú editorial del sitio y quiere quedarse en cuatro
-              entradas. Estas dos son herramientas, no secciones, y por eso se
-              separan con un filete y se dicen con un icono, no con la palabra.
-
-              Sin `link-underline` en ellas: el filete de ese efecto cruzaría
-              por debajo del dibujo y parecería un error. Basta la opacidad.
-
-              Aquí el carrito sigue sin número, y no es un olvido: leerlo en el
-              servidor convertiría todas las páginas en dinámicas. El indicador
-              existe sólo en la barra de móvil, que lo pide al vuelo a un endpoint
-              —ver `CartCount`—. En escritorio no hace tanta falta: el menú entero
-              está a la vista y el carrito no queda debajo del pulgar. */}
-          <span className="ml-3 flex items-center gap-6 border-l border-current/20 pl-6">
-            {/* Sin tienda abierta no hay carrito que enseñar. «Cuenta» sí se
-                queda: quien ya tenga una debe poder entrar a ver sus pedidos. */}
-            {shopOpen && (
-              <Link
-                href="/carrito"
-                aria-label="Carrito"
-                className="tap opacity-70 transition-opacity duration-500 hover:opacity-100"
-              >
-                <CartIcon className="h-5 w-5" />
-              </Link>
-            )}
-            <Link
-              href="/cuenta"
-              aria-label="Cuenta"
-              className="tap opacity-70 transition-opacity duration-500 hover:opacity-100"
-            >
-              <AccountIcon className="h-5 w-5" />
-            </Link>
-          </span>
-        </nav>
+        </div>
       </div>
-    </header>
+    </nav>
+  )
+}
+
+/**
+ * El cuadrado salvia del icono activo, igual que en `MobileNav` pero con hover:
+ * en escritorio hay ratón, así que el gesto también se anticipa al pasar por
+ * encima y no sólo se confirma al llegar.
+ */
+const iconClass =
+  'tap relative flex h-10 w-10 items-center justify-center transition-colors duration-500'
+
+// Sin `text-bark` en el estado apagado: el icono vive sobre la cabecera, que es
+// transparente contra el hero y sólo se vuelve lino al hacer scroll —el color
+// tiene que seguir heredando el de `<header>` en vez de fijarse en tinta,
+// o se vería oscuro sobre una imagen donde el resto del texto es blanco.
+const iconState = (active: boolean) =>
+  active
+    ? 'bg-sage-deep/12 text-sage-deep'
+    : 'opacity-70 hover:opacity-100 hover:bg-sage-deep/12'
+
+function IconLink({
+  href,
+  label,
+  active,
+  onClick,
+  children,
+}: {
+  href: string
+  label: string
+  active: boolean
+  onClick?: (event: React.MouseEvent<HTMLAnchorElement>) => void
+  children: React.ReactNode
+}) {
+  return (
+    <Link
+      href={href}
+      aria-label={label}
+      aria-current={active ? 'page' : undefined}
+      onClick={onClick}
+      className={cn(iconClass, iconState(active))}
+    >
+      {children}
+    </Link>
   )
 }
