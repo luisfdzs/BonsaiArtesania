@@ -21,12 +21,12 @@ export default async function TallerPedidoPage({ params }: Params) {
   const address = order.shipping.address
 
   return (
-    <section className="max-w-2xl">
+    <section>
       <Link href="/taller" className="link-underline tap eyebrow">
         ← Pedidos
       </Link>
 
-      <header className="mt-8 flex flex-wrap items-baseline justify-between gap-4">
+      <header className="mt-8 flex flex-col items-center gap-2">
         <h2 className="font-serif text-title">{order.number}</h2>
         <p className="text-small text-bark-soft">{ORDER_STATUS_LABEL[order.status]}</p>
       </header>
@@ -42,13 +42,15 @@ export default async function TallerPedidoPage({ params }: Params) {
         {order.items.map((item) => (
           <li
             key={item.slug}
-            className="flex justify-between gap-4 border-b border-line py-4 first:border-t"
+            className="flex flex-col items-center gap-1 border-b border-line py-4 first:border-t"
           >
             <Link href={`/tienda/${item.slug}`} className="link-underline tap">
               {item.name}
               {item.qty > 1 && ` × ${item.qty}`}
             </Link>
-            <span>{formatCents(item.unitPriceCents * item.qty)}</span>
+            <span className="text-small text-bark-soft">
+              {formatCents(item.unitPriceCents * item.qty)}
+            </span>
           </li>
         ))}
       </ul>
@@ -101,7 +103,7 @@ export default async function TallerPedidoPage({ params }: Params) {
             <input id="note" name="note" type="text" className="field" />
           </div>
 
-          <button type="submit" className="btn self-start">
+          <button type="submit" className="btn self-center">
             Guardar
           </button>
         </form>
