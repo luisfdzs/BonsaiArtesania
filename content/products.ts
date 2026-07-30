@@ -96,6 +96,40 @@ export const products: Product[] = [
     featured: false,
   },
   {
+    slug: 'pendientes-turmalina',
+    name: 'Pendientes Turmalina',
+    category: 'pendientes',
+    price: 34,
+    summary: 'Pétalos de muchos colores en forma de ala',
+    description: [
+      'Pétalos rosas, naranjas y lilas repartidos sin orden dentro de una resina en forma de ala. El nombre viene de la piedra: dos colores que se cruzan y nunca salen igual dos veces.',
+      'Cada par es distinto, así que el que recibes no es exactamente el de la foto.',
+    ],
+    materials: ['Resina', 'Pétalos secos', 'Acero dorado'],
+    image: img(
+      'pendientes-turmalina',
+      'Pendientes de resina con pétalos de colores puestos en una oreja',
+    ),
+    featured: false,
+  },
+  {
+    slug: 'pendientes-colgantes-margarita',
+    name: 'Pendientes Colgantes Margarita',
+    category: 'pendientes',
+    price: 32,
+    summary: 'Una margarita rosa al final de una cadena',
+    description: [
+      'Una margarita entera, rosada, colgando de una cadena fina dorada. Se mueve al andar y roza el cuello.',
+      'Los mismos pétalos que en la versión de aro, pero con caída.',
+    ],
+    materials: ['Resina', 'Margarita seca', 'Cadena de acero dorado'],
+    image: img(
+      'pendientes-colgantes-margarita',
+      'Pendiente largo con una margarita rosa en resina, junto al cuello',
+    ),
+    featured: false,
+  },
+  {
     slug: 'anillo-flor-silvestre',
     name: 'Anillo Flor Silvestre',
     category: 'anillos',
@@ -134,6 +168,23 @@ export const products: Product[] = [
     ],
     materials: ['Resina', 'Flor seca', 'Montura dorada ajustable'],
     image: img('anillos-de-campo', 'Tres anillos finos con flores en resina sobre un soporte'),
+    featured: false,
+  },
+  {
+    slug: 'anillo-ajustable-margarita',
+    name: 'Anillo Ajustable Margarita',
+    category: 'anillos',
+    price: 34,
+    summary: 'Flores amarillas en resina irregular',
+    description: [
+      'Flores pequeñas amarillas y naranjas dentro de una resina de borde libre, sin molde: cada anillo sale con su propia forma.',
+      'La montura es ajustable, así que no hace falta saber la talla.',
+    ],
+    materials: ['Resina', 'Flor silvestre seca', 'Montura ajustable'],
+    image: img(
+      'anillo-ajustable-margarita',
+      'Anillo de resina con flores amarillas en una mano, entre espigas',
+    ),
     featured: false,
   },
   {
