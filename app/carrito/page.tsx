@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { CartPing } from '@/components/layout/CartCount'
+import { CheckIcon, TrashIcon } from '@/components/ui/CartIcons'
+import { Media } from '@/components/ui/Media'
 import { readCart } from '@/lib/cart'
 import { formatCents } from '@/lib/schema'
 import { shopOpen } from '@/lib/shop'
@@ -51,76 +53,112 @@ export default async function CarritoPage() {
   }
 
   return (
-    <div className="page-gutter pt-16 pb-(--spacing-section) md:pt-24">
-      <h1 className="font-serif text-title">Tu carrito</h1>
+    <div className="page-gutter pt-10 pb-(--spacing-section) md:pt-16">
+      <Link href="/tienda" className="link-underline tap eyebrow">
+        ← Seguir viendo la tienda
+      </Link>
 
-      <div className="mt-14 grid gap-14 lg:grid-cols-12">
+      <div className="mt-5 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+        <h1 className="font-serif text-title">Tu carrito</h1>
+        <p className="text-small text-bark-faint">
+          {cart.count} {cart.count === 1 ? 'pieza' : 'piezas'}
+        </p>
+      </div>
+
+      <div className="mt-12 grid gap-14 lg:grid-cols-12 lg:items-start">
         <ul className="lg:col-span-7">
           {cart.lines.map((line) => (
             <li
               key={line.slug}
-              className="flex items-start justify-between gap-6 border-b border-line py-6 first:border-t"
+              className="flex gap-5 border-b border-line py-8 first:border-t sm:gap-7"
             >
-              <div>
-                <Link href={`/tienda/${line.slug}`} className="link-underline tap">
-                  {line.name}
-                </Link>
-                <p className="mt-2 text-small text-bark-faint">
-                  {formatCents(line.unitPriceCents)} por unidad
-                </p>
-                {/* Piezas únicas: alguien pudo comprarla mientras estaba aquí
-                    guardada. Se avisa en la línea y no suma al total. */}
-                {line.available < line.qty && (
-                  <p className="mt-2 text-small text-sage-deep">
-                    {line.available === 0
-                      ? 'Se ha agotado. Quítala para poder seguir.'
-                      : `Sólo queda${line.available === 1 ? '' : 'n'} ${line.available}. Ajusta la cantidad.`}
+              <Link href={`/tienda/${line.slug}`} className="w-20 shrink-0 sm:w-28">
+                <Media
+                  image={line.image}
+                  ratio="1 / 1"
+                  sizes="(max-width: 640px) 5rem, 7rem"
+                  className="border border-line"
+                />
+              </Link>
+
+              <div className="flex flex-1 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0">
+                  <Link
+                    href={`/tienda/${line.slug}`}
+                    className="link-underline tap font-serif text-lead"
+                  >
+                    {line.name}
+                  </Link>
+                  <p className="mt-2 text-small text-bark-faint">
+                    {formatCents(line.unitPriceCents)} por unidad
                   </p>
-                )}
-              </div>
 
-              <div className="flex shrink-0 items-center gap-6">
-                {/* Un `select` que se envía al cambiar es lo más simple que
-                    funciona con y sin JavaScript; sin él hace falta pulsar Intro,
-                    que sigue siendo un camino válido. */}
-                <form action={setQty} className="flex items-center gap-2">
-                  <input type="hidden" name="slug" value={line.slug} />
-                  {/* Cambiar la cantidad cambia el contador de la barra de móvil,
-                      y este aviso es lo que se lo dice. Ver `CartCount`. */}
-                  <CartPing />
-                  <label className="sr-only" htmlFor={`qty-${line.slug}`}>
-                    Cantidad de {line.name}
-                  </label>
-                  <input
-                    id={`qty-${line.slug}`}
-                    name="qty"
-                    type="number"
-                    min={1}
-                    max={20}
-                    defaultValue={line.qty}
-                    className="field w-14 text-center"
-                  />
-                  <button type="submit" className="link-underline tap text-small text-bark-faint">
-                    Cambiar
-                  </button>
-                </form>
+                  {/* Piezas únicas: alguien pudo comprarla mientras estaba aquí
+                      guardada. Se avisa en la línea y no suma al total. */}
+                  {line.available < line.qty && (
+                    <p className="mt-2 text-small text-sage-deep">
+                      {line.available === 0
+                        ? 'Se ha agotado. Quítala para poder seguir.'
+                        : `Sólo queda${line.available === 1 ? '' : 'n'} ${line.available}. Ajusta la cantidad.`}
+                    </p>
+                  )}
+                </div>
 
-                <p className="w-20 text-right">{formatCents(line.lineTotalCents)}</p>
+                <div className="flex shrink-0 items-center justify-between gap-5 sm:flex-col sm:items-end sm:gap-4">
+                  <p className="text-lead">{formatCents(line.lineTotalCents)}</p>
 
-                <form action={removeFromCart}>
-                  <input type="hidden" name="slug" value={line.slug} />
-                  <CartPing />
-                  <button type="submit" className="link-underline tap text-small text-bark-faint">
-                    Quitar
-                  </button>
-                </form>
+                  <div className="flex items-center gap-3">
+                    {/* Un `input` numérico que se envía al pulsar el visto es lo
+                        más simple que funciona con y sin JavaScript; sin él sigue
+                        valiendo pulsar Intro dentro del campo. */}
+                    <form action={setQty} className="flex items-center border border-line">
+                      <input type="hidden" name="slug" value={line.slug} />
+                      {/* Cambiar la cantidad cambia el contador de la barra de
+                          móvil, y este aviso es lo que se lo dice. Ver `CartCount`. */}
+                      <CartPing />
+                      <label className="sr-only" htmlFor={`qty-${line.slug}`}>
+                        Cantidad de {line.name}
+                      </label>
+                      <input
+                        id={`qty-${line.slug}`}
+                        name="qty"
+                        type="number"
+                        min={1}
+                        max={20}
+                        defaultValue={line.qty}
+                        className="w-10 border-0 bg-transparent py-2 text-center text-small [appearance:textfield] focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                      />
+                      <button
+                        type="submit"
+                        aria-label="Actualizar cantidad"
+                        title="Actualizar cantidad"
+                        className="tap flex h-9 w-9 shrink-0 items-center justify-center border-l border-line text-bark-faint transition-colors duration-500 hover:text-sage-deep"
+                      >
+                        <CheckIcon className="h-4 w-4" />
+                      </button>
+                    </form>
+
+                    <form action={removeFromCart}>
+                      <input type="hidden" name="slug" value={line.slug} />
+                      <CartPing />
+                      <button
+                        type="submit"
+                        aria-label={`Quitar ${line.name}`}
+                        title="Quitar"
+                        className="tap flex h-9 w-9 items-center justify-center text-bark-faint transition-colors duration-500 hover:text-sage-deep"
+                      >
+                        <TrashIcon className="h-4 w-4" />
+                      </button>
+                    </form>
+                  </div>
+                </div>
               </div>
             </li>
           ))}
         </ul>
 
         <aside className="lg:col-span-5 lg:sticky lg:top-32 lg:self-start">
-          <div className="border border-line p-8">
+          <div className="border border-line bg-linen-deep/50 p-8 sm:p-10">
             <h2 className="eyebrow">Resumen</h2>
 
             <dl className="mt-8 flex flex-col gap-3">
@@ -132,9 +170,9 @@ export default async function CarritoPage() {
                 <dt className="text-bark-soft">Envío</dt>
                 <dd>{cart.shippingCents === 0 ? 'Gratis' : formatCents(cart.shippingCents)}</dd>
               </div>
-              <div className="mt-3 flex justify-between border-t border-line pt-4 text-lead">
-                <dt>Total</dt>
-                <dd>{formatCents(cart.totalCents)}</dd>
+              <div className="mt-3 flex items-baseline justify-between border-t border-line pt-5">
+                <dt className="font-serif text-lead">Total</dt>
+                <dd className="font-serif text-title">{formatCents(cart.totalCents)}</dd>
               </div>
             </dl>
 
