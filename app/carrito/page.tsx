@@ -42,9 +42,11 @@ export default async function CarritoPage() {
 
   if (cart.lines.length === 0) {
     return (
-      // Igual que el 404: con tan poco contenido, pegarlo arriba deja la
-      // pantalla medio vacía, así que se centra en los dos ejes.
-      <div className="page-gutter grid min-h-[60svh] place-items-center py-24 text-center">
+      // Con tan poco contenido, pegarlo arriba deja la pantalla medio vacía.
+      // `data-fill` hace que el <main> estire esta caja a todo el hueco entre
+      // cabecera y pie (ver globals.css) y aquí el grid reparte ese hueco por
+      // igual arriba y abajo. El relleno es simétrico para no descentrarlo.
+      <div data-fill className="page-gutter grid place-items-center py-16 text-center">
         <div>
           <h1 className="font-serif text-title">Tu carrito</h1>
           <p className="mt-6 text-bark-soft">Todavía no has añadido ninguna pieza.</p>
