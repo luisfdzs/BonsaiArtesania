@@ -15,7 +15,7 @@ export default async function TallerStockPage() {
   const stock = await availabilityFor(sellable.map((product) => product.slug))
 
   return (
-    <section className="max-w-2xl">
+    <section>
       <p className="text-bark-soft">
         Cuántas unidades quedan de cada pieza. Una pieza única lleva 1: al venderse baja a 0 sola y
         deja de poderse comprar.
@@ -28,7 +28,7 @@ export default async function TallerStockPage() {
           return (
             <li
               key={product.slug}
-              className="flex flex-wrap items-center justify-between gap-4 border-b border-line py-4 first:border-t"
+              className="flex flex-col items-center gap-3 border-b border-line py-4 first:border-t"
             >
               <div>
                 <p>{product.name}</p>
@@ -38,7 +38,7 @@ export default async function TallerStockPage() {
                 </p>
               </div>
 
-              <form action={updateStock} className="flex items-center gap-3">
+              <form action={updateStock} className="flex items-center justify-center gap-3">
                 <input type="hidden" name="slug" value={product.slug} />
                 <label className="sr-only" htmlFor={`stock-${product.slug}`}>
                   Unidades de {product.name}

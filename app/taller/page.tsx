@@ -36,7 +36,7 @@ export default async function TallerPedidosPage({ searchParams }: Props) {
 
   return (
     <section>
-      <div className="flex flex-wrap gap-x-6 gap-y-3">
+      <div className="flex flex-wrap justify-center gap-x-6 gap-y-3">
         <Link
           href="/taller"
           className={`text-small ${!estado ? 'text-bark' : 'text-bark-faint'} link-underline tap`}
@@ -60,7 +60,10 @@ export default async function TallerPedidosPage({ searchParams }: Props) {
         <ul className="mt-12 flex flex-col">
           {docs.map((order) => (
             <li key={order.number} className="border-b border-line py-5 first:border-t">
-              <div className="flex flex-wrap items-baseline justify-between gap-4">
+              {/* Antes eran dos columnas, pedido a la izquierda y total a la
+                  derecha. Centrado se apilan: el número primero, porque es lo que
+                  se pulsa, y el importe y el estado debajo. */}
+              <div className="flex flex-col items-center gap-3">
                 <div>
                   <Link href={`/taller/pedidos/${order.number}`} className="link-underline tap">
                     {order.number}
@@ -76,7 +79,7 @@ export default async function TallerPedidosPage({ searchParams }: Props) {
                   </p>
                 </div>
 
-                <div className="text-right">
+                <div>
                   <p>{formatCents(order.totals.totalCents)}</p>
                   <p className="mt-2 text-small text-bark-soft">
                     {ORDER_STATUS_LABEL[order.status]}
