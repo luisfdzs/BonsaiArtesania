@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { ObjectId } from 'mongodb'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { auth } from '@/auth'
+import { getSession } from '@/auth'
 import { ORDER_STATUS_LABEL } from '@/lib/order-status'
 import { formatCents, orders } from '@/lib/schema'
 
@@ -18,7 +18,7 @@ const dateFormat = new Intl.DateTimeFormat('es-ES', {
 })
 
 export default async function PedidosPage() {
-  const session = await auth()
+  const session = await getSession()
   if (!session?.user?.id) redirect('/entrar?volver=/cuenta/pedidos')
 
   const collection = await orders()

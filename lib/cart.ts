@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb'
 import { cookies } from 'next/headers'
-import { auth } from '@/auth'
+import { getSession } from '@/auth'
 import { getProduct } from '@/content/products'
 import { carts, toCents, type CartDoc } from '@/lib/schema'
 import { shippingCostCents } from '@/lib/shipping'
@@ -53,7 +53,7 @@ const EMPTY: Cart = {
  * acción de «añadir al carrito», que es el primer momento en que hace falta.
  */
 export async function cartOwner(): Promise<{ userId?: ObjectId; guestId?: string } | null> {
-  const session = await auth()
+  const session = await getSession()
   if (session?.user?.id) return { userId: new ObjectId(session.user.id) }
 
   const guestId = (await cookies()).get(GUEST_COOKIE)?.value
@@ -97,7 +97,7 @@ async function mergeGuestCart(userId: ObjectId): Promise<void> {
 
 /** Documento del carrito de esta petición, ya fusionado si hacía falta. */
 export async function cartDoc(): Promise<CartDoc | null> {
-  const session = await auth()
+  const session = await getSession()
 
   if (session?.user?.id) {
     const userId = new ObjectId(session.user.id)
