@@ -2,6 +2,7 @@ import { ObjectId } from 'mongodb'
 import { cookies } from 'next/headers'
 import { getSession } from '@/auth'
 import { getProduct } from '@/content/products'
+import type { Image } from '@/lib/media'
 import { carts, toCents, type CartDoc } from '@/lib/schema'
 import { shippingCostCents } from '@/lib/shipping'
 import { availabilityFor } from '@/lib/stock'
@@ -26,6 +27,7 @@ export type CartLine = {
   lineTotalCents: number
   /** Unidades que quedan. Menos que `qty` significa que no se puede cerrar así. */
   available: number
+  image: Image | null
 }
 
 export type Cart = {
@@ -137,6 +139,7 @@ export async function readCart(): Promise<Cart> {
         unitPriceCents,
         lineTotalCents: unitPriceCents * item.qty,
         available: stock.get(item.slug) ?? 0,
+        image: product.image,
       },
     ]
   })
