@@ -37,15 +37,22 @@ export function useActiveSection(): string {
 
     // La línea a la altura de la cabecera: una sección cuenta como «la
     // actual» en cuanto su borde superior la cruza, igual que se lee arriba
-    // del todo nada más llegar a una página nueva.
+    // del todo nada más llegar a una página nueva. El margen de unos pocos
+    // píxeles importa de verdad: el scroll automático al enlazar a una
+    // sección la deja con el borde justo en `scroll-padding-top` (96px),
+    // pero el redondeo de subpíxel puede dejarla en 96,17 y, sin margen, esa
+    // fracción de más bastaba para que nunca se contara cruzada —Contacto,
+    // al ser la última sección, se quedaba entonces marcando El taller para
+    // siempre—.
     const LINE = 96
+    const TOLERANCE = 4
 
     let frame = 0
     const read = () => {
       frame = 0
       let current = ''
       for (const el of sections) {
-        if (el.getBoundingClientRect().top <= LINE) current = el.id
+        if (el.getBoundingClientRect().top <= LINE + TOLERANCE) current = el.id
       }
       setId(current)
       const hash = current ? `#${current}` : ''
