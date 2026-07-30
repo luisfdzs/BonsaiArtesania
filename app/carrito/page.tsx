@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { CartPing } from '@/components/layout/CartCount'
 import { readCart } from '@/lib/cart'
 import { formatCents } from '@/lib/schema'
 import { shopOpen } from '@/lib/shop'
@@ -84,6 +85,9 @@ export default async function CarritoPage() {
                     que sigue siendo un camino válido. */}
                 <form action={setQty} className="flex items-center gap-2">
                   <input type="hidden" name="slug" value={line.slug} />
+                  {/* Cambiar la cantidad cambia el contador de la barra de móvil,
+                      y este aviso es lo que se lo dice. Ver `CartCount`. */}
+                  <CartPing />
                   <label className="sr-only" htmlFor={`qty-${line.slug}`}>
                     Cantidad de {line.name}
                   </label>
@@ -105,6 +109,7 @@ export default async function CarritoPage() {
 
                 <form action={removeFromCart}>
                   <input type="hidden" name="slug" value={line.slug} />
+                  <CartPing />
                   <button type="submit" className="link-underline tap text-small text-bark-faint">
                     Quitar
                   </button>

@@ -2,6 +2,7 @@
 
 import { type AnimationEvent, type CSSProperties, useState } from 'react'
 import { addToCart } from '@/app/carrito/actions'
+import { CartPing } from '@/components/layout/CartCount'
 
 /**
  * Botón de añadir al carrito.
@@ -14,7 +15,7 @@ import { addToCart } from '@/app/carrito/actions'
  * A propósito **no** consulta si la pieza ya está en el carrito. Hacerlo obligaría
  * a leer la base de datos en la ficha y las 14 fichas dejarían de generarse en
  * build para pasar a renderizarse en cada visita. Cambiar el botón no paga ese
- * precio; quien quiera ver lo que lleva tiene el contador de la cabecera.
+ * precio; quien quiera ver lo que lleva tiene el contador de la barra de móvil.
  *
  * Ya no lleva rótulo: el icono de la bolsa con el «+» dice lo mismo en un cuarto
  * del sitio, y el botón deja de ocupar la columna entera —«Añadir al carrito» a
@@ -78,6 +79,9 @@ export function AddToCart({ slug }: { slug: string }) {
   return (
     <form action={addToCart} className="relative w-fit">
       <input type="hidden" name="slug" value={slug} />
+      {/* Avisa al contador de la barra de móvil cuando la pieza ya está dentro.
+          No pinta nada y no toca el envío, que sigue funcionando sin JS. */}
+      <CartPing />
       <button
         type="submit"
         onClick={() => setBurst((n) => n + 1)}

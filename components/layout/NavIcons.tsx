@@ -1,5 +1,6 @@
 /**
- * Los dos iconos de herramientas de la barra: carrito y cuenta.
+ * Los iconos de navegación: carrito y cuenta en la barra de escritorio, y esos
+ * dos más casa, contacto, menú y cerrar en la barra inferior de móvil.
  *
  * Trazados de Lucide (ISC), guardados también como archivo en `public/icons/`
  * para tenerlos a mano. Van embebidos y no como <img> por lo mismo que los de
@@ -38,6 +39,47 @@ export function AccountIcon({ className }: IconProps) {
     <svg {...common} aria-hidden className={className}>
       <circle cx="12" cy="8" r="5" />
       <path d="M20 21a8 8 0 0 0-16 0" />
+    </svg>
+  )
+}
+
+/** Inicio. En escritorio ese papel lo hace la marca; en la barra de móvil, esto. */
+export function HomeIcon({ className }: IconProps) {
+  return (
+    <svg {...common} aria-hidden className={className}>
+      <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+      <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+    </svg>
+  )
+}
+
+/**
+ * Contacto. Un bocadillo y no un sobre: en esa sección no hay formulario, se
+ * cierra hablando por WhatsApp o Instagram, y el sobre prometería un correo.
+ */
+export function ContactIcon({ className }: IconProps) {
+  return (
+    <svg {...common} aria-hidden className={className}>
+      <path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719" />
+    </svg>
+  )
+}
+
+export function MenuIcon({ className }: IconProps) {
+  return (
+    <svg {...common} aria-hidden className={className}>
+      <path d="M4 5h16" />
+      <path d="M4 12h16" />
+      <path d="M4 19h16" />
+    </svg>
+  )
+}
+
+export function CloseIcon({ className }: IconProps) {
+  return (
+    <svg {...common} aria-hidden className={className}>
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
     </svg>
   )
 }
