@@ -1,6 +1,7 @@
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getSession, signOut } from '@/auth'
+import { LogoutIcon } from '@/components/cuenta/CuentaIcons'
+import { CuentaNav } from '@/components/cuenta/CuentaNav'
 
 /**
  * Guarda de toda la zona de cuenta. Se hace aquí, en un layout de servidor, y no
@@ -8,48 +9,62 @@ import { getSession, signOut } from '@/auth'
  * antes de poder consultarla sin arrastrar el driver de Mongo al edge. Un layout
  * ya se ejecuta en el servidor con acceso completo, y protege por igual a todas
  * las rutas hijas presentes y futuras.
+ *
+ * Toda la zona es una sola columna centrada, como el resto de las páginas de
+ * texto del sitio: la cuenta de una tienda de cuatro secciones no necesita un
+ * panel con barra lateral, y centrado se lee igual en móvil que en escritorio sin
+ * dos maquetaciones distintas.
  */
 export default async function CuentaLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession()
 
   if (!session?.user) redirect('/entrar?volver=/cuenta')
 
-  return (
-    <div className="page-gutter pt-16 md:pt-24">
-      <header className="flex flex-wrap items-baseline justify-between gap-6 border-b border-line pb-6">
-        <div>
-          <p className="eyebrow">Tu cuenta</p>
-          <h1 className="mt-2 font-serif text-title">{session.user.name ?? 'Hola'}</h1>
-        </div>
+  const name = session.user.name?.trim()
+  const email = session.user.email ?? ''
+  // La inicial del nombre, y si aún no lo ha rellenado, la del correo. En
+  // mayúscula desde CSS (`uppercase`) y no aquí, para no romper letras que se
+  // mayusculizan en dos caracteres.
+  const initial = (name || email || '·').slice(0, 1)
 
+  return (
+    <div className="page-gutter pt-16 pb-(--spacing-section) md:pt-24">
+      <header className="mx-auto flex max-w-2xl flex-col items-center text-center">
+        <span
+          aria-hidden
+          className="flex h-16 w-16 items-center justify-center rounded-full border border-line bg-petal-soft font-serif text-lead text-bark-soft uppercase"
+        >
+          {initial}
+        </span>
+
+        <p className="eyebrow mt-6">Tu cuenta</p>
+        <h1 className="mt-3 font-serif text-title">{name || 'Hola'}</h1>
+        {email && <p className="mt-3 text-small text-bark-faint">{email}</p>}
+      </header>
+
+      <div className="mx-auto mt-10 max-w-2xl border-t border-line pt-8">
+        <CuentaNav />
+      </div>
+
+      <div className="mx-auto mt-14 max-w-xl text-center">{children}</div>
+
+      {/* Salir vive al final de la columna y no arriba a la derecha: arriba
+          quedaría pegado a las pestañas, y es el único gesto de aquí que saca a
+          alguien de su cuenta. Abajo se encuentra cuando se busca y no se pulsa
+          sin querer. */}
+      <div className="mx-auto mt-20 max-w-xl border-t border-line pt-10 text-center">
         <form
           action={async () => {
             'use server'
             await signOut({ redirectTo: '/' })
           }}
         >
-          <button type="submit" className="btn btn-quiet">
+          <button type="submit" className="btn btn-quiet btn-sm">
+            <LogoutIcon className="h-4 w-4" />
             Salir
           </button>
         </form>
-      </header>
-
-      <nav className="mt-8 flex gap-8" aria-label="Secciones de tu cuenta">
-        <Link href="/cuenta" className="link-underline tap text-small">
-          Datos personales
-        </Link>
-        <Link href="/cuenta/pedidos" className="link-underline tap text-small">
-          Pedidos
-        </Link>
-        <Link href="/cuenta/direcciones" className="link-underline tap text-small">
-          Direcciones
-        </Link>
-        <Link href="/cuenta/privacidad" className="link-underline tap text-small">
-          Datos y privacidad
-        </Link>
-      </nav>
-
-      <div className="mt-12 max-w-xl pb-(--spacing-section)">{children}</div>
+      </div>
     </div>
   )
 }

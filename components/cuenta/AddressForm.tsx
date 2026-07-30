@@ -2,7 +2,10 @@
 
 import { useActionState, useEffect } from 'react'
 import { createAddress, updateAddress, type ActionState } from '@/app/cuenta/actions'
+import { CloseIcon } from '@/components/layout/NavIcons'
+import { CheckIcon } from '@/components/ui/CartIcons'
 import { Field } from '@/components/ui/Field'
+import { PlusIcon } from './CuentaIcons'
 
 export type AddressValues = {
   id?: string
@@ -43,7 +46,7 @@ export function AddressForm({
   }, [state.ok, onDone])
 
   return (
-    <form action={action} className="flex flex-col gap-8">
+    <form action={action} className="flex flex-col gap-8 text-left">
       {editing && <input type="hidden" name="id" value={values.id} />}
 
       <Field
@@ -134,12 +137,19 @@ export function AddressForm({
         </p>
       )}
 
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center justify-center gap-3 border-t border-line pt-8">
         <button type="submit" className="btn" disabled={pending}>
+          {editing ? <CheckIcon className="h-4 w-4" /> : <PlusIcon className="h-4 w-4" />}
           {pending ? 'Guardando…' : editing ? 'Guardar cambios' : 'Añadir dirección'}
         </button>
         {onDone && (
-          <button type="button" className="btn btn-quiet" onClick={onDone} disabled={pending}>
+          <button
+            type="button"
+            className="btn btn-quiet btn-sm"
+            onClick={onDone}
+            disabled={pending}
+          >
+            <CloseIcon className="h-4 w-4" />
             Cancelar
           </button>
         )}

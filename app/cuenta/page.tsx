@@ -3,6 +3,7 @@ import { ObjectId } from 'mongodb'
 import { redirect } from 'next/navigation'
 import { getSession } from '@/auth'
 import { ProfileForm } from '@/components/cuenta/ProfileForm'
+import { SectionIntro } from '@/components/cuenta/SectionIntro'
 import { users } from '@/lib/schema'
 
 export const metadata: Metadata = {
@@ -25,9 +26,9 @@ export default async function CuentaPage() {
 
   return (
     <section>
-      <p className="text-bark-soft">
-        Estos datos se usan para preparar tus pedidos y para avisarte de cómo va el envío.
-      </p>
+      <SectionIntro title="Tus datos">
+        Se usan para preparar tus pedidos y para avisarte de cómo va el envío.
+      </SectionIntro>
 
       <div className="mt-12">
         <ProfileForm name={user.name ?? null} phone={user.phone ?? null} email={user.email} />
