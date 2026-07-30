@@ -222,6 +222,18 @@
     text-shadow: 0 1px 24px rgb(0 0 0 / 0.3);
   }
 
+  /* Pantallas casi vacías —el carrito sin nada dentro— que quieren su contenido
+     en el centro vertical del hueco entre cabecera y pie. No basta con
+     `min-height: 100%` en la página: el <main> es un ítem flex de altura
+     automática y el porcentaje no resuelve contra él. Así que es el <main> el
+     que se vuelve rejilla de una fila `1fr`, y con eso la página se estira a
+     todo el hueco disponible y puede centrar dentro. Igual que con el hero, lo
+     decide :has(): el layout no necesita saber en qué página está. */
+  main:has(> [data-fill]) {
+    display: grid;
+    grid-template-rows: 1fr;
+  }
+
   ::selection {
     background: var(--color-petal-soft);
     color: var(--color-bark);
