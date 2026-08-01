@@ -48,12 +48,19 @@ de fuentes en la imprenta.
 - **`geometry.mjs`** — todas las medidas, en un solo sitio. El generador y el
   verificador leen de aquí, así que si el QR se mueve, la comprobación se mueve
   con él.
-- **`build-card.mjs`** — dibuja las dos caras en milímetros reales. Colores y
+- **`build-card.mjs`** — dibuja las dos caras en milímetros reales: el anverso a
+  1:1 y la cara del QR, que es lo único propio de la tarjeta.
+- **`../comun/marca.mjs`** — la marca sobre papel: colores, tipografías, el
+  logotipo y el anverso entero. Está fuera de esta carpeta porque también lo usa
+  la funda de la caja de regalo (`../caja/`), y las dos cosas tienen que llevar
+  exactamente el mismo anverso: si cada generador dibujara su propio bonsái
+  acabaría habiendo dos parecidos pero distintos, que es el fallo que no se ve
+  hasta que están los dos impresos encima de la mesa. Los colores y las
   tipografías salen del sistema del sitio (`app/globals.css`, `app/layout.tsx`),
   el arco del logotipo son los mismos trazados de `Wordmark.tsx`, y los logos de
   Instagram y Gmail se leen de `public/icons/` — los mismos archivos que usa la
-  web, para que no haya dos versiones del mismo trazado. Ahí están también el
-  dominio, el usuario de Instagram y el correo, como constantes al principio.
+  web. Ahí están también el dominio, el usuario de Instagram y el correo, como
+  constantes al principio.
 - **`qr.mjs`** — generador de QR sin dependencias: versión 4, corrección H
   (30%). Se codifica aquí y no con un servicio online porque los generadores
   "gratis" devuelven QR _dinámicos_ que pasan por su dominio y mueren cuando
@@ -64,9 +71,9 @@ de fuentes en la imprenta.
   de Reed-Solomon. Encontró dos fallos que a ojo no se ven —la información de
   formato transpuesta y la columna 0 sin escribir— y por eso sigue aquí: es lo
   que hay que ejecutar antes de mandar nada a imprimir.
-- **`fuentes/`** — copia del subconjunto latino de Cormorant Garamond y Jost.
-  Están aquí y no se leen de `.next/static/media` porque allí el nombre lleva un
-  hash de compilación que cambia en cada build.
+- **`../comun/fuentes/`** — copia del subconjunto latino de Cormorant Garamond y
+  Jost. Están ahí y no se leen de `.next/static/media` porque allí el nombre
+  lleva un hash de compilación que cambia en cada build.
 
 ## Si cambia algo
 
@@ -76,4 +83,5 @@ de fuentes en la imprenta.
   uno hay que tocar el otro: los dos deben decir `bonsai@bonsaiartesania.com`.
 - **El tamaño o la posición del QR**, en `geometry.mjs`. Cada módulo no debería
   bajar de 0.4 mm; `verify-qr.mjs` lo comprueba.
-- **Las tipografías de la web**: reemplazar los dos archivos de `fuentes/`.
+- **Las tipografías de la web**: reemplazar los dos archivos de
+  `../comun/fuentes/`.
