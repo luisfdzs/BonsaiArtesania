@@ -15,7 +15,7 @@ const dateFormat = new Intl.DateTimeFormat('es-ES', {
 /** Lo que Ana quiere ver primero: lo que hay que preparar. */
 const PENDING: OrderStatus[] = ['pendiente_pago', 'pagado', 'preparando']
 
-export default async function TallerPedidosPage({ searchParams }: Props) {
+export default async function GestionPedidosPage({ searchParams }: Props) {
   const { estado } = await searchParams
 
   const collection = await orders()
@@ -38,7 +38,7 @@ export default async function TallerPedidosPage({ searchParams }: Props) {
     <section>
       <div className="flex flex-wrap justify-center gap-x-6 gap-y-3">
         <Link
-          href="/taller"
+          href="/gestion"
           className={`text-small ${!estado ? 'text-bark' : 'text-bark-faint'} link-underline tap`}
         >
           Por preparar
@@ -46,7 +46,7 @@ export default async function TallerPedidosPage({ searchParams }: Props) {
         {ORDER_STATUS_FLOW.map((status) => (
           <Link
             key={status}
-            href={`/taller?estado=${status}`}
+            href={`/gestion?estado=${status}`}
             className={`text-small ${estado === status ? 'text-bark' : 'text-bark-faint'} link-underline tap`}
           >
             {ORDER_STATUS_ADMIN_LABEL[status]} ({countBy.get(status) ?? 0})
@@ -59,15 +59,34 @@ export default async function TallerPedidosPage({ searchParams }: Props) {
       ) : (
         <ul className="mt-12 flex flex-col">
           {docs.map((order) => (
-            <li key={order.number} className="border-b border-line py-5 first:border-t">
-              {/* Antes eran dos columnas, pedido a la izquierda y total a la
-                  derecha. Centrado se apilan: el número primero, porque es lo que
-                  se pulsa, y el importe y el estado debajo. */}
-              <div className="flex flex-col items-center gap-3">
+            <li key={order.number} className="border-b border-line first:border-t">
+              {/* El enlace envuelve la fila entera y no sólo el número. Antes
+                  había que acertarle a «BA-2026-0004» —nueve caracteres en una
+                  fila de cinco líneas—, y todo lo demás, que es lo que de verdad
+                  se está mirando (el nombre, las piezas, el importe), no hacía
+                  nada al pulsarlo. Dentro no hay ningún otro botón ni enlace, así
+                  que no hay nada que anidar y el bloque puede ser el enlace.
+
+                  El nombre accesible sale del contenido entero de la fila, que
+                  es largo pero exacto: dice a qué pedido se entra.
+
+                  Y con la fila entera pulsable, el número deja de llevar
+                  subrayado: `link-underline` sólo se dibuja al pasar por encima
+                  de sí mismo, así que señalaría como zona pulsable justo el
+                  trozo pequeño que antes lo era. Lo que responde ahora es la
+                  fila, con un fondo salvia muy rebajado —el mismo verde con el
+                  que responde todo lo demás—, y se enciende igual llegando con
+                  el tabulador.
+
+                  Antes eran dos columnas, pedido a la izquierda y total a la
+                  derecha. Centrado se apilan: el número primero, y el importe y
+                  el estado debajo. */}
+              <Link
+                href={`/gestion/pedidos/${order.number}`}
+                className="-mx-4 flex flex-col items-center gap-3 px-4 py-5 transition-colors duration-500 hover:bg-sage-deep/8 focus-visible:bg-sage-deep/8"
+              >
                 <div>
-                  <Link href={`/taller/pedidos/${order.number}`} className="link-underline tap">
-                    {order.number}
-                  </Link>
+                  <span>{order.number}</span>
                   <p className="mt-2 text-small text-bark-faint">
                     {dateFormat.format(order.createdAt)} · {order.shipping.address.recipient} ·{' '}
                     {order.shipping.address.city}
@@ -88,7 +107,7 @@ export default async function TallerPedidosPage({ searchParams }: Props) {
                     <p className="eyebrow mt-2 text-bark-faint">Cobro simulado</p>
                   )}
                 </div>
-              </div>
+              </Link>
             </li>
           ))}
         </ul>

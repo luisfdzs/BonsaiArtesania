@@ -4,7 +4,7 @@ import { site } from '@/content/site'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   // Las páginas legales sí van al sitemap: son públicas y conviene que sean
-  // localizables. Lo que no entra es nada tras el login (cuenta, carrito, taller),
+  // localizables. Lo que no entra es nada tras el login (cuenta, carrito, gestión),
   // que además lleva `robots: noindex` en sus metadatos.
   const routes = [
     '',

@@ -4,7 +4,6 @@ import { redirect } from 'next/navigation'
 import { getSession } from '@/auth'
 import { AddressList } from '@/components/cuenta/AddressList'
 import { SectionIntro } from '@/components/cuenta/SectionIntro'
-import { isAdmin } from '@/lib/admin'
 import { addresses } from '@/lib/schema'
 
 export const metadata: Metadata = {
@@ -15,10 +14,6 @@ export const metadata: Metadata = {
 export default async function DireccionesPage() {
   const session = await getSession()
   if (!session?.user?.id) redirect('/entrar?volver=/cuenta/direcciones')
-
-  // Las direcciones son a dónde te envían lo que has comprado. La cuenta del
-  // taller no compra, así que no tiene ninguna. Ver `lib/admin.ts`.
-  if (await isAdmin()) redirect('/taller')
 
   const collection = await addresses()
   const docs = await collection

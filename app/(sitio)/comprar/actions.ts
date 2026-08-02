@@ -263,7 +263,7 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
 
   revalidatePath('/carrito')
   revalidatePath('/cuenta/pedidos')
-  revalidatePath('/taller')
+  revalidatePath('/gestion')
 
   // Redirección, y no un estado devuelto: la confirmación es una página propia, así
   // que sobrevive a recargar y se puede volver a ella. Ojo, `redirect` funciona

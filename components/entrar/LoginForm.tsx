@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useActionState } from 'react'
-import { iniciarSesion, type EntrarState } from '@/app/entrar/actions'
+import { iniciarSesion, type EntrarState } from '@/app/(sitio)/entrar/actions'
 import { Field } from '@/components/ui/Field'
 import { FormPending } from '@/components/ui/FormPending'
 
