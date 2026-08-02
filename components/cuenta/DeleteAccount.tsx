@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { deleteAccount } from '@/app/cuenta/privacidad/actions'
 import { TrashIcon } from '@/components/ui/CartIcons'
+import { FormPending } from '@/components/ui/FormPending'
 
 /**
  * Borrado de cuenta con confirmación escrita.
@@ -17,6 +18,15 @@ export function DeleteAccount() {
 
   return (
     <form action={deleteAccount} className="mt-8 flex w-full flex-col items-center">
+      {/* Borrar la cuenta recorre seis colecciones —los pedidos, que se
+          anonimizan, y las direcciones, los carritos, las sesiones, las cuentas
+          vinculadas y el usuario, que se borran— y luego cierra la sesión. Es
+          la espera que peor se aguanta en silencio de todo el sitio: se acaba de
+          escribir BORRAR y no hay forma de saber si ha empezado, si ha fallado o
+          si conviene volver a pulsar. Y volver a pulsar aquí, con la cuenta a
+          medio borrar, es lo último que interesa. */}
+      <FormPending label="Borrando tu cuenta" />
+
       <label className="field-label" htmlFor="confirmar">
         Escribe BORRAR para confirmar
       </label>

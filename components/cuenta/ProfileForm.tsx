@@ -5,6 +5,7 @@ import { updateProfile, type ActionState } from '@/app/cuenta/actions'
 import { MailIcon } from '@/components/cuenta/CuentaIcons'
 import { CheckIcon } from '@/components/ui/CartIcons'
 import { Field } from '@/components/ui/Field'
+import { FlowerBud } from '@/components/ui/FlowerBud'
 
 type Props = {
   name: string | null
@@ -64,7 +65,11 @@ export function ProfileForm({ name, phone, email }: Props) {
 
       <div className="flex flex-col items-center gap-3 border-t border-line pt-8">
         <button type="submit" className="btn" disabled={pending}>
-          <CheckIcon className="h-4 w-4" />
+          {/* La flor ocupa el hueco del visto mientras se guarda; el visto vuelve
+              cuando el «Guardado.» de abajo confirma. Ver `FlowerBud`. */}
+          <FlowerBud>
+            <CheckIcon className="h-4 w-4" />
+          </FlowerBud>
           {pending ? 'Guardando…' : 'Guardar'}
         </button>
 

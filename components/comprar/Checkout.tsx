@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useActionState, useEffect, useRef } from 'react'
 import { placeOrder, type CheckoutState } from '@/app/comprar/actions'
 import type { AddressValues } from '@/components/cuenta/AddressForm'
+import { FormPending } from '@/components/ui/FormPending'
 
 const initial: CheckoutState = {}
 
@@ -35,6 +36,16 @@ export function Checkout({ addresses }: { addresses: AddressValues[] }) {
   return (
     <>
       <form action={action}>
+        {/* El envío del pedido es la escritura más larga del sitio: guarda el
+            pedido, baja las existencias de cada pieza y manda el correo a Ana.
+            El botón apagado con «Enviando…» ya avisaba, pero es un rótulo de 13px
+            para varios segundos de espera, y la página seguía viva detrás: se
+            podía tocar «Añadir o editar direcciones» y salir de aquí a mitad de la
+            escritura. La flor lo dice a pantalla completa y cierra el paso hasta
+            que hay respuesta, que es lo que corresponde al único gesto del sitio
+            que crea un pedido. */}
+        <FormPending label="Enviando tu petición" />
+
         <fieldset>
           <legend className="eyebrow">Enviar a</legend>
 

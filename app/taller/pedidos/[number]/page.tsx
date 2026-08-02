@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { FlowerBud } from '@/components/ui/FlowerBud'
 import { ORDER_STATUS_LABEL } from '@/lib/order-status'
 import { formatCents, orders, type OrderStatus } from '@/lib/schema'
 import { updateOrderStatus } from '../../actions'
@@ -104,6 +105,12 @@ export default async function TallerPedidoPage({ params }: Params) {
           </div>
 
           <button type="submit" className="btn self-center">
+            {/* Cambiar el estado escribe el pedido, apunta la nota en el historial
+                y, si se cancela, devuelve las unidades al stock: lo más lento del
+                taller. Y lo que cambia está arriba —el rótulo bajo el número— y
+                abajo —el historial—, nunca en el botón, así que sin la flor no hay
+                nada que mirar mientras se espera. */}
+            <FlowerBud />
             Guardar
           </button>
         </form>

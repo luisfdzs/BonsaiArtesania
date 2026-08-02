@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { deleteAddress } from '@/app/cuenta/actions'
 import { TrashIcon } from '@/components/ui/CartIcons'
+import { FlowerBud } from '@/components/ui/FlowerBud'
 import { AddressForm, type AddressValues } from './AddressForm'
 import { PencilIcon, PinIcon, PlusIcon } from './CuentaIcons'
 
@@ -63,7 +64,12 @@ export function AddressList({ items }: { items: AddressValues[] }) {
                   <form action={deleteAddress}>
                     <input type="hidden" name="id" value={address.id} />
                     <button type="submit" className="btn btn-quiet btn-sm">
-                      <TrashIcon className="h-4 w-4" />
+                      {/* La tarjeta desaparece cuando la acción vuelve, no al
+                          pulsar: hasta entonces la papelera parecía no haber
+                          hecho nada y se pulsaba otra vez. */}
+                      <FlowerBud>
+                        <TrashIcon className="h-4 w-4" />
+                      </FlowerBud>
                       Borrar
                     </button>
                   </form>
