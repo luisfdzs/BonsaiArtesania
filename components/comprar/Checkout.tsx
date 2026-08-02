@@ -1,112 +1,107 @@
 'use client'
 
 import Link from 'next/link'
-import { useActionState, useEffect, useRef } from 'react'
+import { useActionState } from 'react'
 import { placeOrder, type CheckoutState } from '@/app/comprar/actions'
 import type { AddressValues } from '@/components/cuenta/AddressForm'
+import { SendIcon } from '@/components/ui/SocialIcons'
+import { HONEYPOT_FIELD, TOKEN_FIELD } from '@/lib/form-fields'
 
 const initial: CheckoutState = {}
 
 /**
- * Elección de dirección y envío de la petición.
+ * Elección de dirección y envío del pedido.
  *
  * Todavía no hay pasarela, así que aquí **no se cobra nada**, y por eso ni el botón
- * ni el aviso final mencionan un pago: dicen lo que de verdad ha pasado —la
- * petición queda registrada y Ana escribe para cerrar pago y envío—. Escrito así, el
- * texto es cierto tal cual y la tienda puede estar abierta al público sin engañar a
- * nadie; no es un placeholder que haya que tapar.
+ * ni el correo mencionan un pago: dicen lo que de verdad ha pasado —el pedido queda
+ * registrado y Ana escribe para cerrar pago y envío—. Escrito así, el texto es
+ * cierto tal cual y la tienda puede estar abierta al público sin engañar a nadie;
+ * no es un placeholder que haya que tapar.
  *
  * El pedido se guarda como `simulado` / `pendiente_pago` (ver `app/comprar/actions.ts`).
  * Cuando se conecte el cobro de verdad, este componente es uno de los sitios que
  * pasa a poder hablar de pago.
+ *
+ * Al terminar ya no se abre un modal: la acción redirige a `/comprar/enviado`, que
+ * es una página de verdad y aguanta que alguien la recargue o vuelva a ella.
  */
-export function Checkout({ addresses }: { addresses: AddressValues[] }) {
+export function Checkout({ addresses, token }: { addresses: AddressValues[]; token: string }) {
   const [state, action, pending] = useActionState(placeOrder, initial)
-  const dialog = useRef<HTMLDialogElement>(null)
-
-  // `<dialog>` nativo: da el foco atrapado, el cierre con Escape y el fondo
-  // inerte sin traer una librería ni reimplementarlo mal.
-  useEffect(() => {
-    if (state.ok) dialog.current?.showModal()
-  }, [state.ok])
 
   const preselected = addresses.find((address) => address.isDefault) ?? addresses[0]
 
   return (
-    <>
-      <form action={action}>
-        <fieldset>
-          <legend className="eyebrow">Enviar a</legend>
+    <form action={action}>
+      {/* Las dos trampas de `lib/form-guard.ts`. El testigo lo firma el servidor al
+          pintar la página; el campo de abajo tiene que llegar vacío. */}
+      <input type="hidden" name={TOKEN_FIELD} value={token} />
+      <div aria-hidden className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+        {/* Fuera de la pantalla y no `display:none`: así cae también el bot que
+            sólo rellena lo que el navegador considera visible, y quien navega con
+            teclado no llega nunca por el `tabIndex`. */}
+        <label htmlFor="apellidos">No rellenes este campo</label>
+        <input id="apellidos" name={HONEYPOT_FIELD} type="text" tabIndex={-1} autoComplete="off" />
+      </div>
 
-          <div className="mt-6 flex flex-col">
-            {addresses.map((address) => (
-              <label
-                key={address.id}
-                className="flex cursor-pointer items-start gap-4 border-b border-line py-5 first:border-t"
-              >
-                <input
-                  type="radio"
-                  name="addressId"
-                  value={address.id}
-                  defaultChecked={address.id === preselected?.id}
-                  required
-                  className="mt-1 size-4 accent-sage-deep"
-                />
-                <span>
-                  <span className="block">{address.alias}</span>
-                  <span className="mt-1 block text-small text-bark-soft">
-                    {address.recipient} · {address.line1}
-                    {address.line2 ? `, ${address.line2}` : ''} · {address.postalCode}{' '}
-                    {address.city}
-                  </span>
+      <fieldset>
+        <legend className="eyebrow">Enviar a</legend>
+
+        <div className="mt-6 flex flex-col">
+          {addresses.map((address) => (
+            <label
+              key={address.id}
+              className="flex cursor-pointer items-start gap-4 border-b border-line py-5 first:border-t"
+            >
+              <input
+                type="radio"
+                name="addressId"
+                value={address.id}
+                defaultChecked={address.id === preselected?.id}
+                required
+                className="mt-1 size-4 accent-sage-deep"
+              />
+              <span>
+                <span className="block">{address.alias}</span>
+                <span className="mt-1 block text-small text-bark-soft">
+                  {address.recipient} · {address.line1}
+                  {address.line2 ? `, ${address.line2}` : ''} · {address.postalCode} {address.city}
                 </span>
-              </label>
-            ))}
-          </div>
-        </fieldset>
-
-        <Link
-          href="/cuenta/direcciones"
-          className="link-underline tap mt-6 inline-block text-small"
-        >
-          Añadir o editar direcciones
-        </Link>
-
-        {state.error && (
-          <p className="field-error mt-8" role="alert">
-            {state.error}
-          </p>
-        )}
-
-        <button type="submit" className="btn mt-10 w-full" disabled={pending}>
-          {pending ? 'Enviando…' : 'Enviar mi petición'}
-        </button>
-      </form>
-
-      <dialog
-        ref={dialog}
-        className="m-auto max-w-md border border-line bg-linen p-10 text-bark backdrop:bg-bark/40"
-      >
-        <h2 className="font-serif text-title">¡Todo listo!</h2>
-        <p className="mt-5 text-bark-soft">
-          Hemos recibido tu petición <strong className="text-bark">{state.number}</strong>. Ana la
-          revisa y te escribe enseguida para confirmarla y quedar en cómo pagarla, con el envío a{' '}
-          {state.shippingTo}.
-        </p>
-        <p className="mt-4 text-small text-bark-faint">
-          Cada pieza se hace a mano bajo pedido, así que la preparación lleva entre 1 y 3 semanas.
-          Nada está cobrado todavía: eso se cierra hablando con ella.
-        </p>
-
-        <div className="mt-10 flex flex-col gap-2">
-          <Link href="/cuenta/pedidos" className="btn w-full">
-            Ver mis pedidos
-          </Link>
-          <Link href="/tienda" className="btn btn-quiet w-full">
-            Seguir mirando
-          </Link>
+              </span>
+            </label>
+          ))}
         </div>
-      </dialog>
-    </>
+      </fieldset>
+
+      <Link href="/cuenta/direcciones" className="link-underline tap mt-6 inline-block text-small">
+        Añadir o editar direcciones
+      </Link>
+
+      {state.error && (
+        <p className="field-error mt-8" role="alert">
+          {state.error}
+        </p>
+      )}
+
+      {/* Botón de icono, como el de «entrar». El rótulo va debajo y no dentro: éste
+          es el paso que no se deshace, y un avioncito solo no le dice a nadie que
+          al pulsarlo se manda un pedido con su dirección. El `aria-label` es lo que
+          oye quien usa lector de pantalla; el `title`, lo que sale al pasar el ratón. */}
+      <div className="mt-10 flex flex-col items-center gap-4">
+        <button
+          type="submit"
+          disabled={pending}
+          aria-label={pending ? 'Enviando tu pedido' : 'Enviar mi pedido'}
+          title={pending ? 'Enviando tu pedido' : 'Enviar mi pedido'}
+          className="btn btn-icon btn-icon-lg"
+        >
+          <SendIcon className="h-5 w-5" />
+        </button>
+        {/* `aria-hidden` porque repite el `aria-label` del botón: quien lo oiga dos
+            veces no entiende que es el mismo control. */}
+        <p aria-hidden className="text-small text-bark-faint">
+          {pending ? 'Enviando…' : 'Enviar mi pedido'}
+        </p>
+      </div>
+    </form>
   )
 }

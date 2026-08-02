@@ -2,25 +2,68 @@
 
 import { ObjectId } from 'mongodb'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
 import { readCart } from '@/lib/cart'
+import { sendOrderEmails } from '@/lib/email'
+import { checkFormGuard } from '@/lib/form-guard'
+import { notifyNewOrder } from '@/lib/notify'
 import { nextOrderNumber } from '@/lib/orders'
-import { addresses, carts, orders, type OrderDoc } from '@/lib/schema'
+import { clientIp, consumeAll, describeWait, POLICIES } from '@/lib/rate-limit'
+import { addresses, carts, orders, type CartItem, type OrderDoc } from '@/lib/schema'
 import { shopOpen } from '@/lib/shop'
 import { reserveStock } from '@/lib/stock'
-import { sendOrderEmails } from '@/lib/email'
 
 export type CheckoutState = {
-  ok?: boolean
-  /** Número del pedido creado, para mostrarlo en el aviso de confirmación. */
-  number?: string
-  /** Resumen de a dónde va, para el mismo aviso. */
-  shippingTo?: string
   error?: string
 }
 
+/** Ventana en la que un segundo envío se considera el mismo, no otro pedido. */
+const DUPLICADO_MS = 10 * 60 * 1000
+
 /**
- * Registra la petición.
+ * ¿Acaba de pedir esta persona? Devuelve el número, para llevarla a la
+ * confirmación de ese pedido en vez de darle un error que no entendería.
+ */
+async function pedidoReciente(userId: ObjectId): Promise<string | null> {
+  const collection = await orders()
+  const last = await collection.findOne(
+    { userId, createdAt: { $gte: new Date(Date.now() - DUPLICADO_MS) } },
+    { sort: { createdAt: -1 }, projection: { number: 1 } },
+  )
+  return last?.number ?? null
+}
+
+/**
+ * Se queda con el contenido del carrito **y lo vacía en la misma operación**.
+ *
+ * Es el cerrojo que impide el pedido doble. Antes, vaciar el carrito era el último
+ * paso: dos envíos simultáneos —un doble clic, o dos pestañas— leían los dos el
+ * mismo carrito lleno y creaban dos pedidos con dos correos cada uno. Aquí la
+ * condición «items no vacío» y el vaciado van en un solo `findOneAndUpdate`, que en
+ * Mongo es atómico sobre el documento: el primero se lleva las líneas, el segundo
+ * recibe `null` y sabe que llega tarde.
+ *
+ * Devuelve las líneas que había *antes* de vaciar, que son las que hay que cobrar.
+ */
+async function tomarCarrito(userId: ObjectId): Promise<CartItem[] | null> {
+  const collection = await carts()
+  const before = await collection.findOneAndUpdate(
+    { userId, items: { $not: { $size: 0 } } },
+    { $set: { items: [], updatedAt: new Date() } },
+    { returnDocument: 'before' },
+  )
+  return before?.items ?? null
+}
+
+/** Devuelve las líneas al carrito cuando el pedido no llega a crearse. */
+async function devolverCarrito(userId: ObjectId, items: CartItem[]): Promise<void> {
+  const collection = await carts()
+  await collection.updateOne({ userId }, { $set: { items, updatedAt: new Date() } })
+}
+
+/**
+ * Registra el pedido.
  *
  * ⚠️ NO COBRA NADA. Todavía no hay pasarela, así que esto no es una venta cerrada:
  * crea el pedido, reserva las unidades y avisa a Ana para que sea ella quien
@@ -30,23 +73,62 @@ export type CheckoutState = {
  * Para que la base de datos tampoco lo dé por pagado, el pedido se guarda con
  * `payment.provider: 'simulado'`, `payment.status: 'pendiente'` y estado
  * `pendiente_pago`. Así, cuando se conecte Stripe, una consulta distingue sin
- * ambigüedad las peticiones de esta etapa de los pedidos cobrados de verdad.
+ * ambigüedad los pedidos de esta etapa de los cobrados de verdad.
  *
  * No cambiar esos tres valores sin sustituir de verdad el cobro: son lo único que
  * impide que un pedido no pagado parezca pagado.
+ *
+ * ## Por qué hay tanta comprobación antes de llegar a crear nada
+ *
+ * Cada pedido dispara **dos correos desde el buzón de IONOS y un aviso a Telegram**.
+ * Sin freno, eso es a la vez una forma de sepultar a Ana y una forma de quemar la
+ * cuota de envío del buzón hasta que IONOS lo bloquee — y con él dejaría de salir
+ * también el enlace de acceso, o sea que nadie podría ni entrar. Las capas, en el
+ * orden en que actúan:
+ *
+ * 1. **Hace falta cuenta**, y la cuenta se consigue pulsando un enlace enviado a un
+ *    correo real. Es el filtro más fuerte y ya estaba.
+ * 2. **Campo trampa y testigo con la hora** (`lib/form-guard.ts`): descartan al bot
+ *    tonto antes de gastar cuota de nadie.
+ * 3. **Cubo ancho por usuario y por IP**: acota los envíos, salgan bien o mal.
+ * 4. **Cubo estrecho, sólo al crear el pedido**: es el que de verdad acota cuántos
+ *    correos pueden salir, porque sólo se gasta cuando hay pedido de verdad.
+ * 5. **Cerrojo atómico del carrito**: un doble clic no puede hacer dos pedidos.
+ *
+ * El orden importa: lo barato, y lo que no consume cuota de nadie, va primero.
  */
 export async function placeOrder(_prev: CheckoutState, formData: FormData): Promise<CheckoutState> {
-  // Primera comprobación de todas: con la tienda cerrada no se registra ninguna
-  // petición ni se reserva stock. Va en la acción y no sólo en la página porque una
+  // Primera comprobación de todas: con la tienda cerrada no se registra ningún
+  // pedido ni se reserva stock. Va en la acción y no sólo en la página porque una
   // acción de servidor es un endpoint público: ocultar el formulario no la cierra.
   if (!shopOpen) {
     return { error: 'La tienda no está abierta todavía. Escríbeme y lo vemos por mensaje.' }
   }
 
   const session = await auth()
-  if (!session?.user?.id) return { error: 'Tienes que entrar para poder enviar la petición.' }
+  if (!session?.user?.id) return { error: 'Tienes que entrar para poder enviar el pedido.' }
 
   const userId = new ObjectId(session.user.id)
+
+  const guard = checkFormGuard(formData)
+  if (!guard.ok) {
+    // Al bot se le contesta lo mismo que a la pestaña caducada, y a propósito: un
+    // mensaje que dijera «has caído en el campo trampa» sería un manual para
+    // esquivarla. Recargar arregla el caso legítimo y no ayuda nada al otro.
+    return { error: 'Este formulario ha caducado. Recarga la página y vuelve a enviarlo.' }
+  }
+
+  const ip = await clientIp()
+
+  const intento = await consumeAll([
+    { bucket: 'pedido:intento', key: session.user.id, policy: POLICIES.orderAttempt },
+    { bucket: 'pedido:intento:ip', key: ip, policy: POLICIES.orderAttemptIp },
+  ])
+  if (!intento.ok) {
+    return {
+      error: `Has enviado el formulario muchas veces seguidas. Prueba dentro de ${describeWait(intento.retryAfterMs)}.`,
+    }
+  }
 
   const rawAddressId = String(formData.get('addressId') ?? '')
   if (!ObjectId.isValid(rawAddressId)) {
@@ -65,7 +147,27 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
   // El carrito y los precios se releen aquí, en el servidor. Nada de importes
   // venidos del formulario: es el único punto donde se decide cuánto cuesta.
   const cart = await readCart()
-  if (cart.lines.length === 0) return { error: 'Tu carrito está vacío.' }
+
+  if (cart.lines.length === 0) {
+    // Un carrito vacío justo después de pedir es casi siempre un «atrás» o un
+    // recargar, no un error: se le lleva a la confirmación de lo que ya envió.
+    const reciente = await pedidoReciente(userId)
+    if (reciente) redirect(`/comprar/enviado?pedido=${reciente}`)
+    return { error: 'Tu carrito está vacío.' }
+  }
+
+  if (cart.hasUnavailable) {
+    return { error: 'Algo de tu carrito ya no está disponible. Revísalo antes de seguir.' }
+  }
+
+  // Aquí se cierra el cerrojo: a partir de este punto el carrito está vacío y estas
+  // líneas son nuestras. Cualquier salida por error tiene que devolverlas.
+  const tomadas = await tomarCarrito(userId)
+  if (!tomadas) {
+    const reciente = await pedidoReciente(userId)
+    if (reciente) redirect(`/comprar/enviado?pedido=${reciente}`)
+    return { error: 'Tu carrito está vacío.' }
+  }
 
   const items = cart.lines.map((line) => ({
     slug: line.slug,
@@ -74,11 +176,41 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
     qty: line.qty,
   }))
 
+  // Paranoia barata: entre leer el carrito y cerrar el cerrojo pudo colarse un
+  // «añadir al carrito» desde otra pestaña. Lo que se comprueba es que **todo lo
+  // que se va a cobrar estaba de verdad en lo tomado**, no que las dos listas sean
+  // idénticas: `readCart` descarta en silencio los slugs que ya no están en el
+  // catálogo, así que exigir el mismo número de líneas dejaría un carrito con una
+  // pieza retirada atascado para siempre, sin forma de pedir.
+  const mismasLineas = items.every((item) =>
+    tomadas.some((tomada) => tomada.slug === item.slug && tomada.qty === item.qty),
+  )
+  if (!mismasLineas) {
+    await devolverCarrito(userId, tomadas)
+    return { error: 'Tu carrito ha cambiado mientras enviabas. Revísalo y vuelve a intentarlo.' }
+  }
+
+  // El cubo estrecho: se gasta ya, con el carrito tomado y a un paso de crear el
+  // pedido. No antes, para que los intentos fallidos de arriba no lo consuman.
+  const creado = await consumeAll([
+    { bucket: 'pedido:creado', key: session.user.id, policy: POLICIES.orderCreated },
+    { bucket: 'pedido:creado:dia', key: session.user.id, policy: POLICIES.orderCreatedDay },
+    { bucket: 'pedido:creado:ip', key: ip, policy: POLICIES.orderCreatedIp },
+    { bucket: 'pedido:global', key: 'todos', policy: POLICIES.orderGlobal },
+  ])
+  if (!creado.ok) {
+    await devolverCarrito(userId, tomadas)
+    return {
+      error: `Has hecho varios pedidos muy seguidos. Tu carrito sigue guardado: inténtalo dentro de ${describeWait(creado.retryAfterMs)}, o escríbele directamente a Ana.`,
+    }
+  }
+
   // Se descuentan las unidades ANTES de crear el pedido. La comprobación es
-  // atómica en Mongo, así que dos clientes que pulsen «pagar» a la vez no pueden
+  // atómica en Mongo, así que dos clientes que pulsen «enviar» a la vez no pueden
   // llevarse los dos la misma pieza única: al segundo le falla aquí.
   const reserved = await reserveStock(items)
   if (!reserved.ok) {
+    await devolverCarrito(userId, tomadas)
     const names = reserved.unavailable
       .map((slug) => cart.lines.find((line) => line.slug === slug)?.name ?? slug)
       .join(', ')
@@ -124,7 +256,7 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
       intentId: null,
     },
     history: [
-      { status: 'pendiente_pago', at: now, note: 'Petición registrada desde la web, sin cobrar' },
+      { status: 'pendiente_pago', at: now, note: 'Pedido registrado desde la web, sin cobrar' },
     ],
     createdAt: now,
     updatedAt: now,
@@ -132,22 +264,21 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
 
   await orderCollection.insertOne(order)
 
-  // El carrito se vacía, no se borra: así el documento y su índice siguen ahí para
-  // la siguiente compra.
-  const cartCollection = await carts()
-  await cartCollection.updateOne({ userId }, { $set: { items: [], updatedAt: now } })
-
   // Después de guardar y a prueba de fallos: el pedido ya está cerrado y las
-  // unidades descontadas, así que un SMTP caído no puede deshacer la venta.
-  if (session.user.email) await sendOrderEmails(order, session.user.email)
+  // unidades descontadas, así que ni un SMTP caído ni un Telegram que no responda
+  // pueden deshacer la venta. Los dos avisos van a la vez porque son
+  // independientes: el correo es el registro, la notificación es la prisa.
+  await Promise.allSettled([
+    session.user.email ? sendOrderEmails(order, session.user.email) : Promise.resolve(),
+    notifyNewOrder(order),
+  ])
 
   revalidatePath('/carrito')
   revalidatePath('/cuenta/pedidos')
   revalidatePath('/taller')
 
-  return {
-    ok: true,
-    number,
-    shippingTo: `${address.line1}${address.line2 ? `, ${address.line2}` : ''}, ${address.postalCode} ${address.city}`,
-  }
+  // Redirección, y no un estado devuelto: la confirmación es una página propia, así
+  // que sobrevive a recargar y se puede volver a ella. Ojo, `redirect` funciona
+  // lanzando, así que tiene que ser lo último y quedar fuera de cualquier `try`.
+  redirect(`/comprar/enviado?pedido=${number}`)
 }
