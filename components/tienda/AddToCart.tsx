@@ -17,34 +17,14 @@ import { CartPing } from '@/components/layout/CartCount'
  * build para pasar a renderizarse en cada visita. Cambiar el botón no paga ese
  * precio; quien quiera ver lo que lleva tiene el contador de la barra de móvil.
  *
- * Ya no lleva rótulo: el icono de la bolsa con el «+» dice lo mismo en un cuarto
- * del sitio, y el botón deja de ocupar la columna entera —«Añadir al carrito» a
- * todo lo ancho era, con diferencia, el elemento más grande de la ficha y le
- * comía protagonismo a la pieza—. Lo que se pierde al quitar el texto es el
- * nombre accesible, así que va en `aria-label` y en `title`; el `title` además
- * hace de rótulo para quien lo dude, y por eso el botón es algo mayor que los dos
- * de contacto de debajo: es la acción principal y tiene que verse como tal.
+ * Lleva rótulo escrito, «Añadir al carrito», en vez del icono de la bolsa con el
+ * «+»: la acción principal de la ficha se lee sin tener que descifrar un dibujo,
+ * y el nombre accesible pasa a ser el propio texto, así que ya no hacen falta
+ * `aria-label` ni `title`. El botón sigue sin ocupar la columna entera —el
+ * formulario es `w-fit`—, que era lo que motivó quitar el rótulo en su día; con
+ * el ancho ajustado al texto no le come protagonismo a la pieza y aun así se
+ * distingue de los dos iconos de contacto de debajo, que son la vía secundaria.
  */
-
-/** Bolsa con un «+» dentro, del mismo trazo fino que el resto de las líneas. */
-function BagPlusIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-      className={className}
-    >
-      <path d="M4.6 7.6h14.8l-1.3 11a1.6 1.6 0 0 1-1.6 1.4H7.5a1.6 1.6 0 0 1-1.6-1.4L4.6 7.6Z" />
-      <path d="M9.1 7.6V6.1a2.9 2.9 0 0 1 5.8 0v1.5" />
-      <path d="M12 11.4v5.2M9.4 14h5.2" />
-    </svg>
-  )
-}
 
 /**
  * Los pétalos del estallido, uno por entrada: a dónde sale, cuánto gira y cuándo
@@ -85,11 +65,9 @@ export function AddToCart({ slug }: { slug: string }) {
       <button
         type="submit"
         onClick={() => setBurst((n) => n + 1)}
-        aria-label="Añadir al carrito"
-        title="Añadir al carrito"
-        className="btn btn-icon btn-icon-lg"
+        className="btn"
       >
-        <BagPlusIcon className="h-6 w-6" />
+        Añadir al carrito
       </button>
 
       {burst > 0 ? (

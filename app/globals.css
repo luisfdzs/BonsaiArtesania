@@ -441,9 +441,9 @@
   gap: 0;
 }
 
-/* El tamaño de la acción principal de una página, cuando va sin rótulo: el botón
-   de añadir al carrito de la ficha de pieza. Cuadrado como el normal, pero se
-   distingue a simple vista de los dos iconos de contacto que lleva debajo. */
+/* El tamaño de la acción principal de una página, cuando va sin rótulo dentro: el
+   botón de enviar el pedido del checkout, que lleva el rótulo debajo. Cuadrado
+   como el normal, pero se distingue a simple vista del resto de iconos. */
 @utility btn-icon-lg {
   --btn-icon-size: 3.5rem;
 }
