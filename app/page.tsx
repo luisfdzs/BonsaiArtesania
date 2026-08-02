@@ -1,11 +1,16 @@
 import Link from 'next/link'
-import { ContactoSection } from '@/components/sections/ContactoSection'
 import { Hero } from '@/components/sections/Hero'
 import { ProductCard } from '@/components/sections/ProductCard'
-import { TallerSection } from '@/components/sections/TallerSection'
 import { Reveal } from '@/components/ui/Reveal'
 import { featuredProducts } from '@/content/products'
 
+/**
+ * La portada ya no lleva El taller ni Contacto colgando debajo: cada una es una
+ * página con su ruta —`/el-taller` y `/contacto`—, y el menú enlaza a ellas
+ * directamente. Antes eran anclas de esta misma página, así que la barra de
+ * direcciones acababa enseñando un `/#taller` que ni parece una página ni se
+ * comparte bien; ahora todas las entradas del menú son rutas normales.
+ */
 export default function HomePage() {
   return (
     <>
@@ -44,9 +49,6 @@ export default function HomePage() {
           </Link>
         </Reveal>
       </section>
-
-      <TallerSection />
-      <ContactoSection />
     </>
   )
 }

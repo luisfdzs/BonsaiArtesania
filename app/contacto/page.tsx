@@ -1,22 +1,26 @@
-import { site } from '@/content/site'
+import type { Metadata } from 'next'
 import { ContactButtons } from '@/components/ui/ContactButtons'
 import { Reveal } from '@/components/ui/Reveal'
+import { site } from '@/content/site'
 import { customOrderMessage, whatsappDisplay } from '@/lib/contact'
 
+export const metadata: Metadata = {
+  title: 'Contacto',
+  description:
+    'Encargos, dudas de talla o tiempos de envío: escribe por WhatsApp, correo o Instagram. Contesta Ana.',
+}
+
 /**
- * Cierre del sitio. No hay formulario: Ana ya conversa con sus clientas por
- * mensaje y un formulario sólo añadiría un paso —y un correo que se pierde—
- * entre las dos. La web deja el mensaje escrito; ella responde donde siempre.
+ * No hay formulario: Ana ya conversa con sus clientas por mensaje y un
+ * formulario sólo añadiría un paso —y un correo que se pierde— entre las dos.
+ * La web deja el mensaje escrito; ella responde donde siempre.
  */
-export function ContactoSection() {
+export default function ContactoPage() {
   return (
-    <section
-      id="contacto"
-      className="mt-(--spacing-section) bg-linen-deep py-(--spacing-section) page-gutter"
-    >
+    <div className="page-gutter pt-16 md:pt-24">
       <Reveal className="mx-auto max-w-2xl text-center">
-        <h2 className="eyebrow">Contacto</h2>
-        <p className="mt-8 font-serif text-title">Cuéntame qué flor quieres guardar</p>
+        <p className="eyebrow">Contacto</p>
+        <h1 className="mt-8 font-serif text-title">Cuéntame qué flor quieres guardar</h1>
         <p className="mt-7 text-bark-soft">
           Encargos, dudas de talla, tiempos de envío o simplemente saludar. Escribe por donde te
           resulte más cómodo: contesto yo, no hay nadie más al otro lado.
@@ -46,6 +50,6 @@ export function ContactoSection() {
           <li>{site.social.instagramHandle}</li>
         </ul>
       </Reveal>
-    </section>
+    </div>
   )
 }

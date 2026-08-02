@@ -30,7 +30,7 @@ export default async function CarritoPage() {
           <Link href="/tienda" className="btn">
             Ver las piezas
           </Link>
-          <Link href="/#contacto" className="btn btn-quiet">
+          <Link href="/contacto" className="btn btn-quiet">
             Escribir a Ana
           </Link>
         </div>
