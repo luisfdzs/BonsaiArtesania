@@ -6,7 +6,7 @@ import {
   recuperarCuenta,
   reenviarCodigo,
   type EntrarState,
-} from '@/app/entrar/actions'
+} from '@/app/(sitio)/entrar/actions'
 import { Field } from '@/components/ui/Field'
 import { FlowerBud } from '@/components/ui/FlowerBud'
 import { FormPending } from '@/components/ui/FormPending'

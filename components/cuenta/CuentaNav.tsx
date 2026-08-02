@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { AccountIcon } from '@/components/layout/NavIcons'
 import { cn } from '@/lib/cn'
-import { HammerIcon, PackageIcon, PinIcon, ShieldIcon } from './CuentaIcons'
+import { PackageIcon, PinIcon, ShieldIcon } from './CuentaIcons'
 
 type Item = {
   href: string
@@ -20,23 +20,6 @@ const items: Item[] = [
 ]
 
 /**
- * Lo que ve la cuenta del taller en lugar de lo de arriba.
- *
- * Se quitan «Pedidos» y «Direcciones» porque en esa cuenta no significan nada:
- * no hace pedidos y no recibe envíos (ver `lib/admin.ts`). En su sitio va el
- * taller, que es a donde va a ir siempre. Y se conservan «Tus datos» y
- * «Privacidad» porque Ana sigue siendo una persona con una contraseña que
- * cambiar y unos datos suyos: gestionar la tienda no es motivo para quitarle eso.
- *
- * El taller va el primero y no el último: es lo que viene a hacer.
- */
-const adminItems: Item[] = [
-  { href: '/taller', label: 'Taller', Icon: HammerIcon },
-  { href: '/cuenta', label: 'Tus datos', Icon: AccountIcon },
-  { href: '/cuenta/privacidad', label: 'Privacidad', Icon: ShieldIcon },
-]
-
-/**
  * Las secciones de la cuenta. Cliente por una sola razón: `usePathname`, que es
  * lo que permite encender la pestaña en la que se está. Antes eran cuatro
  * enlaces iguales y no había forma de saber dónde estabas más que por el título.
@@ -44,18 +27,18 @@ const adminItems: Item[] = [
  * Mismo lenguaje de activo que la barra de navegación del sitio —fondo salvia al
  * 12% y tinta salvia—, para que «estar aquí» se diga siempre igual.
  *
- * Quién es admin lo decide el servidor y baja como prop: aquí no se puede leer
- * `ADMIN_EMAILS`, y aunque se pudiera, esto sólo pinta enlaces. Lo que de verdad
- * cierra las secciones que faltan son las guardas del servidor.
+ * Hubo aquí una segunda lista, la que veía la cuenta del taller: sin «Pedidos»
+ * ni «Direcciones» y con una pestaña de más hacia el panel. Ya no hace falta,
+ * porque esa cuenta no entra en `/cuenta` —lo suyo está entero en `/gestion`, y
+ * su propia barra la pinta `components/gestion/GestionNav.tsx`—.
  */
-export function CuentaNav({ admin = false }: { admin?: boolean }) {
+export function CuentaNav() {
   const pathname = usePathname()
-  const entries = admin ? adminItems : items
 
   return (
     <nav aria-label="Secciones de tu cuenta">
       <ul className="flex flex-wrap justify-center gap-x-2 gap-y-1">
-        {entries.map(({ href, label, Icon }) => {
+        {items.map(({ href, label, Icon }) => {
           // Exacto para «Tus datos» y por prefijo para el resto: si no, la raíz
           // se quedaría encendida en todas las pestañas.
           const active = href === '/cuenta' ? pathname === href : pathname.startsWith(href)

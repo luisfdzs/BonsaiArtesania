@@ -441,7 +441,7 @@ ha movido, así que el pago se acuerda aparte.
 Escríbele tú: ese contacto es el único paso que cierra el encargo. En su correo
 se le ha dicho que te pones con ello enseguida, así que no lo dejes dormir.
 
-Gestionar: ${site.url}/taller/pedidos/${order.number}`
+Gestionar: ${site.url}/gestion/pedidos/${order.number}`
 }
 
 /**

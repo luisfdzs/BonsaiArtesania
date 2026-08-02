@@ -44,7 +44,7 @@ function orderMessage(order: OrderDoc): string {
     `Para ${escape(address.recipient)} — ${escape(address.city)} (${escape(address.province)})`,
     `Tel. ${escape(address.phone)}`,
     '',
-    `${site.url}/taller/pedidos/${escape(order.number)}`,
+    `${site.url}/gestion/pedidos/${escape(order.number)}`,
   ]
     .join('\n')
     .slice(0, MAX_LENGTH)
@@ -75,7 +75,7 @@ export async function notifyNewOrder(order: OrderDoc): Promise<boolean> {
         chat_id: chatId,
         text: orderMessage(order),
         parse_mode: 'HTML',
-        // El enlace al taller es para ella; la tarjeta de previsualización sobra.
+        // El enlace a la gestión es para ella; la tarjeta de previsualización sobra.
         link_preview_options: { is_disabled: true },
       }),
       signal: AbortSignal.timeout(5_000),

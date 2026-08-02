@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useActionState } from 'react'
-import { placeOrder, type CheckoutState } from '@/app/comprar/actions'
+import { placeOrder, type CheckoutState } from '@/app/(sitio)/comprar/actions'
 import type { AddressValues } from '@/components/cuenta/AddressForm'
 import { FormPending } from '@/components/ui/FormPending'
 import { SendIcon } from '@/components/ui/SocialIcons'

@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 export default async function CarritoPage() {
   // La cuenta del taller no tiene carrito, así que aquí no hay nada que enseñarle:
   // se la manda a su sitio. Ver `lib/admin.ts`.
-  if (await isAdmin()) redirect('/taller')
+  if (await isAdmin()) redirect('/gestion')
 
   // La tienda cerrada no tiene carrito. Se explica en lugar de dar un 404: quien
   // llegue aquí desde un enlace guardado merece saber qué ha pasado.

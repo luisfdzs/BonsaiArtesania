@@ -27,7 +27,7 @@ export default async function ComprarPage() {
 
   // La cuenta del taller no pasa por caja (ver `lib/admin.ts`). Se comprueba con
   // la sesión que ya tenemos en la mano, sin pedir otra.
-  if (isAdminEmail(session.user.email)) redirect('/taller')
+  if (isAdminEmail(session.user.email)) redirect('/gestion')
 
   const cart = await readCart()
   if (cart.lines.length === 0) redirect('/carrito')
