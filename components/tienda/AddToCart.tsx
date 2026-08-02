@@ -22,8 +22,12 @@ import { CartPing } from '@/components/layout/CartCount'
  * y el nombre accesible pasa a ser el propio texto, así que ya no hacen falta
  * `aria-label` ni `title`. El botón sigue sin ocupar la columna entera —el
  * formulario es `w-fit`—, que era lo que motivó quitar el rótulo en su día; con
- * el ancho ajustado al texto no le come protagonismo a la pieza y aun así se
- * distingue de los dos iconos de contacto de debajo, que son la vía secundaria.
+ * el ancho ajustado al texto no le come protagonismo a la pieza.
+ *
+ * Y con el ancho ajustado, `mx-auto` lo centra en el hueco que le queda. Desde
+ * que es lo único que hay ahí —antes lo acompañaban los iconos de contacto—,
+ * pegado a la izquierda se quedaba descolgado bajo una columna de texto que sí
+ * llega al borde.
  */
 
 /**
@@ -57,16 +61,12 @@ export function AddToCart({ slug }: { slug: string }) {
   }
 
   return (
-    <form action={addToCart} className="relative w-fit">
+    <form action={addToCart} className="relative mx-auto w-fit">
       <input type="hidden" name="slug" value={slug} />
       {/* Avisa al contador de la barra de móvil cuando la pieza ya está dentro.
           No pinta nada y no toca el envío, que sigue funcionando sin JS. */}
       <CartPing />
-      <button
-        type="submit"
-        onClick={() => setBurst((n) => n + 1)}
-        className="btn"
-      >
+      <button type="submit" onClick={() => setBurst((n) => n + 1)} className="btn">
         Añadir al carrito
       </button>
 
