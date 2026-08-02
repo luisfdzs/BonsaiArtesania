@@ -11,13 +11,30 @@ import { HONEYPOT_FIELD, TOKEN_FIELD } from '@/lib/form-fields'
  *
  * 1. **Campo trampa.** Un `input` que una persona no ve ni puede enfocar. Los bots
  *    rellenan todo lo que encuentran; si viene con algo escrito, no es una persona.
- * 2. **Testigo firmado con la hora.** Dice cuándo se pintó el formulario. Un envío
- *    a los dos segundos de cargar la página no lo hace nadie, y uno de hace ocho
- *    horas es una pestaña olvidada. Va firmado con HMAC sobre `AUTH_SECRET` para
- *    que no se pueda inventar una hora que encaje.
+ * 2. **Testigo firmado con la hora.** Dice cuándo se pintó el formulario. Uno de
+ *    hace ocho horas es una pestaña olvidada. Va firmado con HMAC sobre
+ *    `AUTH_SECRET` para que no se pueda inventar una hora que encaje.
+ *
+ * La espera mínima —«nadie rellena un formulario en dos segundos»— es opcional, y
+ * hay que pensarla formulario por formulario. Ver `MIN_MS`.
  */
 
-/** Antes de esto no ha escrito nadie: ha sido un script. */
+/**
+ * Espera mínima por defecto entre pintar el formulario y recibirlo de vuelta.
+ *
+ * **Ojo con lo que mide de verdad**: no es el rato que ha estado la persona
+ * delante, sino el que ha pasado desde que el **servidor** pintó la página. Ahí
+ * dentro va también lo que tarde la respuesta en viajar, en pintarse y en
+ * hidratarse. En local, sin red de por medio, el testigo ya nace con ~1,4 s
+ * encima cuando la página termina de cargar; desde un móvil, con la web en
+ * Vercel, se pasa de los dos segundos **antes de que se vea nada**.
+ *
+ * Por eso sólo tiene sentido donde haya algo que teclear —un correo, un código,
+ * una dirección—, que es lo que de verdad no se hace en dos segundos. En un
+ * formulario cuyo único gesto es pulsar un botón no mide nada humano y sólo
+ * acusa de robot a quien va rápido: pasar `minMs: 0` y dejar el trabajo a las
+ * demás capas (el campo trampa, la firma, la caducidad y `lib/rate-limit.ts`).
+ */
 const MIN_MS = 2_000
 
 /** Después de esto el formulario es de otra visita. Hay que recargar. */
@@ -46,15 +63,24 @@ export type GuardResult =
   /** `bot` es un envío que no parece humano; `caducado`, una pestaña vieja. */
   | { ok: false; reason: 'bot' | 'caducado' }
 
+export type GuardOptions = {
+  /** Espera mínima, en milisegundos. `0` la desactiva. Ver `MIN_MS`. */
+  minMs?: number
+  /** Sólo para las pruebas: la hora que se toma por «ahora». */
+  now?: number
+}
+
 /**
- * Comprueba las dos trampas sobre lo que ha llegado del formulario.
+ * Comprueba las trampas sobre lo que ha llegado del formulario.
  *
  * La firma se compara con `timingSafeEqual` y no con `===`: comparar cadenas se
  * corta en el primer byte distinto, y ese tiempo distinto es medible y filtra la
  * firma byte a byte. Aquí el riesgo es pequeño, pero la comparación segura cuesta
  * lo mismo escribirla.
  */
-export function checkFormGuard(formData: FormData, now = Date.now()): GuardResult {
+export function checkFormGuard(formData: FormData, options: GuardOptions = {}): GuardResult {
+  const { minMs = MIN_MS, now = Date.now() } = options
+
   if (String(formData.get(HONEYPOT_FIELD) ?? '') !== '') return { ok: false, reason: 'bot' }
 
   const raw = String(formData.get(TOKEN_FIELD) ?? '')
@@ -70,8 +96,11 @@ export function checkFormGuard(formData: FormData, now = Date.now()): GuardResul
 
   const age = now - Number(issuedAt)
   // Un testigo con hora futura sólo sale de un reloj mal puesto en el servidor o
-  // de un intento raro; se trata como lo que es, algo que no debería pasar.
-  if (!Number.isFinite(age) || age < MIN_MS) return { ok: false, reason: 'bot' }
+  // de un intento raro; se trata como lo que es, algo que no debería pasar. Eso se
+  // comprueba siempre, aunque la espera mínima esté desactivada: `age < 0` no es
+  // ir rápido, es una hora que no puede ser.
+  if (!Number.isFinite(age) || age < 0) return { ok: false, reason: 'bot' }
+  if (age < minMs) return { ok: false, reason: 'bot' }
   if (age > MAX_MS) return { ok: false, reason: 'caducado' }
 
   return { ok: true }

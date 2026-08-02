@@ -118,7 +118,24 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
 
   const userId = new ObjectId(session.user.id)
 
-  const guard = checkFormGuard(formData)
+  // `minMs: 0` a propósito, y es lo que arregla el «hay que pulsar dos veces».
+  //
+  // El guardián trae de serie una espera mínima de dos segundos entre pintar el
+  // formulario y recibirlo, con el argumento de que nadie rellena uno tan rápido.
+  // Aquí no hay nada que rellenar: se llega con la dirección ya elegida y el único
+  // gesto es pulsar el avioncito. Y el reloj no cuenta desde que la página se ve,
+  // sino desde que **el servidor la pintó**, así que dentro de esos dos segundos
+  // van también el viaje de la respuesta, el pintado y la hidratación: en local ya
+  // se gasta 1,4 s antes de que la página termine de cargar, y desde un móvil se
+  // agota entero antes de que se vea nada. El primer clic caía en la trampa, salía
+  // «este formulario ha caducado» —un mensaje que además no era verdad— y el
+  // segundo, ya pasados los dos segundos, sí entraba.
+  //
+  // Lo que sostiene este envío son las otras capas, que siguen todas puestas: hace
+  // falta cuenta con correo verificado, el campo trampa, la firma del testigo, su
+  // caducidad a las ocho horas, los cuatro cubos de `lib/rate-limit.ts` y el
+  // cerrojo atómico del carrito.
+  const guard = checkFormGuard(formData, { minMs: 0 })
   if (!guard.ok) {
     // Al bot se le contesta lo mismo que a la pestaña caducada, y a propósito: un
     // mensaje que dijera «has caído en el campo trampa» sería un manual para
