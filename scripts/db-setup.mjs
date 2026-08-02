@@ -212,6 +212,14 @@ const indexes = {
     // Panel de Ana: qué hay pendiente de preparar.
     { keys: { status: 1, createdAt: -1 }, options: { name: 'por_estado' } },
   ],
+
+  rate_limits: [
+    // Sin esto la colección crecería para siempre: cada ventana de cada IP deja un
+    // documento. Con el TTL, Mongo los borra en cuanto la ventana pasa y la
+    // colección se queda sólo con lo que está vivo. Es la única razón por la que
+    // llevar los contadores en la base es barato.
+    { keys: { expiresAt: 1 }, options: { expireAfterSeconds: 0, name: 'caducidad' } },
+  ],
 }
 
 const client = new MongoClient(uri)
@@ -236,6 +244,8 @@ try {
     'counters',
     // Unidades disponibles por pieza, con el slug del catálogo como _id.
     'stock',
+    // Contadores de los límites de uso. Se vacían solos por TTL; ver lib/rate-limit.ts.
+    'rate_limits',
   ]
 
   console.log(`\n  Base: ${DB_NAME}\n`)

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { auth, signIn } from '@/auth'
 import { cn } from '@/lib/cn'
+import { clientIp, peek, POLICIES } from '@/lib/rate-limit'
 import { FormPending } from '@/components/ui/FormPending'
 import { SendIcon } from '@/components/ui/SocialIcons'
 
@@ -69,7 +70,9 @@ export default async function EntrarPage({ searchParams }: Props) {
           <p className="field-error mt-8" role="alert">
             {error === 'Verification'
               ? 'Ese enlace ya se ha usado o ha caducado. Pide otro abajo.'
-              : 'No se ha podido enviar el enlace. Comprueba el correo y vuelve a intentarlo.'}
+              : error === 'Limite'
+                ? 'Se han pedido ya varios enlaces para ese correo. Busca en tu buzón el último que te llegó —incluida la carpeta de spam— o espera un rato antes de pedir otro.'
+                : 'No se ha podido enviar el enlace. Comprueba el correo y vuelve a intentarlo.'}
           </p>
         )}
 
@@ -77,13 +80,37 @@ export default async function EntrarPage({ searchParams }: Props) {
           className="mt-10"
           action={async (formData: FormData) => {
             'use server'
+            const email = String(formData.get('email') ?? '')
+              .trim()
+              .toLowerCase()
+
+            /**
+             * Aviso amable, no barrera.
+             *
+             * La barrera está en `sendSignInEmail`, y tiene que estar allí: el
+             * endpoint `/api/auth/signin/nodemailer` de Auth.js acepta un POST
+             * directo sin pasar por esta página, así que cualquier comprobación de
+             * aquí se esquiva con dos líneas de script. Esto sólo mira el contador
+             * —sin gastarlo— para poder explicar lo que pasa en vez de soltar un
+             * «no se ha podido enviar» que no ayuda a nadie.
+             */
+            const ip = await clientIp()
+            const cubos = await Promise.all([
+              peek('signin:email', email, POLICIES.signInEmail),
+              peek('signin:email:dia', email, POLICIES.signInEmailDay),
+              peek('signin:ip', ip, POLICIES.signInIp),
+              peek('signin:ip:dia', ip, POLICIES.signInIpDay),
+            ])
+
+            if (cubos.some((cubo) => !cubo.ok)) {
+              const volverParam = volver ? `&volver=${encodeURIComponent(volver)}` : ''
+              redirect(`/entrar?error=Limite${volverParam}`)
+            }
+
             // El destino se fija aquí, en el servidor, a partir de un valor que ya
             // venía en la URL de esta página: nunca se toma de un campo del
             // formulario, para que no se pueda inyectar una redirección externa.
-            await signIn('nodemailer', {
-              email: String(formData.get('email') ?? ''),
-              redirectTo: backTo,
-            })
+            await signIn('nodemailer', { email, redirectTo: backTo })
           }}
         >
           {/* Pedir el enlace es esperar a un servidor de correo, no a la base de
