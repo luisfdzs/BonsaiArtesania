@@ -14,9 +14,12 @@ import { useEffect, useState } from 'react'
  * trozo suelto de la portada. La sección sigue estando en la portada; lo único
  * que cambia es cómo se escribe.
  *
- * El taller se anuncia como `/el-taller` y no como `/taller` porque esa ruta ya
- * es el panel de gestión: dejarla puesta significaría que recargar desde la
- * sección abre el panel —o un 404, para quien no es Ana—.
+ * El taller se anuncia como `/el-taller` y no como `/taller`. Al principio era
+ * por obligación —`/taller` era el panel de gestión, y recargar desde la sección
+ * habría abierto el panel, o un 404 para quien no es Ana—; desde que el panel
+ * pasó a `/gestion` la ruta está libre, pero se queda como está: es la que llevan
+ * los enlaces guardados y la que redirige `next.config.ts`, y cambiarla no
+ * arreglaría nada.
  */
 const SECTIONS = [
   { id: 'taller', path: '/el-taller' },

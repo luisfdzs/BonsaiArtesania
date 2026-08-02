@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { getSession } from '@/auth'
 import { ArrowLeftIcon, PinIcon } from '@/components/cuenta/CuentaIcons'
-import { isAdmin } from '@/lib/admin'
 import { ORDER_STATUS_LABEL } from '@/lib/order-status'
 import { formatCents, orders } from '@/lib/schema'
 
@@ -24,10 +23,6 @@ const dateFormat = new Intl.DateTimeFormat('es-ES', {
 export default async function PedidoPage({ params }: Params) {
   const session = await getSession()
   if (!session?.user?.id) redirect('/entrar?volver=/cuenta/pedidos')
-
-  // Ana ve este pedido, pero en el taller y con los mandos: aquí sólo encontraría
-  // un 404, porque el filtro de abajo pide que el pedido sea suyo.
-  if (await isAdmin()) redirect(`/taller/pedidos/${(await params).number}`)
 
   const { number } = await params
   const collection = await orders()
