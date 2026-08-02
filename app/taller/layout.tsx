@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { signOut } from '@/auth'
-import { AccountIcon } from '@/components/layout/NavIcons'
 import { LogoutIcon } from '@/components/cuenta/CuentaIcons'
+import { AccountIcon } from '@/components/layout/NavIcons'
 import { FormPending } from '@/components/ui/FormPending'
 import { adminSession } from '@/lib/admin'
 
