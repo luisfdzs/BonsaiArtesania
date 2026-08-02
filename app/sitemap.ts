@@ -10,6 +10,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '',
     '/tienda',
     '/encargos',
+    // El taller y Contacto eran anclas de la portada, así que hasta ahora
+    // entraban en el sitemap dentro de ''. Con ruta propia se listan aparte.
+    '/el-taller',
+    '/contacto',
     '/legal/condiciones',
     '/legal/privacidad',
     '/legal/cookies',
