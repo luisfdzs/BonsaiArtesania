@@ -1,7 +1,6 @@
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getSession, signOut } from '@/auth'
-import { HammerIcon, LogoutIcon } from '@/components/cuenta/CuentaIcons'
+import { LogoutIcon } from '@/components/cuenta/CuentaIcons'
 import { CuentaNav } from '@/components/cuenta/CuentaNav'
 import { FormPending } from '@/components/ui/FormPending'
 import { isAdminEmail } from '@/lib/admin'
@@ -18,22 +17,25 @@ import { isAdminEmail } from '@/lib/admin'
  * panel con barra lateral, y centrado se lee igual en móvil que en escritorio sin
  * dos maquetaciones distintas.
  *
- * ## La cuenta del taller entra por aquí y se lee distinto
+ * ## Esta zona es de los clientes, y sólo de ellos
  *
- * A Ana no se la echa de `/cuenta` —sigue teniendo contraseña que cambiar y datos
- * suyos que descargar—, pero lo que se le enseña no es lo mismo: el rótulo dice a
- * qué cuenta ha entrado, la primera pestaña es el taller y no hay ni «Pedidos»
- * ni «Direcciones». Las dos que faltan están además cerradas por su lado, que es
- * lo que de verdad las cierra. Ver `lib/admin.ts`.
+ * La cuenta del taller entraba por aquí y se le enseñaba una versión recortada
+ * —sin «Pedidos» ni «Direcciones», con una pestaña de más hacia el panel—. Ya no:
+ * lo suyo vive entero bajo `/gestion`, incluida la contraseña, así que aquí se la
+ * manda para allá y esta zona vuelve a significar una sola cosa. Ver `lib/admin.ts`.
+ *
+ * Va en el layout y no en cada página: cierra por igual las que hay y las que
+ * vengan. Y el destino es la portada del panel y no `/gestion/cuenta`, porque
+ * quien escribe `/cuenta` va a su sitio, no a un formulario concreto.
  */
 export default async function CuentaLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession()
 
   if (!session?.user) redirect('/entrar?volver=/cuenta')
+  if (isAdminEmail(session.user.email)) redirect('/gestion')
 
   const name = session.user.name?.trim()
   const email = session.user.email ?? ''
-  const admin = isAdminEmail(email)
   // La inicial del nombre, y si aún no lo ha rellenado, la del correo. En
   // mayúscula desde CSS (`uppercase`) y no aquí, para no romper letras que se
   // mayusculizan en dos caracteres.
@@ -49,31 +51,13 @@ export default async function CuentaLayout({ children }: { children: React.React
           {initial}
         </span>
 
-        <p className="eyebrow mt-6">{admin ? 'Cuenta del taller' : 'Tu cuenta'}</p>
+        <p className="eyebrow mt-6">Tu cuenta</p>
         <h1 className="mt-3 font-serif text-title">{name || 'Hola'}</h1>
         {email && <p className="mt-3 text-small text-bark-faint">{email}</p>}
-
-        {/* Dicho con todas las letras y no insinuado quitando pestañas: si algún
-            día Ana busca su carrito, que sepa aquí mismo por qué no está. */}
-        {admin && (
-          <p className="mt-6 max-w-md text-small text-bark-soft">
-            Desde aquí se gestionan los pedidos de la tienda. Esta cuenta no compra: no tiene
-            carrito ni hace pedidos.
-          </p>
-        )}
       </header>
 
-      {admin && (
-        <div className="mx-auto mt-8 max-w-2xl text-center">
-          <Link href="/taller" className="btn">
-            <HammerIcon className="h-4 w-4" />
-            Ir al taller
-          </Link>
-        </div>
-      )}
-
       <div className="mx-auto mt-10 max-w-2xl border-t border-line pt-8">
-        <CuentaNav admin={admin} />
+        <CuentaNav />
       </div>
 
       <div className="mx-auto mt-14 max-w-xl text-center">{children}</div>

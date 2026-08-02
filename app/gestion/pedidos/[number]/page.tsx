@@ -12,7 +12,7 @@ const dateTimeFormat = new Intl.DateTimeFormat('es-ES', {
   timeStyle: 'short',
 })
 
-export default async function TallerPedidoPage({ params }: Params) {
+export default async function GestionPedidoPage({ params }: Params) {
   const { number } = await params
 
   const collection = await orders()
@@ -23,7 +23,7 @@ export default async function TallerPedidoPage({ params }: Params) {
 
   return (
     <section>
-      <Link href="/taller" className="link-underline tap eyebrow">
+      <Link href="/gestion" className="link-underline tap eyebrow">
         ← Pedidos
       </Link>
 
@@ -31,13 +31,6 @@ export default async function TallerPedidoPage({ params }: Params) {
         <h2 className="font-serif text-title">{order.number}</h2>
         <p className="text-small text-bark-soft">{ORDER_STATUS_ADMIN_LABEL[order.status]}</p>
       </header>
-
-      {order.payment.provider === 'simulado' && (
-        <p className="mt-6 bg-petal-soft p-4 text-small text-bark-soft">
-          <strong className="text-bark">Este pedido no se ha cobrado.</strong> Se creó con el cobro
-          simulado, antes de conectar la pasarela. Si lo preparas, acuerda el pago aparte.
-        </p>
-      )}
 
       <ul className="mt-10 flex flex-col">
         {order.items.map((item) => (

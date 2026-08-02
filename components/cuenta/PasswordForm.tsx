@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
-import { changePassword, type ActionState } from '@/app/cuenta/actions'
+import { changePassword, type ActionState } from '@/app/(sitio)/cuenta/actions'
 import { CheckIcon } from '@/components/ui/CartIcons'
 import { Field } from '@/components/ui/Field'
 import { FlowerBud } from '@/components/ui/FlowerBud'

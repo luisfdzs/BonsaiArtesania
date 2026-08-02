@@ -1,10 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Cormorant_Garamond, Jost } from 'next/font/google'
-import { Footer } from '@/components/layout/Footer'
-import { Header } from '@/components/layout/Header'
-import { MobileNav } from '@/components/layout/MobileNav'
 import { site } from '@/content/site'
-import { shopOpen } from '@/lib/shop'
 import './globals.css'
 
 /**
@@ -46,23 +42,22 @@ export const metadata: Metadata = {
   },
 }
 
+/**
+ * Sólo el documento: `<html>`, `<body>` y las fuentes. La cabecera, el pie y la
+ * barra de móvil ya no están aquí, aunque parezca su sitio.
+ *
+ * El motivo es que hay dos armazones y no uno: la web (`app/(sitio)`) y el panel
+ * de gestión (`app/gestion`), que no comparten ni cabecera ni pie. Lo que un
+ * layout pinta no se lo puede quitar un hijo, así que lo común se queda arriba y
+ * cada uno pone lo suyo. Ver `components/layout/SiteChrome.tsx`.
+ *
+ * El `<body>` conserva la columna a alto de pantalla porque los dos armazones la
+ * usan: es lo que empuja el pie al fondo en las páginas cortas.
+ */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" data-scroll-behavior="smooth" className={`${serif.variable} ${sans.variable}`}>
-      <body className="flex min-h-svh flex-col">
-        {/* El interruptor se lee aquí, en el servidor, y baja como prop: la
-            cabecera y la barra de móvil son componentes de cliente y no ven
-            process.env. */}
-        <Header shopOpen={shopOpen} />
-        <main id="main" className="flex-1">
-          {children}
-        </main>
-        <Footer />
-        {/* La navegación de móvil va al final del documento y no dentro de la
-            cabecera: es una barra fija abajo, y en orden de lectura le toca
-            después del contenido. Sólo se ve por debajo de `md`. */}
-        <MobileNav shopOpen={shopOpen} />
-      </body>
+      <body className="flex min-h-svh flex-col">{children}</body>
     </html>
   )
 }

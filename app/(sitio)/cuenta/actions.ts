@@ -59,7 +59,12 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
     },
   )
 
+  // Las dos rutas: los mismos formularios los pinta la cuenta de cliente en
+  // `/cuenta` y la del taller en `/gestion/cuenta`, y quien guarda es siempre
+  // una de las dos. Revalidar la que no toca no cuesta nada; olvidar la que sí
+  // deja el nombre viejo en pantalla hasta la siguiente navegación.
   revalidatePath('/cuenta')
+  revalidatePath('/gestion/cuenta')
   return { ok: true }
 }
 
@@ -146,6 +151,7 @@ export async function changePassword(_prev: ActionState, formData: FormData): Pr
   const closed = await endSessions(String(userId), { keepCurrent: true })
 
   revalidatePath('/cuenta')
+  revalidatePath('/gestion/cuenta')
   return { ok: true, closed }
 }
 

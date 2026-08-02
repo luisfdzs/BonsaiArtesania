@@ -41,7 +41,7 @@ export async function updateOrderStatus(formData: FormData): Promise<void> {
     },
   )
 
-  revalidatePath('/taller')
-  revalidatePath(`/taller/pedidos/${number}`)
+  revalidatePath('/gestion')
+  revalidatePath(`/gestion/pedidos/${number}`)
   revalidatePath('/cuenta/pedidos')
 }

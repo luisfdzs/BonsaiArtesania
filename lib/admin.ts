@@ -2,7 +2,7 @@ import { cache } from 'react'
 import { auth, getSession } from '@/auth'
 
 /**
- * Quién puede entrar al taller (el panel de gestión).
+ * Quién puede entrar en `/gestion`, el panel del taller.
  *
  * La lista vive en una variable de entorno y no en un campo `role` de la base a
  * propósito: para conceder permisos de administración hay que tener acceso a la
@@ -18,6 +18,12 @@ import { auth, getSession } from '@/auth'
  * hace ninguno**. No tiene carrito, no pasa por caja y no tiene «Tus pedidos»,
  * porque los pedidos que le importan no son suyos, son de los clientes.
  *
+ * Llevado hasta el final, esa cuenta **no tiene web**: no tiene portada, ni
+ * tienda, ni encargos, ni la sección del taller, ni siquiera `/cuenta`. Todo lo
+ * suyo —los pedidos y su propia contraseña— cuelga de `/gestion`, que es un
+ * armazón aparte sin la cabecera ni el pie de la tienda. Ver
+ * `app/gestion/layout.tsx` y `components/layout/SiteChrome.tsx`.
+ *
  * Se hace así, y no con una cuenta que pudiera las dos cosas, por dos razones. La
  * primera es que no habría forma de leer la pantalla: «Pedidos» significaría dos
  * cosas distintas —los que Ana ha hecho y los que tiene que preparar— en el mismo
@@ -29,9 +35,9 @@ import { auth, getSession } from '@/auth'
  * barato que cualquier interruptor de «modo cliente».
  *
  * El bloqueo real está repartido por los sitios donde se compra, y siempre en el
- * servidor: `app/carrito/actions.ts`, `app/comprar/actions.ts`, las páginas de
- * `/carrito` y `/comprar`, y el layout de `/cuenta`. Esconder un botón no cierra
- * nada, porque una acción de servidor es un endpoint público.
+ * servidor: `app/(sitio)/carrito/actions.ts`, `app/(sitio)/comprar/actions.ts`,
+ * las páginas de `/carrito` y `/comprar`, y el layout de `/cuenta`. Esconder un
+ * botón no cierra nada, porque una acción de servidor es un endpoint público.
  */
 function adminEmails(): string[] {
   return (process.env.ADMIN_EMAILS ?? '')
