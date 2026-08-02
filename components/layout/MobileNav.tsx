@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 import { NavPending } from '@/components/ui/NavPending'
 import { cn } from '@/lib/cn'
 import { navigation } from '@/lib/navigation'
-import { useActiveSection } from '@/lib/useActiveSection'
+import { onHome, useActiveSection } from '@/lib/useActiveSection'
 import { useCartCount } from './CartCount'
 import { AccountIcon, CartIcon, CloseIcon, ContactIcon, HomeIcon, MenuIcon } from './NavIcons'
 
@@ -61,7 +61,7 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
   // activa: si no, al entrar en Contacto se encenderían los dos huecos a la
   // vez, que es peor que marcar sólo el que toca.
   const section = useActiveSection()
-  const homeActive = pathname === '/' && !section
+  const homeActive = onHome(pathname) && !section
   const contactoActive = section === 'contacto'
 
   // «Contacto» sale de la barra con su propio icono; las otras tres entradas del
@@ -121,7 +121,7 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
           // del CSS —y el salto seco cuando el sistema pide menos movimiento.
           onClick={(event) => {
             close()
-            if (pathname === '/') {
+            if (onHome(pathname)) {
               event.preventDefault()
               window.scrollTo({ top: 0 })
             }

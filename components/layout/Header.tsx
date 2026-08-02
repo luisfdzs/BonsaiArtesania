@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 import { NavPending } from '@/components/ui/NavPending'
 import { cn } from '@/lib/cn'
 import { navigation } from '@/lib/navigation'
-import { useActiveSection } from '@/lib/useActiveSection'
+import { onHome, useActiveSection } from '@/lib/useActiveSection'
 import { AccountIcon, CartIcon, CloseIcon, ContactIcon, HomeIcon, MenuIcon } from './NavIcons'
 import { Wordmark } from './Wordmark'
 
@@ -85,7 +85,7 @@ export function Header({ shopOpen }: { shopOpen: boolean }) {
             // cuando el sistema pide menos movimiento.
             onClick={(event) => {
               close()
-              if (pathname === '/') {
+              if (onHome(pathname)) {
                 event.preventDefault()
                 window.scrollTo({ top: 0 })
               }
@@ -149,9 +149,9 @@ function DesktopNav({
       <IconLink
         href="/"
         label="Inicio"
-        active={pathname === '/' && !section && !open}
+        active={onHome(pathname) && !section && !open}
         onClick={(event) => {
-          if (pathname === '/') {
+          if (onHome(pathname)) {
             event.preventDefault()
             window.scrollTo({ top: 0, behavior: 'smooth' })
           }
