@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
 import { LoginForm } from '@/components/entrar/LoginForm'
 import { RequestCodeForm } from '@/components/entrar/RequestCodeForm'
+import { NavPending } from '@/components/ui/NavPending'
 import { cn } from '@/lib/cn'
 
 export const metadata: Metadata = {
@@ -44,6 +45,13 @@ export default async function EntrarPage({ searchParams }: Props) {
   return (
     <div className="page-gutter flex min-h-[70vh] items-center pt-16 pb-(--spacing-section) md:pt-24">
       <div className="mx-auto w-full max-w-sm text-center">
+        {/* Las dos pestañas esperan y no lo parecen: cambian un parámetro de esta
+            misma dirección, pero cada una vuelve al servidor —`auth()` es un
+            viaje a Atlas antes de pintar nada—. Al no cambiar de segmento, el
+            `loading.tsx` de esta carpeta no se vuelve a enseñar: su frontera ya
+            está resuelta y React se limita a esperar callado con la pestaña
+            vieja en pantalla. De ahí la flor desde el propio enlace, con
+            `NavPending`, igual que en el icono de Cuenta de la cabecera. */}
         <div className="flex justify-center gap-8 border-b border-line pb-4">
           <Link
             href={`/entrar${volver ? `?volver=${encodeURIComponent(volver)}` : ''}`}
@@ -51,6 +59,7 @@ export default async function EntrarPage({ searchParams }: Props) {
             className={cn('tap text-small', creating ? 'text-bark-faint' : 'text-bark')}
           >
             Iniciar sesión
+            <NavPending label="Preparando la entrada" />
           </Link>
           <Link
             href={crearHref}
@@ -58,6 +67,7 @@ export default async function EntrarPage({ searchParams }: Props) {
             className={cn('tap text-small', creating ? 'text-bark' : 'text-bark-faint')}
           >
             Crear cuenta
+            <NavPending label="Preparando tu alta" />
           </Link>
         </div>
 
@@ -93,8 +103,10 @@ export default async function EntrarPage({ searchParams }: Props) {
           ) : (
             <>
               ¿Todavía no tienes cuenta?{' '}
+              {/* Lleva a la misma pestaña de arriba, así que espera igual. */}
               <Link href={crearHref} className="link-underline">
                 Créala en un minuto
+                <NavPending label="Preparando tu alta" />
               </Link>
               .
             </>
