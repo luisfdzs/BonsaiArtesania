@@ -5,9 +5,10 @@ import { FlowerLoader } from '@/components/ui/FlowerLoader'
  * en base de datos (`strategy: 'database'` en auth.ts), así que la comprobación
  * de si ya se ha entrado es un viaje a Atlas antes de pintar nada.
  *
- * Se nota sobre todo en el enlace que alterna entre entrar y crear cuenta: sólo
- * cambia un parámetro de la dirección, pero vuelve al servidor y repite la
- * comprobación. Sin esto, ese enlace se pulsa y no pasa nada visible.
+ * Ojo con lo que NO cubre: el enlace que alterna entre entrar y crear cuenta se
+ * queda en `/entrar` y sólo cambia un parámetro, así que para React es el mismo
+ * segmento y esta frontera de espera ya está resuelta —no se vuelve a enseñar—.
+ * Esa espera la dice `NavPending` desde los propios enlaces; ver `page.tsx`.
  */
 export default function Loading() {
   return <FlowerLoader label="Preparando la entrada" />
