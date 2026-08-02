@@ -619,13 +619,16 @@
 @utility shop-rail {
   position: relative;
   display: flex;
-  gap: 2rem;
+  /* El hueco real entre rótulos son estos 0.75rem más el relleno lateral de cada
+     `shop-tab`: 2.25rem en total. */
+  gap: 0.75rem;
   overflow-x: auto;
   scroll-snap-type: x proximity;
   scrollbar-width: none;
   /* El sangrado lateral lo pone el carril y no la barra: así el fondo llega de
-     borde a borde y el primer rótulo sigue alineado con el texto de la página. */
-  padding-inline: var(--spacing-gutter);
+     borde a borde y el primer rótulo sigue alineado con el texto de la página
+     —de ahí el descuento del relleno de la propia entrada. */
+  padding-inline: calc(var(--spacing-gutter) - 0.75rem);
 
   &::-webkit-scrollbar {
     display: none;
@@ -642,25 +645,37 @@
   display: inline-flex;
   align-items: baseline;
   gap: 0.45rem;
-  /* Alto de la barra: 2.75rem de zona pulsable repartidas arriba y abajo. */
+  /* Alto de la barra: 2.75rem de zona pulsable repartidas arriba y abajo. El
+     relleno lateral es el que necesita el lavado verde del activo para no ir
+     pegado a las letras; el hueco entre familias se descuenta de él. */
   padding-block: 1.1rem;
+  padding-inline: 0.75rem;
   font-size: var(--text-micro);
   line-height: var(--text-micro--line-height);
   letter-spacing: var(--text-micro--letter-spacing);
   text-transform: uppercase;
   white-space: nowrap;
-  color: var(--color-bark-soft);
-  transition: color 0.6s var(--ease-out-soft);
+  /* Las familias en reposo van en la tinta apagada, no en la secundaria: la
+     salvia del activo y `--color-bark-soft` tienen casi el mismo valor —#6b7a62
+     contra #6e675c— y a 11px no se distinguían. Lo que hace verde al activo no
+     es sólo su color, es que las demás se retiran. */
+  color: var(--color-bark-faint);
+  border-radius: 0.4rem 0.4rem 0 0;
+  transition:
+    color 0.6s var(--ease-out-soft),
+    background-color 0.6s var(--ease-out-soft);
 
-  /* El filete del activo, dibujado ENCIMA del de la barra —de ahí el `-1px`—,
-     así que la línea no se dobla: el mismo píxel cambia de color bajo la familia
-     que se está viendo. Al pasar por encima se dibuja despacio y a media tinta,
+  /* El filete de la familia abierta, justo encima del de la barra. Va pegado al
+     borde y no un píxel por debajo —que es donde estaba, para fundirse con la
+     línea de la barra—: el carril scrollea, y `overflow-x: auto` recorta también
+     por arriba y por abajo, así que ese píxel de más se perdía y el filete se
+     veía a la mitad. Al pasar por encima se dibuja despacio y a media tinta,
      igual que en `link-underline`. */
   &::after {
     content: '';
     position: absolute;
     inset-inline: 0;
-    bottom: -1px;
+    bottom: 0;
     height: 1px;
     background: currentColor;
     opacity: 0.45;
@@ -669,8 +684,11 @@
     transition: transform 0.6s var(--ease-out-soft);
   }
 
+  /* El hover sube a la tinta secundaria y no a la principal: en tinta llena
+     gritaba más que la familia abierta, y entonces el verde dejaba de ser lo
+     primero que se ve en la barra. */
   &:hover {
-    color: var(--color-bark);
+    color: var(--color-bark-soft);
   }
 
   &:hover::after,
@@ -680,12 +698,21 @@
 
   /* El estado activo cuelga de `aria-current` y no de una clase aparte: es el
      atributo que ya hay que poner para que un lector de pantalla lo diga, y así
-     no hay dos formas de estar activo que puedan discrepar. */
+     no hay dos formas de estar activo que puedan discrepar.
+
+     Verde por tres sitios a la vez —rótulo, fondo y filete—, que es lo que hace
+     que se vea de un golpe de vista y no al comparar dos rótulos. El fondo es el
+     mismo lavado de salvia con el que la cabecera marca el icono de la sección
+     abierta; aquí va redondeado sólo por arriba, para que la pestaña nazca del
+     filete de la barra en vez de flotar sobre él. */
   &[aria-current='page'] {
     color: var(--color-sage-deep);
+    background: color-mix(in srgb, var(--color-sage-deep) 12%, transparent);
   }
 
+  /* Y el filete a 2px: a 1px, con el lavado verde detrás, se perdía. */
   &[aria-current='page']::after {
+    height: 2px;
     opacity: 1;
     transform: scaleX(1);
   }
@@ -697,6 +724,12 @@
 @utility shop-tab-count {
   letter-spacing: 0;
   color: var(--color-bark-faint);
+
+  /* En la familia abierta el número se tiñe también: un dígito en gris dentro de
+     un rótulo verde se lee como si no fuera del mismo sitio. */
+  .shop-tab[aria-current='page'] & {
+    color: color-mix(in srgb, var(--color-sage-deep) 70%, transparent);
+  }
 }
 
 /* Tarjeta de la zona de cuenta: un pedido, una dirección, un bloque de ajustes.
