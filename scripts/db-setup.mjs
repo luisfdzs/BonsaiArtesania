@@ -55,6 +55,18 @@ if (!uri) {
 const money = { bsonType: 'int', minimum: 0, description: 'céntimos, entero' }
 
 const validators = {
+  email_codes: {
+    bsonType: 'object',
+    required: ['email', 'purpose', 'codeHash', 'attempts', 'expiresAt'],
+    properties: {
+      email: { bsonType: 'string', minLength: 3, maxLength: 160 },
+      purpose: { enum: ['alta', 'recuperar'] },
+      // El HMAC en base64, nunca las seis cifras. Ver lib/codes.ts.
+      codeHash: { bsonType: 'string' },
+      attempts: { bsonType: 'int', minimum: 0 },
+      expiresAt: { bsonType: 'date' },
+    },
+  },
   addresses: {
     bsonType: 'object',
     required: [
@@ -180,6 +192,14 @@ const indexes = {
     { keys: { expires: 1 }, options: { expireAfterSeconds: 0, name: 'caducidad' } },
   ],
 
+  email_codes: [
+    // Toda consulta de lib/codes.ts busca por este par: emitir, comprobar y borrar.
+    { keys: { email: 1, purpose: 1 }, options: { name: 'por_correo_y_motivo' } },
+    // El TTL es aquí una medida de seguridad y no sólo de limpieza: es lo que hace
+    // que un código deje de valer a los diez minutos aunque nadie lo use.
+    { keys: { expiresAt: 1 }, options: { expireAfterSeconds: 0, name: 'caducidad' } },
+  ],
+
   addresses: [
     { keys: { userId: 1, isDefault: -1 }, options: { name: 'por_usuario_predeterminada' } },
   ],
@@ -237,6 +257,8 @@ try {
     'accounts',
     'sessions',
     'verification_tokens',
+    // Códigos de un solo uso del alta y de la recuperación. Se vacía sola por TTL.
+    'email_codes',
     'addresses',
     'carts',
     'orders',

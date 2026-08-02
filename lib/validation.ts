@@ -29,6 +29,70 @@ export const postalCodeSchema = trimmed(5)
     return province >= 1 && province <= 52
   }, 'Ese código postal no corresponde a ninguna provincia')
 
+/**
+ * Correo. Se guarda y se busca **siempre en minúsculas y sin espacios**: la parte
+ * del dominio no distingue mayúsculas, y en la práctica ningún proveedor real trata
+ * `Ana@` y `ana@` como buzones distintos. Sin normalizar aquí, la misma persona
+ * podría acabar con dos cuentas según cómo hubiera escrito su dirección ese día.
+ */
+export const emailSchema = trimmed(160)
+  .min(1, 'Falta el correo')
+  .toLowerCase()
+  .pipe(z.email('Ese correo no parece válido'))
+
+/**
+ * Las que cumplen todas las reglas de abajo y aun así son las primeras de
+ * cualquier diccionario, justamente porque son la forma más corta de cumplirlas.
+ * La lista es corta a propósito: es un recordatorio, no un filtro de seguridad.
+ */
+const COMMON = new Set([
+  'password1!',
+  'password1.',
+  'contraseña1!',
+  'contrasena1!',
+  'bonsai123!',
+  'qwerty123!',
+  'abcd1234!',
+  'admin123!',
+  '1qaz2wsx!',
+  'welcome1!',
+])
+
+/**
+ * Contraseña.
+ *
+ * Las reglas son las clásicas —ocho caracteres, una mayúscula, un número y un
+ * símbolo— porque es lo que la gente espera encontrar y porque un formulario que
+ * las pide se percibe como serio. Conviene saber que no son gratis: obligar a
+ * combinar tipos empuja a la gente hacia el mismo puñado de patrones («Bonsai1!»)
+ * y hacia apuntarla en un papel, y por eso el NIST dejó de recomendarlas. Lo que
+ * de verdad protege esta cuenta está en otro sitio: el hash con scrypt, el límite
+ * de intentos por hora y el cierre de sesiones al cambiarla.
+ *
+ * El tope de 100 no es capricho: sin él, alguien puede mandar un campo de un megabyte
+ * y obligar al servidor a normalizarlo y derivarlo. Nadie escribe cien caracteres.
+ */
+export const passwordSchema = z
+  .string()
+  .min(8, 'Al menos ocho caracteres')
+  .max(100, 'Como mucho cien caracteres')
+  .regex(/[A-ZÁÉÍÓÚÜÑ]/, 'Tiene que llevar al menos una mayúscula')
+  .regex(/[0-9]/, 'Tiene que llevar al menos un número')
+  // «Símbolo» es cualquier cosa que no sea letra ni número, acentos incluidos: no
+  // tiene sentido rechazar un símbolo raro por no estar en una lista nuestra.
+  .regex(/[^\p{L}\p{N}]/u, 'Tiene que llevar al menos un símbolo, como . - ! o #')
+  .refine(
+    (value) => !COMMON.has(value.toLowerCase()),
+    'Esa es de las primeras que se prueban. Piensa otra.',
+  )
+
+/** El código del correo: seis cifras. Se limpian espacios y guiones al vuelo. */
+export const codeSchema = z
+  .string()
+  .trim()
+  .transform((value) => value.replace(/[\s.-]/g, ''))
+  .pipe(z.string().regex(/^[0-9]{6}$/, 'El código son seis cifras'))
+
 export const addressSchema = z.object({
   alias: trimmed(40).min(1, 'Pon un nombre para distinguirla, como «Casa»'),
   recipient: trimmed(120).min(1, 'Falta el nombre de quien recibe el paquete'),

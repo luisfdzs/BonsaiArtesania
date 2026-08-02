@@ -37,11 +37,12 @@ export function ProfileForm({ name, phone, email }: Props) {
           Correo
         </p>
         <p className="py-[0.6rem] text-bark-soft">{email}</p>
-        {/* El correo es la identidad de la cuenta: es a donde se envía el enlace
-            de acceso, así que cambiarlo aquí dejaría a la persona sin poder
-            entrar. Se hace creando una cuenta con la dirección nueva. */}
+        {/* El correo es la identidad de la cuenta: es con lo que se entra y a donde
+            va el código si algún día hay que recuperarla, así que cambiarlo aquí
+            dejaría a la persona fuera. Se hace creando una cuenta con la nueva. */}
         <p className="text-small text-bark-faint">
-          Es la dirección a la que se envía tu enlace para entrar, así que no se cambia desde aquí.
+          Es con lo que entras y a donde va el código si olvidas la contraseña, así que no se cambia
+          desde aquí.
         </p>
       </div>
 
