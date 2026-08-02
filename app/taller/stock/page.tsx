@@ -1,5 +1,6 @@
 import { products } from '@/content/products'
 import { formatPrice } from '@/content/products'
+import { FlowerBud } from '@/components/ui/FlowerBud'
 import { availabilityFor } from '@/lib/stock'
 import { updateStock } from '../actions'
 
@@ -53,6 +54,16 @@ export default async function TallerStockPage() {
                   className="field w-16 text-center"
                 />
                 <button type="submit" className="link-underline tap text-small text-bark-faint">
+                  {/* Ana corrige existencias pieza por pieza, una fila detrás de
+                      otra, y la página no cambia nada visible al guardar: el
+                      número ya era el que ella escribió. Sin la flor, la única
+                      forma de saber si la fila de arriba se guardó era volver a
+                      pulsar. Aquí la flor no sustituye a ningún icono —el botón
+                      es sólo texto—, así que asoma delante del rótulo. Sin tocar
+                      el `display` del botón: `link-underline` lo pone en
+                      `inline-block` y una utilidad de Tailwind aquí discutiría con
+                      él, así que la flor se alinea sola y ya está. */}
+                  <FlowerBud className="mr-2 inline-block h-3.5 w-3.5 align-middle" />
                   Guardar
                 </button>
               </form>

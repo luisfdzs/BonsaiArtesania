@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { getSession, signOut } from '@/auth'
 import { LogoutIcon } from '@/components/cuenta/CuentaIcons'
 import { CuentaNav } from '@/components/cuenta/CuentaNav'
+import { FormPending } from '@/components/ui/FormPending'
 
 /**
  * Guarda de toda la zona de cuenta. Se hace aquí, en un layout de servidor, y no
@@ -59,6 +60,12 @@ export default async function CuentaLayout({ children }: { children: React.React
             await signOut({ redirectTo: '/' })
           }}
         >
+          {/* Salir borra la sesión de la base de datos y luego lleva a la portada:
+              dos viajes, y hasta el segundo la cuenta sigue en pantalla como si no
+              se hubiera pulsado nada. La flor cubre ese hueco —y es la última cosa
+              que se ve del sitio antes de la portada, así que además despide. */}
+          <FormPending label="Cerrando tu sesión" />
+
           <button type="submit" className="btn btn-quiet btn-sm">
             <LogoutIcon className="h-4 w-4" />
             Salir

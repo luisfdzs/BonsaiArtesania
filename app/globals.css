@@ -203,6 +203,23 @@
   }
 }
 
+/* La misma flor dentro de un botón que espera —cambiar una cantidad, guardar una
+   dirección—: se abre una vez y se queda abierta hasta que llega la respuesta.
+   Sin bucle a propósito, al contrario que la de la página: a 1rem, cada vuelta
+   dejaría el botón vacío durante un segundo, y un indicador que desaparece y
+   vuelve se lee como un error. Abierta y quieta dice «sigue en marcha». Ver
+   `FlowerBud`. */
+@keyframes bud-open {
+  from {
+    opacity: 0;
+    transform: scale(0.12);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* ============================================================================
    Base
    ========================================================================= */
@@ -517,6 +534,27 @@
   & .flower-heart {
     transform-origin: 20px 21px;
     animation: flower-heart 2.8s var(--ease-out-soft) infinite both;
+  }
+}
+
+/* La flor de botón. Comparte con la grande el dibujo y las clases de las piezas,
+   pero nada de su tiempo: aquí no hay tallo del que esperar a que suba, así que
+   los pétalos abren desde el primer momento y no vuelven a cerrarse.
+
+   Su sistema de coordenadas es otro —22×22 con el centro en (11,11), ver
+   `FlowerBud`—, y de ahí que repita los `transform-origin` en vez de heredar los
+   de `flower`: un origen en píxeles dentro de un SVG se mide contra el `viewBox`,
+   así que los de la grande abrirían los pétalos fuera del dibujo.
+
+   Con `prefers-reduced-motion` la regla de base deja la animación en 0.01ms y con
+   `both` lo que queda es la flor abierta desde el primer fotograma. */
+@utility flower-bud {
+  & .flower-petal,
+  & .flower-heart {
+    transform-box: view-box;
+    transform-origin: 11px 11px;
+    /* El retardo de cada pieza lo pone el componente, inline, como en la grande. */
+    animation: bud-open 420ms var(--ease-out-soft) both;
   }
 }
 

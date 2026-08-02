@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { auth, signIn } from '@/auth'
 import { cn } from '@/lib/cn'
+import { FormPending } from '@/components/ui/FormPending'
 import { SendIcon } from '@/components/ui/SocialIcons'
 
 export const metadata: Metadata = {
@@ -85,6 +86,14 @@ export default async function EntrarPage({ searchParams }: Props) {
             })
           }}
         >
+          {/* Pedir el enlace es esperar a un servidor de correo, no a la base de
+              datos: es la espera más larga y la más variable de todo el sitio, y
+              acaba en otra página. Sin nada que lo dijera, el botón se quedaba
+              igual varios segundos después de pulsarlo —el momento exacto en el
+              que se vuelve a pulsar y llegan dos correos, con la duda de cuál de
+              los dos enlaces hay que abrir—. */}
+          <FormPending label="Enviando tu enlace" />
+
           <label className="field-label" htmlFor="email">
             Correo
           </label>

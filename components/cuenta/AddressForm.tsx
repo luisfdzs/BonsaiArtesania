@@ -5,6 +5,7 @@ import { createAddress, updateAddress, type ActionState } from '@/app/cuenta/act
 import { CloseIcon } from '@/components/layout/NavIcons'
 import { CheckIcon } from '@/components/ui/CartIcons'
 import { Field } from '@/components/ui/Field'
+import { FlowerBud } from '@/components/ui/FlowerBud'
 import { PlusIcon } from './CuentaIcons'
 
 export type AddressValues = {
@@ -139,7 +140,14 @@ export function AddressForm({
 
       <div className="flex flex-wrap items-center justify-center gap-3 border-t border-line pt-8">
         <button type="submit" className="btn" disabled={pending}>
-          {editing ? <CheckIcon className="h-4 w-4" /> : <PlusIcon className="h-4 w-4" />}
+          {/* El icono del botón se convierte en la flor mientras se guarda, y el
+              rótulo pasa a «Guardando…»: el mismo aviso dicho de las dos maneras,
+              que es lo que hace que valga con y sin lector de pantalla. Por eso
+              aquí la flor va sin `label` —lo dice el rótulo— y no se cambia de
+              tamaño: ocupa el hueco del icono, no uno nuevo. */}
+          <FlowerBud>
+            {editing ? <CheckIcon className="h-4 w-4" /> : <PlusIcon className="h-4 w-4" />}
+          </FlowerBud>
           {pending ? 'Guardando…' : editing ? 'Guardar cambios' : 'Añadir dirección'}
         </button>
         {onDone && (

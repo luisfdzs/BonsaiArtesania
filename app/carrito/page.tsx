@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { CartPing } from '@/components/layout/CartCount'
 import { CheckIcon, TrashIcon } from '@/components/ui/CartIcons'
+import { FlowerBud } from '@/components/ui/FlowerBud'
 import { Media } from '@/components/ui/Media'
 import { readCart } from '@/lib/cart'
 import { formatCents } from '@/lib/schema'
@@ -140,7 +141,15 @@ export default async function CarritoPage() {
                         title="Actualizar cantidad"
                         className="tap flex h-9 w-9 shrink-0 items-center justify-center border-l border-line text-bark-faint transition-colors duration-500 hover:text-sage-deep"
                       >
-                        <CheckIcon className="h-4 w-4" />
+                        {/* Guardar la cantidad va a la base y vuelve a pintar el
+                            carrito entero —línea, resumen y contador de la barra—,
+                            pero mientras tanto el número en pantalla es el nuevo y
+                            todo lo demás es el viejo: parece que el visto no ha
+                            hecho nada. La flor ocupa el sitio del visto y lo
+                            desmiente sin mover nada de sitio. */}
+                        <FlowerBud label="Actualizando la cantidad">
+                          <CheckIcon className="h-4 w-4" />
+                        </FlowerBud>
                       </button>
                     </form>
 
@@ -153,7 +162,12 @@ export default async function CarritoPage() {
                         title="Quitar"
                         className="tap flex h-9 w-9 items-center justify-center text-bark-faint transition-colors duration-500 hover:text-sage-deep"
                       >
-                        <TrashIcon className="h-4 w-4" />
+                        {/* Igual que el visto de al lado: quitar una pieza tarda
+                            lo que tarde la base y hasta que vuelve la línea sigue
+                            ahí, entera. */}
+                        <FlowerBud label={`Quitando ${line.name}`}>
+                          <TrashIcon className="h-4 w-4" />
+                        </FlowerBud>
                       </button>
                     </form>
                   </div>
