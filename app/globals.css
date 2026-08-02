@@ -783,8 +783,10 @@
   }
 }
 
-/* Etiqueta sobre el campo, siempre visible: un placeholder que hace de etiqueta
-   desaparece al escribir y deja el formulario sin contexto. */
+/* Etiqueta sobre el campo. Los campos de texto ya no la usan —su rótulo va
+   dentro, de `placeholder`, para que el formulario ocupe la mitad de alto; ver
+   `Field`—, pero un `select` sí la necesita: enseña un valor desde el principio,
+   así que no hay dónde meterle el nombre de lo que se elige. */
 @utility field-label {
   display: block;
   font-size: var(--text-micro);
