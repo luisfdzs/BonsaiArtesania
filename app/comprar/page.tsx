@@ -31,9 +31,6 @@ export default async function ComprarPage() {
 
   const cart = await readCart()
   if (cart.lines.length === 0) redirect('/carrito')
-  // Algo se agotó mientras el carrito estaba abierto: se resuelve allí, donde
-  // están los controles para ajustar cantidades o quitar la línea.
-  if (cart.hasUnavailable) redirect('/carrito')
 
   const collection = await addresses()
   const docs = await collection
@@ -58,11 +55,11 @@ export default async function ComprarPage() {
     <div className="page-gutter pt-16 pb-(--spacing-section) md:pt-24">
       <h1 className="font-serif text-title">Confirmar tu pedido</h1>
 
-      {/* Dicho antes de que rellene nada, no después: si alguien espera pagar con
-          tarjeta aquí, tiene que enterarse ahora y no al recibir el aviso. */}
+      {/* Dicho antes de que rellene nada, no después: aquí no se cierra una compra
+          a un botón, se manda un encargo, y eso hay que saberlo al empezar. */}
       <p className="mt-6 max-w-lg text-bark-soft">
-        Todavía no se paga por la web. Al enviar el pedido te reservo las piezas y te escribo para
-        confirmarlo y quedar en cómo pagarlo.
+        Esto es un encargo: al enviarlo me llega a mí y me pongo con tus piezas. Te escribo
+        enseguida para confirmarte los detalles y contarte cómo va.
       </p>
 
       <div className="mt-14 grid gap-14 lg:grid-cols-12">

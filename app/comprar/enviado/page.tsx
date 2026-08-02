@@ -75,14 +75,14 @@ export default async function EnviadoPage({ searchParams }: Props) {
 
         <div className="mt-10 border border-line bg-linen-deep/50 p-8 text-left">
           <p className="text-bark-soft">
-            Enseguida le llega a Ana un aviso al móvil para que pueda ponerse con ello. Aunque esto
-            parezca una herramienta de gestión automatizada, al otro lado sólo está ella, que hará
-            tu pedido con mucha paz y alegría.
+            Muchísimas gracias por tu pedido. Ya está en el taller y Ana se pone con él enseguida:
+            aunque esto parezca una herramienta de gestión automatizada, al otro lado sólo está
+            ella, que preparará tus piezas con mucha paz y alegría.
           </p>
           <p className="mt-5 text-small text-bark-faint">
-            No se ha cobrado nada: en la web todavía no se paga con tarjeta. Ana te escribe para
-            confirmarlo y quedar en cómo pagarlo. Cada pieza se hace a mano bajo pedido, así que la
-            preparación lleva entre una y tres semanas.
+            Cada pieza se hace a mano para ti, así que la preparación lleva entre una y tres
+            semanas. Puedes consultar cómo va tu pedido cuando quieras desde «Mis pedidos», y Ana te
+            escribe en cuanto haya novedades.
           </p>
           <p className="mt-5 text-small text-bark-faint">
             Se enviará a {address.line1}

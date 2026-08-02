@@ -13,11 +13,10 @@ const initial: CheckoutState = {}
 /**
  * Elección de dirección y envío del pedido.
  *
- * Todavía no hay pasarela, así que aquí **no se cobra nada**, y por eso ni el botón
- * ni el correo mencionan un pago: dicen lo que de verdad ha pasado —el pedido queda
- * registrado y Ana escribe para cerrar pago y envío—. Escrito así, el texto es
- * cierto tal cual y la tienda puede estar abierta al público sin engañar a nadie;
- * no es un placeholder que haya que tapar.
+ * Aquí **no se cobra nada**, y por eso ni el botón ni el correo mencionan un pago:
+ * dicen lo que de verdad ha pasado —el encargo queda recibido y Ana se pone con él
+ * y escribe—. Escrito así, el texto es cierto tal cual y la tienda puede estar
+ * abierta al público sin engañar a nadie; no es un placeholder que haya que tapar.
  *
  * El pedido se guarda como `simulado` / `pendiente_pago` (ver `app/comprar/actions.ts`).
  * Cuando se conecte el cobro de verdad, este componente es uno de los sitios que
@@ -34,8 +33,8 @@ export function Checkout({ addresses, token }: { addresses: AddressValues[]; tok
   return (
     <form action={action}>
       {/* El envío del pedido es la escritura más larga del sitio: guarda el pedido,
-          baja las existencias de cada pieza, manda el correo y avisa a Ana por
-          Telegram. El botón apagado ya avisaba, pero es un rótulo de 13px para
+          manda el correo y avisa a Ana por Telegram.
+          El botón apagado ya avisaba, pero es un rótulo de 13px para
           varios segundos de espera, y la página seguía viva detrás: se podía tocar
           «Añadir o editar direcciones» y salir de aquí a mitad de la escritura. La
           flor lo dice a pantalla completa y cierra el paso hasta que hay respuesta,

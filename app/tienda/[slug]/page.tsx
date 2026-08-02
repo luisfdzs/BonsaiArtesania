@@ -96,10 +96,10 @@ export default async function ProductPage({ params }: Params) {
 
           {/* Con la tienda cerrada, cualquier pieza se encarga hablando: es como
               funcionaba la web antes de tener carrito, así que no se pierde nada.
-              Una pieza con precio se compra: el carrito es la acción principal y
-              los dos iconos quedan como vía secundaria para preguntar dudas. La
-              jerarquía la marca que el del carrito va con rótulo escrito y los de
-              contacto sólo con icono, además del orden.
+              Una pieza con precio se pide desde el carrito, y ésa es aquí la única
+              acción: los iconos de WhatsApp y correo que la acompañaban bajo un
+              «¿Alguna duda?» se quitaron porque la sección de contacto ya está
+              para eso y aquí sólo repartían la atención.
               Las piezas a medida no tienen precio cerrado y no pasan por el
               carrito, así que ahí escribir sigue siendo la única acción. */}
           {product.price === null || !shopOpen ? (
@@ -110,20 +110,12 @@ export default async function ProductPage({ params }: Params) {
               className="mt-11"
             />
           ) : (
-            <div className="mt-11 flex flex-col gap-5">
+            <div className="mt-11">
               <AddToCart slug={product.slug} />
-              <div className="flex items-center gap-4">
-                <span className="eyebrow">¿Alguna duda?</span>
-                <ContactButtons
-                  message={message}
-                  subject={`Encargo · ${product.name}`}
-                  action="Preguntar por esta pieza"
-                />
-              </div>
             </div>
           )}
           <p className="mt-6 text-small text-bark-faint">
-            Hecha a mano bajo pedido: entre 1 y 3 semanas. Envío a toda España.
+            Hecha a mano para ti: entre 1 y 3 semanas. Envío a toda España.
           </p>
         </div>
       </article>

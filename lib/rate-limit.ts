@@ -102,7 +102,7 @@ export const POLICIES = {
 
   /**
    * Envíos del formulario de pedido, salgan bien o mal. Es el cubo ancho: absorbe
-   * los reintentos legítimos de quien se equivoca de dirección o se queda sin stock.
+   * los reintentos legítimos de quien se equivoca de dirección o se lo piensa dos veces.
    */
   orderAttempt: { limit: 20, windowMs: HOUR },
   orderAttemptIp: { limit: 40, windowMs: HOUR },

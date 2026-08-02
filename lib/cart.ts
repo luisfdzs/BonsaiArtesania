@@ -6,16 +6,19 @@ import { isAdmin } from '@/lib/admin'
 import type { Image } from '@/lib/media'
 import { carts, toCents, type CartDoc } from '@/lib/schema'
 import { shippingCostCents } from '@/lib/shipping'
-import { availabilityFor } from '@/lib/stock'
 
 /**
  * Carrito. Vive en la base de datos, no en la cookie: así sobrevive al cambio de
- * dispositivo y, sobre todo, el precio con el que se cobra nunca llega del
+ * dispositivo y, sobre todo, el precio con el que se cuenta nunca llega del
  * navegador. La cookie sólo guarda un identificador opaco de invitado.
  *
  * De la línea sólo se persiste `slug` y `qty`. El precio se lee del catálogo cada
  * vez que se pinta el carrito: si Ana corrige un precio, nadie se queda con un
  * importe viejo guardado. Congelarlo es cosa del pedido, no del carrito.
+ *
+ * **No hay existencias que consultar.** Ninguna pieza se agota: todas se hacen a
+ * mano bajo pedido y Ana puede repetir cualquiera, así que una línea del carrito
+ * siempre se puede encargar y no hay nada que reservar ni que descontar.
  */
 
 export const GUEST_COOKIE = 'ba_carrito'
@@ -26,8 +29,6 @@ export type CartLine = {
   qty: number
   unitPriceCents: number
   lineTotalCents: number
-  /** Unidades que quedan. Menos que `qty` significa que no se puede cerrar así. */
-  available: number
   image: Image | null
 }
 
@@ -37,8 +38,6 @@ export type Cart = {
   subtotalCents: number
   shippingCents: number
   totalCents: number
-  /** Hay alguna línea que pide más unidades de las que quedan. */
-  hasUnavailable: boolean
 }
 
 const EMPTY: Cart = {
@@ -47,7 +46,6 @@ const EMPTY: Cart = {
   subtotalCents: 0,
   shippingCents: 0,
   totalCents: 0,
-  hasUnavailable: false,
 }
 
 /**
@@ -68,8 +66,9 @@ export async function cartOwner(): Promise<{ userId?: ObjectId; guestId?: string
  * y no en un callback de Auth.js porque necesita la cookie de la petición, y este
  * es el punto por el que pasan todas las lecturas del carrito.
  *
- * Las cantidades no se suman: se queda la mayor. Sumar convertiría «lo tenía en
- * el móvil y en el portátil» en dos unidades de una pieza que es única.
+ * Las cantidades no se suman: se queda la mayor. Sumar convertiría «lo tenía
+ * abierto en el móvil y en el portátil» en dos piezas de lo que sólo se quería
+ * una vez.
  */
 async function mergeGuestCart(userId: ObjectId): Promise<void> {
   const guestId = (await cookies()).get(GUEST_COOKIE)?.value
@@ -123,8 +122,6 @@ export async function readCart(): Promise<Cart> {
   const doc = await cartDoc()
   if (!doc || doc.items.length === 0) return EMPTY
 
-  const stock = await availabilityFor(doc.items.map((item) => item.slug))
-
   const lines = doc.items.flatMap((item) => {
     const product = getProduct(item.slug)
     // `price === null` son las piezas a medida: no tienen importe que cobrar y no
@@ -139,25 +136,20 @@ export async function readCart(): Promise<Cart> {
         qty: item.qty,
         unitPriceCents,
         lineTotalCents: unitPriceCents * item.qty,
-        available: stock.get(item.slug) ?? 0,
         image: product.image,
       },
     ]
   })
 
-  // Las líneas sin unidades no suman: el total tiene que cuadrar con lo que se
-  // puede comprar de verdad, no con lo que hay guardado en el carrito.
-  const disponibles = lines.filter((line) => line.available >= line.qty)
-  const subtotalCents = disponibles.reduce((total, line) => total + line.lineTotalCents, 0)
+  const subtotalCents = lines.reduce((total, line) => total + line.lineTotalCents, 0)
   const shippingCents = shippingCostCents(subtotalCents)
 
   return {
     lines,
-    count: disponibles.reduce((total, line) => total + line.qty, 0),
+    count: lines.reduce((total, line) => total + line.qty, 0),
     subtotalCents,
     shippingCents,
     totalCents: subtotalCents + shippingCents,
-    hasUnavailable: lines.some((line) => line.available < line.qty),
   }
 }
 

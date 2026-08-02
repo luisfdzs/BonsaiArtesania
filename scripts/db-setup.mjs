@@ -264,8 +264,6 @@ try {
     'orders',
     // Contador del número de pedido. Un documento por año; ver lib/orders.ts.
     'counters',
-    // Unidades disponibles por pieza, con el slug del catálogo como _id.
-    'stock',
     // Contadores de los límites de uso. Se vacían solos por TTL; ver lib/rate-limit.ts.
     'rate_limits',
   ]
