@@ -1,11 +1,10 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { auth, signIn } from '@/auth'
+import { auth } from '@/auth'
+import { LoginForm } from '@/components/entrar/LoginForm'
+import { RequestCodeForm } from '@/components/entrar/RequestCodeForm'
 import { cn } from '@/lib/cn'
-import { clientIp, peek, POLICIES } from '@/lib/rate-limit'
-import { FormPending } from '@/components/ui/FormPending'
-import { SendIcon } from '@/components/ui/SocialIcons'
 
 export const metadata: Metadata = {
   title: 'Entrar',
@@ -15,26 +14,32 @@ export const metadata: Metadata = {
 }
 
 type Props = {
-  searchParams: Promise<{ volver?: string; modo?: string; error?: string }>
+  searchParams: Promise<{ volver?: string; modo?: string }>
 }
 
 /**
  * Entrar y crear cuenta.
  *
- * Por detrás son lo mismo —se envía un enlace al correo y, si esa dirección no
- * tenía cuenta, se crea al pulsarlo—, pero se presentan como dos pestañas porque
- * es lo que la gente espera encontrar. Cambia el texto, no el mecanismo: quien
- * viene a registrarse no debería tener que deducir que «entrar» también le vale.
+ * Ahora las dos pestañas sí son dos cosas distintas —antes eran el mismo enlace por
+ * correo con otro rótulo—: a la izquierda se entra con la contraseña de siempre, y
+ * a la derecha se empieza un alta que pasa por el buzón una única vez, la del día
+ * en que se crea la cuenta.
+ *
+ * Se ha quitado el aviso de errores por la URL (`?error=...`) que ponía aquí
+ * Auth.js: ya no hay ningún proveedor suyo que pueda fallar, y cada formulario
+ * cuenta lo suyo en su propio sitio en vez de a través de un parámetro que se queda
+ * pegado al historial.
  */
 export default async function EntrarPage({ searchParams }: Props) {
   const session = await auth()
-  const { volver, modo, error } = await searchParams
+  const { volver, modo } = await searchParams
 
   // Ya identificado: no tiene sentido ver el formulario de acceso.
   if (session?.user) redirect(volver ?? '/cuenta')
 
   const creating = modo === 'crear'
   const backTo = volver ?? '/cuenta'
+  const crearHref = `/entrar?modo=crear${volver ? `&volver=${encodeURIComponent(volver)}` : ''}`
 
   return (
     <div className="page-gutter flex min-h-[70vh] items-center pt-16 pb-(--spacing-section) md:pt-24">
@@ -48,7 +53,7 @@ export default async function EntrarPage({ searchParams }: Props) {
             Iniciar sesión
           </Link>
           <Link
-            href={`/entrar?modo=crear${volver ? `&volver=${encodeURIComponent(volver)}` : ''}`}
+            href={crearHref}
             aria-current={creating ? 'page' : undefined}
             className={cn('tap text-small', creating ? 'text-bark' : 'text-bark-faint')}
           >
@@ -62,87 +67,15 @@ export default async function EntrarPage({ searchParams }: Props) {
 
         <p className="mt-5 text-bark-soft">
           {creating
-            ? 'Con una cuenta guardas tus direcciones de envío y puedes seguir tus pedidos. Escribe tu correo y te envío un enlace para entrar.'
-            : 'Escribe tu correo y te envío un enlace para entrar. Sin contraseñas que recordar.'}
+            ? 'Con una cuenta guardas tus direcciones de envío y puedes seguir tus pedidos. Escribe tu correo y te envío un código para confirmarlo.'
+            : 'Entra con el correo y la contraseña de tu cuenta.'}
         </p>
 
-        {error && (
-          <p className="field-error mt-8" role="alert">
-            {error === 'Verification'
-              ? 'Ese enlace ya se ha usado o ha caducado. Pide otro abajo.'
-              : error === 'Limite'
-                ? 'Se han pedido ya varios enlaces para ese correo. Busca en tu buzón el último que te llegó —incluida la carpeta de spam— o espera un rato antes de pedir otro.'
-                : 'No se ha podido enviar el enlace. Comprueba el correo y vuelve a intentarlo.'}
-          </p>
+        {creating ? (
+          <RequestCodeForm purpose="alta" backTo={backTo} />
+        ) : (
+          <LoginForm backTo={backTo} />
         )}
-
-        <form
-          className="mt-10"
-          action={async (formData: FormData) => {
-            'use server'
-            const email = String(formData.get('email') ?? '')
-              .trim()
-              .toLowerCase()
-
-            /**
-             * Aviso amable, no barrera.
-             *
-             * La barrera está en `sendSignInEmail`, y tiene que estar allí: el
-             * endpoint `/api/auth/signin/nodemailer` de Auth.js acepta un POST
-             * directo sin pasar por esta página, así que cualquier comprobación de
-             * aquí se esquiva con dos líneas de script. Esto sólo mira el contador
-             * —sin gastarlo— para poder explicar lo que pasa en vez de soltar un
-             * «no se ha podido enviar» que no ayuda a nadie.
-             */
-            const ip = await clientIp()
-            const cubos = await Promise.all([
-              peek('signin:email', email, POLICIES.signInEmail),
-              peek('signin:email:dia', email, POLICIES.signInEmailDay),
-              peek('signin:ip', ip, POLICIES.signInIp),
-              peek('signin:ip:dia', ip, POLICIES.signInIpDay),
-            ])
-
-            if (cubos.some((cubo) => !cubo.ok)) {
-              const volverParam = volver ? `&volver=${encodeURIComponent(volver)}` : ''
-              redirect(`/entrar?error=Limite${volverParam}`)
-            }
-
-            // El destino se fija aquí, en el servidor, a partir de un valor que ya
-            // venía en la URL de esta página: nunca se toma de un campo del
-            // formulario, para que no se pueda inyectar una redirección externa.
-            await signIn('nodemailer', { email, redirectTo: backTo })
-          }}
-        >
-          {/* Pedir el enlace es esperar a un servidor de correo, no a la base de
-              datos: es la espera más larga y la más variable de todo el sitio, y
-              acaba en otra página. Sin nada que lo dijera, el botón se quedaba
-              igual varios segundos después de pulsarlo —el momento exacto en el
-              que se vuelve a pulsar y llegan dos correos, con la duda de cuál de
-              los dos enlaces hay que abrir—. */}
-          <FormPending label="Enviando tu enlace" />
-
-          <label className="field-label" htmlFor="email">
-            Correo
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            autoComplete="email"
-            placeholder="tucorreo@ejemplo.com"
-            className="field text-center"
-          />
-
-          <button
-            type="submit"
-            aria-label="Enviarme un enlace"
-            title="Enviarme un enlace"
-            className="btn btn-icon btn-icon-lg mt-8"
-          >
-            <SendIcon className="h-5 w-5" />
-          </button>
-        </form>
 
         <p className="mt-8 text-small text-bark-faint">
           {creating ? (
@@ -158,7 +91,13 @@ export default async function EntrarPage({ searchParams }: Props) {
               .
             </>
           ) : (
-            'Si ese correo no tiene cuenta todavía, se creará al pulsar el enlace.'
+            <>
+              ¿Todavía no tienes cuenta?{' '}
+              <Link href={crearHref} className="link-underline">
+                Créala en un minuto
+              </Link>
+              .
+            </>
           )}
         </p>
       </div>

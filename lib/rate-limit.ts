@@ -4,13 +4,20 @@ import { getDb } from '@/lib/db'
 /**
  * Límites de uso, contados en Mongo.
  *
- * Existe por una razón concreta: **la web puede provocar el envío de correos desde
- * el buzón de IONOS sin que nadie haya iniciado sesión**. El formulario de `/entrar`
- * manda un enlace a la dirección que le escribas, y el endpoint de Auth.js que hay
- * debajo (`/api/auth/signin/nodemailer`) se puede llamar directamente con un script.
- * Sin freno, eso son dos problemas a la vez: bombardear el buzón de un tercero, y
- * agotar la cuota de envío de IONOS hasta que la cuenta quede bloqueada y dejen de
- * salir también los avisos de pedido.
+ * Existe por dos razones, y las dos viven en `/entrar`.
+ *
+ * La primera: **la web puede provocar el envío de correos desde el buzón de IONOS
+ * sin que nadie haya iniciado sesión**. El formulario de alta manda un código a la
+ * dirección que le escribas, y una acción de servidor se puede llamar con un script
+ * igual de bien que con un navegador. Sin freno, eso son dos problemas a la vez:
+ * bombardear el buzón de un tercero, y agotar la cuota de envío de IONOS hasta que
+ * la cuenta quede bloqueada y dejen de salir también los avisos de pedido.
+ *
+ * La segunda, desde que hay contraseñas: **probar contraseñas es gratis para quien
+ * lo intenta y caro para nosotros**. Cada intento cuesta un scrypt de una décima de
+ * segundo, así que sin límite un ataque por diccionario tumbaría el servidor antes
+ * de acertar nada. Los cubos `login:*` acotan los intentos; los `codigo:check:*`
+ * hacen lo mismo con quien pruebe códigos de seis cifras a lo bruto.
  *
  * Se cuenta en Mongo y no en memoria del proceso porque en Vercel cada función es
  * una instancia distinta y un contador local no vería más que su propio trocito de
@@ -50,22 +57,48 @@ const DAY = 24 * HOUR
  * seguridad y hay que poder leer de un vistazo qué está protegido y con qué holgura.
  *
  * Los números están puestos para que una persona real no los note nunca. Nadie
- * pide cinco enlaces de acceso en una hora salvo que algo vaya mal, y quien
- * encarga dos veces en el mismo día es ya un cliente excepcional.
+ * pide cinco códigos en una hora salvo que algo vaya mal, y quien encarga dos veces
+ * en el mismo día es ya un cliente excepcional.
  */
 export const POLICIES = {
-  /** Enlaces de acceso a una misma dirección de correo. El bombardeo a un tercero. */
-  signInEmail: { limit: 4, windowMs: HOUR },
-  signInEmailDay: { limit: 12, windowMs: DAY },
-  /** Enlaces de acceso pedidos desde una misma IP, sea cual sea la dirección. */
-  signInIp: { limit: 8, windowMs: HOUR },
-  signInIpDay: { limit: 25, windowMs: DAY },
+  /** Códigos enviados a una misma dirección de correo. El bombardeo a un tercero. */
+  codeEmail: { limit: 4, windowMs: HOUR },
+  codeEmailDay: { limit: 12, windowMs: DAY },
+  /** Códigos pedidos desde una misma IP, sea cual sea la dirección. */
+  codeIp: { limit: 8, windowMs: HOUR },
+  codeIpDay: { limit: 25, windowMs: DAY },
   /**
-   * Techo global de enlaces de acceso. Última red: protege la cuota de IONOS
-   * aunque el ataque venga repartido entre muchas IPs.
+   * Techo global de códigos. Última red: protege la cuota de IONOS aunque el
+   * ataque venga repartido entre muchas IPs.
    */
-  signInGlobal: { limit: 120, windowMs: HOUR },
-  signInGlobalDay: { limit: 400, windowMs: DAY },
+  codeGlobal: { limit: 120, windowMs: HOUR },
+  codeGlobalDay: { limit: 400, windowMs: DAY },
+
+  /**
+   * Intentos de teclear un código, acertados o no.
+   *
+   * El código ya muere solo a los cinco fallos (ver `lib/codes.ts`), así que esto
+   * no protege a una cuenta concreta: protege del que va probando seis cifras
+   * contra muchas direcciones a la vez, para el que los cinco fallos por cuenta no
+   * son ninguna barrera.
+   */
+  codeCheckIp: { limit: 30, windowMs: HOUR },
+
+  /**
+   * Intentos de contraseña sobre una misma cuenta. Es el freno al ataque por
+   * diccionario, y el número está pensado para que quepan los despistes de una
+   * tarde —el `Caps Lock`, la del otro sitio, la vieja— sin dejar sitio para más.
+   */
+  loginEmail: { limit: 10, windowMs: HOUR },
+  loginEmailDay: { limit: 30, windowMs: DAY },
+  /** Intentos desde una misma IP. Acota al que prueba una clave común contra muchas cuentas. */
+  loginIp: { limit: 30, windowMs: HOUR },
+  /**
+   * Techo global de comprobaciones de contraseña. Cada una es un scrypt de una
+   * décima de segundo: sin este número, la propia defensa sería la forma de tirar
+   * la web.
+   */
+  loginGlobal: { limit: 400, windowMs: HOUR },
 
   /**
    * Envíos del formulario de pedido, salgan bien o mal. Es el cubo ancho: absorbe

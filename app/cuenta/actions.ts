@@ -3,8 +3,11 @@
 import { ObjectId } from 'mongodb'
 import { revalidatePath } from 'next/cache'
 import { auth } from '@/auth'
+import { hashPassword, verifyPassword } from '@/lib/password'
+import { consumeAll, describeWait, POLICIES } from '@/lib/rate-limit'
+import { endSessions } from '@/lib/session'
 import { addresses, users } from '@/lib/schema'
-import { addressSchema, fieldErrors, profileSchema } from '@/lib/validation'
+import { addressSchema, fieldErrors, passwordSchema, profileSchema } from '@/lib/validation'
 
 /**
  * Acciones de la zona de cuenta.
@@ -18,6 +21,8 @@ import { addressSchema, fieldErrors, profileSchema } from '@/lib/validation'
 export type ActionState = {
   ok?: boolean
   errors?: Record<string, string>
+  /** Sólo lo usa el cambio de contraseña: cuántas otras sesiones se cerraron. */
+  closed?: number
 }
 
 async function requireUserId(): Promise<ObjectId> {
@@ -56,6 +61,92 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
 
   revalidatePath('/cuenta')
   return { ok: true }
+}
+
+/**
+ * Cambiar la contraseña desde dentro de la cuenta.
+ *
+ * Pide la actual aunque ya haya sesión abierta, y no es burocracia: sin eso, un
+ * portátil desbloqueado un minuto en una cafetería es una cuenta perdida para
+ * siempre —quien pase por delante le pone otra clave y el dueño ya no entra—. Con
+ * ella, una sesión robada sirve para husmear pero no para quedarse con la cuenta.
+ *
+ * Al terminar se cierran **las demás sesiones**, todas: el motivo más común para
+ * cambiar una contraseña es sospechar que alguien más está dentro, y dejarle la
+ * sesión viva vaciaría el gesto. La de este navegador se respeta, que si no
+ * echaríamos a quien la está cambiando. Ver `endSessions`.
+ */
+export async function changePassword(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const userId = await requireUserId()
+
+  const collection = await users()
+  const user = await collection.findOne(
+    { _id: userId },
+    { projection: { email: 1, passwordHash: 1 } },
+  )
+  if (!user) return { errors: { form: 'No se ha encontrado tu cuenta.' } }
+
+  const current = String(formData.get('current') ?? '')
+
+  // El mismo cubo que el login: si no, esto sería la rendija por la que probar
+  // contraseñas sin límite, sólo que hace falta una sesión para asomarse.
+  const verdict = await consumeAll([
+    { bucket: 'login:email', key: user.email, policy: POLICIES.loginEmail },
+    { bucket: 'login:global', key: 'todos', policy: POLICIES.loginGlobal },
+  ])
+  if (!verdict.ok) {
+    return {
+      errors: {
+        current: `Demasiados intentos. Prueba dentro de ${describeWait(verdict.retryAfterMs)}.`,
+      },
+    }
+  }
+
+  /**
+   * Una cuenta de antes de que hubiera contraseñas no tiene ninguna que comprobar.
+   * Aquí sí se le puede decir con todas las letras —ya ha demostrado quién es al
+   * entrar— y se le manda al único sitio donde puede ponerse la primera, que es el
+   * flujo del código por correo.
+   */
+  if (!user.passwordHash) {
+    return {
+      errors: {
+        form: 'Tu cuenta es de cuando se entraba con un enlace y todavía no tiene contraseña. Sal y pon una desde «No recuerdo mi contraseña».',
+      },
+    }
+  }
+
+  if (!(await verifyPassword(current, user.passwordHash))) {
+    return { errors: { current: 'Esa no es tu contraseña actual' } }
+  }
+
+  const parsed = passwordSchema.safeParse(formData.get('password'))
+  if (!parsed.success) {
+    return { errors: { password: parsed.error.issues[0]?.message ?? 'Contraseña no válida' } }
+  }
+  if (formData.get('password2') !== parsed.data) {
+    return { errors: { password2: 'Las dos no coinciden' } }
+  }
+  if (parsed.data === current) {
+    return { errors: { password: 'Esa es la que ya tenías. Pon otra distinta.' } }
+  }
+
+  const now = new Date()
+  await collection.updateOne(
+    { _id: userId },
+    {
+      $set: {
+        passwordHash: await hashPassword(parsed.data),
+        passwordUpdatedAt: now,
+        updatedAt: now,
+      },
+    },
+  )
+
+  const closed = await endSessions(String(userId), { keepCurrent: true })
+
+  revalidatePath('/cuenta')
+  return { ok: true, closed }
 }
 
 /** Lee y valida los campos comunes de crear y editar dirección. */

@@ -22,15 +22,24 @@ export const AUTH_COLLECTIONS = ['accounts', 'sessions', 'verification_tokens'] 
 
 export type UserDoc = {
   _id: ObjectId
-  /**
-   * Los cuatro primeros campos los escribe el adaptador de Auth.js.
-   * No hay campo de contraseña, y es a propósito: se entra con un enlace de un
-   * solo uso al correo, así que no existe ninguna clave que guardar ni filtrar.
-   */
+  /** Los cuatro primeros campos son los que espera el adaptador de Auth.js. */
   name?: string | null
   email: string
+  /**
+   * Se rellena al acertar el código que se envió a esa dirección. Que esté puesto
+   * significa que alguien con acceso a ese buzón completó el alta; una cuenta sin
+   * ello no debería existir, porque la contraseña se elige en el mismo paso.
+   */
   emailVerified?: Date | null
   image?: string | null
+  /**
+   * Contraseña, con la sal y el coste dentro de la propia cadena. Ver
+   * `lib/password.ts`: nunca se guarda ni se compara en claro, y no sale de la
+   * base más que para el `verifyPassword` del login.
+   */
+  passwordHash?: string | null
+  /** Última vez que se cambió. Sirve para explicar por qué se cerraron las sesiones. */
+  passwordUpdatedAt?: Date | null
   /** Perfil propio. Opcional: al registrarse por correo sólo se conoce el correo. */
   phone?: string | null
   /** Referencia al cliente en la pasarela. Se rellena en la fase de pago. */
@@ -132,8 +141,35 @@ export type OrderDoc = {
   updatedAt: Date
 }
 
+/**
+ * Código de un solo uso enviado al correo. Dos usos: confirmar la dirección al
+ * crear la cuenta y recuperar el acceso cuando se olvida la contraseña.
+ *
+ * Vive en su propia colección y no en `verification_tokens` a propósito: aquella
+ * la escribe y la limpia el adaptador de Auth.js, y meterle documentos con otra
+ * forma es pedir que se rompa cuando la librería cambie. Aquí mandamos nosotros.
+ *
+ * Del código sólo se guarda su HMAC, nunca las seis cifras. Ver `lib/codes.ts`.
+ */
+export type EmailCodeDoc = {
+  _id: ObjectId
+  /** Siempre en minúsculas y sin espacios: es la clave de búsqueda. */
+  email: string
+  purpose: 'alta' | 'recuperar'
+  codeHash: string
+  /** Intentos fallidos gastados. Al pasarse, el código muere. */
+  attempts: number
+  /** Índice TTL: Mongo borra el documento al caducar. Ver db-setup. */
+  expiresAt: Date
+  createdAt: Date
+}
+
 export async function users(): Promise<Collection<UserDoc>> {
   return (await getDb()).collection<UserDoc>('users')
+}
+
+export async function emailCodes(): Promise<Collection<EmailCodeDoc>> {
+  return (await getDb()).collection<EmailCodeDoc>('email_codes')
 }
 
 export async function addresses(): Promise<Collection<AddressDoc>> {

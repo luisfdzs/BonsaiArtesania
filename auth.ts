@@ -1,66 +1,51 @@
 import { cache } from 'react'
 import NextAuth from 'next-auth'
-import Nodemailer from 'next-auth/providers/nodemailer'
 import { MongoDBAdapter } from '@auth/mongodb-adapter'
 import { getClient, DB_NAME } from '@/lib/db'
-import { sendSignInEmail } from '@/lib/email'
 
 /**
- * Autenticación por enlace al correo. Sin contraseñas: la persona escribe su
- * correo, recibe un enlace de un solo uso y entra.
+ * Sesiones y cuenta: **correo verificado con un código, y contraseña para volver**.
  *
- * Se eligió frente a Google y frente a la contraseña clásica por tres razones:
+ * Crear la cuenta pide la dirección, envía seis cifras y, al acertarlas, se elige
+ * la contraseña en el mismo paso. A partir de ahí se entra con correo y contraseña,
+ * sin volver a pisar el buzón. Si se olvida, el mismo código sirve para ponerla de
+ * nuevo. Todo eso vive en `app/entrar/actions.ts`, `lib/codes.ts` y `lib/password.ts`.
  *
- * 1. **No hay contraseñas que guardar.** La peor fuga posible de esta web sería
- *    una tabla de contraseñas; sin tabla, no hay fuga. Tampoco hay que montar
- *    recuperación, límite de intentos ni caducidad de contraseñas.
- * 2. **No depende de nadie más.** Google exige registrar la aplicación en su
- *    consola y tener las URLs de retorno declaradas de antemano, lo que además
- *    rompe el login en los previews de Vercel, cuya URL cambia en cada
- *    despliegue. El correo ya lo teníamos: hace falta igual para avisar de los
- *    pedidos.
- * 3. **Funciona con cualquier correo**, no sólo con quien tenga cuenta de Google.
+ * **Aquí ya no hay `providers`, y no es un olvido.** Antes había uno de Nodemailer
+ * que mandaba un enlace de un solo uso; se quitó porque obligaba a abrir el correo
+ * en el mismo navegador donde estabas comprando y porque dejaba en el buzón, vivo,
+ * algo que abría la cuenta entera con un clic. Con contraseña se entra en dos
+ * segundos y desde cualquier sitio, y el correo sólo hace falta el día del alta.
  *
- * El precio es que entrar obliga a abrir el buzón. Para una tienda donde se compra
- * cada varios meses es un intercambio razonable: nadie recuerda la contraseña de
- * una tienda que usa tres veces al año.
+ * Auth.js no ofrece ninguna pieza para eso: su proveedor de credenciales existe,
+ * pero se niega a funcionar con `strategy: 'database'`. Así que de esta librería se
+ * conserva lo que sí interesa —el modelo de sesión, `auth()`, `signOut()`, el
+ * adaptador de Mongo— y el inicio de sesión lo abre `lib/session.ts` a mano. De ahí
+ * que el adaptador se exporte: es lo que ese módulo necesita para crear la sesión
+ * con la misma forma que la crearía la librería.
  *
  * Sesiones en base de datos y no en JWT: cuesta una consulta por petición, pero
  * permite cerrar sesión de verdad —un JWT firmado sigue valiendo hasta que caduca,
- * aunque el usuario pulse «salir»—. En una tienda con direcciones guardadas importa.
+ * aunque el usuario pulse «salir»—. En una tienda con direcciones guardadas importa,
+ * y con contraseñas de por medio importa el doble: cambiarla tiene que poder echar
+ * a quien estuviera dentro.
  */
-export const { handlers, auth, signIn, signOut } = NextAuth({
-  // Se pasa la función, no la promesa: así el adaptador no fuerza la conexión
-  // durante el build (ver el comentario en lib/db.ts).
-  adapter: MongoDBAdapter(getClient, { databaseName: DB_NAME }),
+
+// Se pasa la función, no la promesa: así el adaptador no fuerza la conexión
+// durante el build (ver el comentario en lib/db.ts).
+export const adapter = MongoDBAdapter(getClient, { databaseName: DB_NAME })
+
+export const { handlers, auth, signOut } = NextAuth({
+  adapter,
   session: { strategy: 'database' },
-  providers: [
-    Nodemailer({
-      server: {
-        host: process.env.SMTP_HOST,
-        port: Number(process.env.SMTP_PORT ?? 465),
-        secure: Number(process.env.SMTP_PORT ?? 465) === 465,
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASSWORD,
-        },
-      },
-      from: process.env.SMTP_USER,
-      /**
-       * Diez minutos. El valor por defecto de Auth.js son 24 horas, que para un
-       * enlace que da acceso completo a la cuenta es demasiado: queda vivo en el
-       * buzón todo un día. Diez minutos bastan para ir al correo y volver.
-       */
-      maxAge: 10 * 60,
-      // El correo por defecto de Auth.js está en inglés y sin la marca. Ver lib/email.ts.
-      async sendVerificationRequest({ identifier, url }) {
-        await sendSignInEmail({ to: identifier, url })
-      },
-    }),
-  ],
+  /**
+   * Vacío a propósito: no hay ningún proveedor externo ni ninguna pantalla de
+   * acceso de Auth.js. La nuestra está en `/entrar` y habla con la base de datos
+   * directamente.
+   */
+  providers: [],
   pages: {
     signIn: '/entrar',
-    verifyRequest: '/entrar/revisa-tu-correo',
     error: '/entrar',
   },
   callbacks: {
