@@ -80,7 +80,6 @@ export default async function TallerPedidoPage({ params }: Params) {
 
       <div className="mt-12 border-t border-line pt-8">
         <h3 className="eyebrow">Cambiar estado</h3>
-        {/* Cancelar devuelve las unidades al stock; lo hace la acción. */}
         <form action={updateOrderStatus} className="mt-6 flex flex-col gap-6">
           <input type="hidden" name="number" value={order.number} />
 
@@ -114,9 +113,9 @@ export default async function TallerPedidoPage({ params }: Params) {
           </div>
 
           <button type="submit" className="btn self-center">
-            {/* Cambiar el estado escribe el pedido, apunta la nota en el historial
-                y, si se cancela, devuelve las unidades al stock: lo más lento del
-                taller. Y lo que cambia está arriba —el rótulo bajo el número— y
+            {/* Cambiar el estado escribe el pedido y apunta la nota en el
+                historial: lo más lento del taller.
+                Y lo que cambia está arriba —el rótulo bajo el número— y
                 abajo —el historial—, nunca en el botón, así que sin la flor no hay
                 nada que mirar mientras se espera. */}
             <FlowerBud />

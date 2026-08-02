@@ -4,19 +4,20 @@ import { formatCents, type OrderDoc } from '@/lib/schema'
 /**
  * El aviso que le suena a Ana en el móvil, por un bot de Telegram.
  *
- * Existe porque el correo que recibe el cliente le promete literalmente que «se
- * avisará a Ana con una notificación en su teléfono». Si eso no ocurriera de
- * verdad, el correo estaría mintiendo, y ese texto es el que sostiene la confianza
- * de una tienda donde todavía no se paga por la web.
+ * Existe porque al cliente se le dice que su encargo ya está en el taller y que
+ * Ana se pone con él enseguida. El correo ya no promete el aviso al móvil con esas
+ * palabras —lo prometía antes—, pero la promesa de fondo sigue siendo la misma y
+ * es esto lo que la cumple: sin el aviso, «enseguida» depende de cuándo abra ella
+ * el buzón.
  *
  * Telegram y no un SMS ni una app propia: es gratis, no hay que dar de alta ningún
  * servicio de pago, la API es una llamada HTTP sin dependencias y la notificación
  * llega igual de rápido. Si algún día hace falta algo más serio, este módulo es el
  * único sitio que hay que tocar.
  *
- * **Nunca lanza.** Se llama después de que el pedido esté guardado y el stock
- * descontado: un bot caído no puede deshacer una venta. Si falla, queda en el log y
- * el correo a `bonsai@` sigue siendo el aviso de respaldo.
+ * **Nunca lanza.** Se llama después de que el pedido esté guardado: un bot caído no
+ * puede deshacer un pedido. Si falla, queda en el log y el correo a `bonsai@` sigue
+ * siendo el aviso de respaldo.
  */
 
 /** Telegram corta los mensajes a 4096 caracteres. Ninguno se acerca, pero por si acaso. */

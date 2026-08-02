@@ -317,12 +317,13 @@ function addressBlock(order: OrderDoc): string {
  * El correo que recibe el cliente.
  *
  * El párrafo del medio es el que sostiene todo el invento y por eso está escrito
- * así, en voz baja y sin jerga: quien acaba de mandar un pedido a una web que no le
- * ha cobrado nada necesita saber que al otro lado hay una persona, no un sistema.
+ * así, en voz baja y sin jerga: quien acaba de encargar algo por una web necesita
+ * saber que al otro lado hay una persona, no un sistema.
  *
- * Cuidado al tocarlo: **promete un aviso al móvil de Ana**, y eso lo cumple
- * `lib/notify.ts` con el bot de Telegram. Si algún día se quita esa notificación,
- * hay que quitar también la frase, o el correo pasa a mentir.
+ * Aquí no se habla de pagos ni de cobros, y no por omisión: lo que la web recoge
+ * son encargos, y el correo tiene que sonar a eso —gracias, ya está en marcha, y
+ * puedes mirar cómo va cuando quieras—. Sólo se promete lo que se cumple: el aviso
+ * de novedades lo da Ana, y el estado sale de `/cuenta/pedidos`.
  */
 function customerBody(order: OrderDoc): string {
   return `¡Gracias por tu pedido!
@@ -338,20 +339,18 @@ Total: ${formatCents(order.totals.totalCents)}
 Se enviaría a:
 ${addressBlock(order)}
 
-Enseguida avisamos a Ana con una notificación en su teléfono, para que pueda ver
-tu pedido y ponerse con ello.
+Muchísimas gracias. Tu pedido ya está en el taller y Ana se pone con él
+enseguida.
 
 Y tranquilo: aunque esto pueda parecer una herramienta de gestión empresarial
-automatizada, al otro lado sólo está Ana, que hará tu pedido con mucha paz y
-alegría.
+automatizada, al otro lado sólo está ella, que preparará tus piezas con mucha
+paz y alegría.
 
-Todavía no se ha cobrado nada: en la web aún no se paga con tarjeta. Ana te
-escribe para confirmar el pedido y quedar en cómo pagarlo.
+Cada pieza se hace a mano para ti, así que la preparación lleva entre una y tres
+semanas. Ana te escribe en cuanto haya novedades.
 
-Cada pieza se hace a mano bajo pedido, así que la preparación lleva entre una y
-tres semanas. Te avisa en cuanto salga.
-
-Puedes verlo en ${site.url}/cuenta/pedidos
+Puedes consultar cómo va tu pedido cuando quieras en
+${site.url}/cuenta/pedidos
 
 Ana · ${site.nameFull}
 ${site.url}`
@@ -408,12 +407,12 @@ function customerHtml(order: OrderDoc): string {
         ${escapeHtml(address.phone)}
       </p>
 
-      <p style="font-size:15px;line-height:1.7;color:#6e675c;margin:0 0 20px">Enseguida avisamos a Ana con una notificación en su teléfono, para que pueda ver tu pedido y ponerse con ello.</p>
-      <p style="font-size:15px;line-height:1.7;color:#6e675c;margin:0 0 32px">Y tranquilo: aunque esto pueda parecer una herramienta de gestión empresarial automatizada, al otro lado sólo está Ana, que hará tu pedido con mucha paz y alegría.</p>
+      <p style="font-size:15px;line-height:1.7;color:#6e675c;margin:0 0 20px">Muchísimas gracias. Tu pedido ya está en el taller y Ana se pone con él enseguida.</p>
+      <p style="font-size:15px;line-height:1.7;color:#6e675c;margin:0 0 32px">Y tranquilo: aunque esto pueda parecer una herramienta de gestión empresarial automatizada, al otro lado sólo está ella, que preparará tus piezas con mucha paz y alegría.</p>
 
-      <p style="background:#f4e7e7;padding:16px;font-size:14px;line-height:1.6;color:#6e675c;margin:0 0 32px">Todavía no se ha cobrado nada: en la web aún no se paga con tarjeta. Ana te escribe para confirmar el pedido y quedar en cómo pagarlo.</p>
+      <p style="background:#f4e7e7;padding:16px;font-size:14px;line-height:1.6;color:#6e675c;margin:0 0 32px">Cada pieza se hace a mano para ti, así que la preparación lleva entre una y tres semanas. Ana te escribe en cuanto haya novedades.</p>
 
-      <p style="font-size:13px;line-height:1.6;color:#a79f91;margin:0 0 32px">Cada pieza se hace a mano bajo pedido, así que la preparación lleva entre una y tres semanas. Te avisa en cuanto salga.</p>
+      <p style="font-size:13px;line-height:1.6;color:#a79f91;margin:0 0 32px">Puedes consultar cómo va tu pedido cuando quieras, desde aquí:</p>
 
       <p style="margin:0 0 32px">
         <a href="${site.url}/cuenta/pedidos" style="display:inline-block;background:#6b7a62;color:#faf7f2;text-decoration:none;padding:14px 32px;border-radius:999px;font-size:13px;letter-spacing:0.1em;text-transform:uppercase">Ver mis pedidos</a>
@@ -435,13 +434,12 @@ Total: ${formatCents(order.totals.totalCents)}
 Enviar a:
 ${addressBlock(order)}
 
-⚠️ SIN COBRAR. La pasarela no está conectada: al cliente se le ha dicho que su
-pedido queda registrado y que le escribes para confirmarlo y cobrarlo. Las
-unidades ya están descontadas del stock, así que si no sale adelante hay que
-cancelarlo en el taller para devolverlas.
+⚠️ SIN COBRAR. Esto es un encargo, no una venta cerrada: al cliente se le ha
+dicho que su pedido ya está en el taller y que le escribes tú. Nada de dinero se
+ha movido, así que el pago se acuerda aparte.
 
-Escríbele tú: ese contacto es el único paso que cierra la venta. En su correo se
-le ha prometido que te llega un aviso al móvil, así que no lo dejes dormir.
+Escríbele tú: ese contacto es el único paso que cierra el encargo. En su correo
+se le ha dicho que te pones con ello enseguida, así que no lo dejes dormir.
 
 Gestionar: ${site.url}/taller/pedidos/${order.number}`
 }

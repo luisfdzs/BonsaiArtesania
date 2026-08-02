@@ -23,8 +23,9 @@ export default function TiendaPage() {
       <header className="max-w-xl">
         <h1 className="font-serif text-display">Tienda</h1>
         <p className="mt-7 text-bark-soft">
-          Cada pieza está hecha a mano y es irrepetible: la flor que ves en la foto es exactamente
-          la que recibes. Si algo se ha agotado, casi siempre puedo hacer otra parecida.
+          Cada pieza está hecha a mano y ninguna sale igual que otra: la foto enseña la forma y el
+          color, y la tuya se hace para ti con su propia flor. Aquí no se agota nada, así que puedes
+          pedir la que quieras cuando quieras.
         </p>
 
         {/* Mientras la tienda esté cerrada conviene decirlo aquí y no dejar

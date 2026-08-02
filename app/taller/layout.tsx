@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { adminSession } from '@/lib/admin'
 
@@ -30,18 +29,9 @@ export default async function TallerLayout({ children }: { children: React.React
         <h1 className="mt-2 font-serif text-title">Gestión</h1>
       </header>
 
-      <nav
-        className="mx-auto mt-8 flex max-w-2xl justify-center gap-8"
-        aria-label="Secciones del taller"
-      >
-        <Link href="/taller" className="link-underline tap text-small">
-          Pedidos
-        </Link>
-        <Link href="/taller/stock" className="link-underline tap text-small">
-          Existencias
-        </Link>
-      </nav>
-
+      {/* Sin barra de secciones: desde que ninguna pieza se agota no hay
+          existencias que gestionar y el taller es sólo los pedidos. La vuelta al
+          listado la da el «← Pedidos» de la ficha de cada uno. */}
       <div className="mx-auto mt-12 max-w-2xl text-center">{children}</div>
     </div>
   )

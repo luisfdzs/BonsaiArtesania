@@ -12,7 +12,6 @@ import { nextOrderNumber } from '@/lib/orders'
 import { clientIp, consumeAll, describeWait, POLICIES } from '@/lib/rate-limit'
 import { addresses, carts, orders, type CartItem, type OrderDoc } from '@/lib/schema'
 import { shopOpen } from '@/lib/shop'
-import { reserveStock } from '@/lib/stock'
 
 export type CheckoutState = {
   error?: string
@@ -44,7 +43,7 @@ async function pedidoReciente(userId: ObjectId): Promise<string | null> {
  * Mongo es atómico sobre el documento: el primero se lleva las líneas, el segundo
  * recibe `null` y sabe que llega tarde.
  *
- * Devuelve las líneas que había *antes* de vaciar, que son las que hay que cobrar.
+ * Devuelve las líneas que había *antes* de vaciar, que son las del pedido.
  */
 async function tomarCarrito(userId: ObjectId): Promise<CartItem[] | null> {
   const collection = await carts()
@@ -65,10 +64,10 @@ async function devolverCarrito(userId: ObjectId, items: CartItem[]): Promise<voi
 /**
  * Registra el pedido.
  *
- * ⚠️ NO COBRA NADA. Todavía no hay pasarela, así que esto no es una venta cerrada:
- * crea el pedido, reserva las unidades y avisa a Ana para que sea ella quien
- * contacte y cobre. La interfaz se lo dice al cliente con esas palabras y no habla
- * de ningún pago recibido.
+ * ⚠️ NO COBRA NADA. Esto no es una venta cerrada: crea el pedido y avisa a Ana
+ * para que sea ella quien se ponga con él y hable con quien lo ha pedido. La
+ * interfaz se lo dice al cliente en esos términos —un encargo recibido— y no
+ * habla de ningún pago.
  *
  * Para que la base de datos tampoco lo dé por pagado, el pedido se guarda con
  * `payment.provider: 'simulado'`, `payment.status: 'pendiente'` y estado
@@ -99,8 +98,8 @@ async function devolverCarrito(userId: ObjectId, items: CartItem[]): Promise<voi
  */
 export async function placeOrder(_prev: CheckoutState, formData: FormData): Promise<CheckoutState> {
   // Primera comprobación de todas: con la tienda cerrada no se registra ningún
-  // pedido ni se reserva stock. Va en la acción y no sólo en la página porque una
-  // acción de servidor es un endpoint público: ocultar el formulario no la cierra.
+  // pedido. Va en la acción y no sólo en la página porque una acción de servidor
+  // es un endpoint público: ocultar el formulario no la cierra.
   if (!shopOpen) {
     return { error: 'La tienda no está abierta todavía. Escríbeme y lo vemos por mensaje.' }
   }
@@ -156,10 +155,6 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
     return { error: 'Tu carrito está vacío.' }
   }
 
-  if (cart.hasUnavailable) {
-    return { error: 'Algo de tu carrito ya no está disponible. Revísalo antes de seguir.' }
-  }
-
   // Aquí se cierra el cerrojo: a partir de este punto el carrito está vacío y estas
   // líneas son nuestras. Cualquier salida por error tiene que devolverlas.
   const tomadas = await tomarCarrito(userId)
@@ -178,8 +173,8 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
 
   // Paranoia barata: entre leer el carrito y cerrar el cerrojo pudo colarse un
   // «añadir al carrito» desde otra pestaña. Lo que se comprueba es que **todo lo
-  // que se va a cobrar estaba de verdad en lo tomado**, no que las dos listas sean
-  // idénticas: `readCart` descarta en silencio los slugs que ya no están en el
+  // que va a ir al pedido estaba de verdad en lo tomado**, no que las dos listas
+  // sean idénticas: `readCart` descarta en silencio los slugs que ya no están en el
   // catálogo, así que exigir el mismo número de líneas dejaría un carrito con una
   // pieza retirada atascado para siempre, sin forma de pedir.
   const mismasLineas = items.every((item) =>
@@ -202,20 +197,6 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
     await devolverCarrito(userId, tomadas)
     return {
       error: `Has hecho varios pedidos muy seguidos. Tu carrito sigue guardado: inténtalo dentro de ${describeWait(creado.retryAfterMs)}, o escríbele directamente a Ana.`,
-    }
-  }
-
-  // Se descuentan las unidades ANTES de crear el pedido. La comprobación es
-  // atómica en Mongo, así que dos clientes que pulsen «enviar» a la vez no pueden
-  // llevarse los dos la misma pieza única: al segundo le falla aquí.
-  const reserved = await reserveStock(items)
-  if (!reserved.ok) {
-    await devolverCarrito(userId, tomadas)
-    const names = reserved.unavailable
-      .map((slug) => cart.lines.find((line) => line.slug === slug)?.name ?? slug)
-      .join(', ')
-    return {
-      error: `Se acaba de agotar: ${names}. Quítalo del carrito para poder seguir.`,
     }
   }
 
@@ -255,18 +236,16 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
       status: 'pendiente',
       intentId: null,
     },
-    history: [
-      { status: 'pendiente_pago', at: now, note: 'Pedido registrado desde la web, sin cobrar' },
-    ],
+    history: [{ status: 'pendiente_pago', at: now, note: 'Pedido recibido desde la web' }],
     createdAt: now,
     updatedAt: now,
   }
 
   await orderCollection.insertOne(order)
 
-  // Después de guardar y a prueba de fallos: el pedido ya está cerrado y las
-  // unidades descontadas, así que ni un SMTP caído ni un Telegram que no responda
-  // pueden deshacer la venta. Los dos avisos van a la vez porque son
+  // Después de guardar y a prueba de fallos: el pedido ya está registrado, así que
+  // ni un SMTP caído ni un Telegram que no responda pueden deshacerlo. Los dos
+  // avisos van a la vez porque son
   // independientes: el correo es el registro, la notificación es la prisa.
   await Promise.allSettled([
     session.user.email ? sendOrderEmails(order, session.user.email) : Promise.resolve(),

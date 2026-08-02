@@ -99,16 +99,6 @@ export default async function CarritoPage() {
                   <p className="mt-2 text-small text-bark-faint">
                     {formatCents(line.unitPriceCents)} por unidad
                   </p>
-
-                  {/* Piezas únicas: alguien pudo comprarla mientras estaba aquí
-                      guardada. Se avisa en la línea y no suma al total. */}
-                  {line.available < line.qty && (
-                    <p className="mt-2 text-small text-sage-deep">
-                      {line.available === 0
-                        ? 'Se ha agotado. Quítala para poder seguir.'
-                        : `Sólo queda${line.available === 1 ? '' : 'n'} ${line.available}. Ajusta la cantidad.`}
-                    </p>
-                  )}
                 </div>
 
                 <div className="flex shrink-0 items-center justify-between gap-5 sm:flex-col sm:items-end sm:gap-4">
@@ -202,19 +192,13 @@ export default async function CarritoPage() {
               </p>
             )}
 
-            {cart.hasUnavailable ? (
-              <p className="btn mt-8 w-full" aria-disabled="true">
-                Revisa el carrito
-              </p>
-            ) : (
-              <Link href="/comprar" className="btn mt-8 w-full">
-                Continuar
-              </Link>
-            )}
+            <Link href="/comprar" className="btn mt-8 w-full">
+              Continuar
+            </Link>
 
             <p className="mt-6 text-small text-bark-faint">
-              Hecha a mano bajo pedido: entre 1 y 3 semanas. Envío a toda España. Todavía no se paga
-              en la web: envías el pedido y Ana te escribe.
+              Cada pieza se hace a mano para ti: entre 1 y 3 semanas. Envío a toda España. Al enviar
+              el pedido le llega a Ana, que se pone con él y te escribe.
             </p>
           </div>
         </aside>
