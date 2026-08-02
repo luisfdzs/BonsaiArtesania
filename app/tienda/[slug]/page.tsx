@@ -97,9 +97,9 @@ export default async function ProductPage({ params }: Params) {
           {/* Con la tienda cerrada, cualquier pieza se encarga hablando: es como
               funcionaba la web antes de tener carrito, así que no se pierde nada.
               Una pieza con precio se compra: el carrito es la acción principal y
-              los dos iconos quedan como vía secundaria para preguntar dudas. Los
-              tres botones son ya sin rótulo, así que lo que marca la jerarquía es
-              el tamaño —el del carrito es mayor— y el orden.
+              los dos iconos quedan como vía secundaria para preguntar dudas. La
+              jerarquía la marca que el del carrito va con rótulo escrito y los de
+              contacto sólo con icono, además del orden.
               Las piezas a medida no tienen precio cerrado y no pasan por el
               carrito, así que ahí escribir sigue siendo la única acción. */}
           {product.price === null || !shopOpen ? (
