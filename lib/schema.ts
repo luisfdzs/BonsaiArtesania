@@ -104,8 +104,17 @@ export type OrderItem = {
   qty: number
 }
 
+/**
+ * El viaje de un pedido, en orden. Los nombres son técnicos y en base se quedan
+ * así; lo que lee cada uno —el cliente una cosa, Ana otra— vive en
+ * `lib/order-status.ts`.
+ *
+ * `en_reparto` es el último tramo, el del repartidor que ya lleva el paquete en
+ * la furgoneta. Se separa de `enviado` porque para quien espera son dos noticias
+ * distintas: «ha salido del taller» y «llega hoy».
+ */
 export type OrderStatus =
-  'pendiente_pago' | 'pagado' | 'preparando' | 'enviado' | 'entregado' | 'cancelado'
+  'pendiente_pago' | 'pagado' | 'preparando' | 'enviado' | 'en_reparto' | 'entregado' | 'cancelado'
 
 export type OrderDoc = {
   _id: ObjectId

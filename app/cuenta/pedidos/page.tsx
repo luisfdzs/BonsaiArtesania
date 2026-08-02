@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { getSession } from '@/auth'
 import { BagIcon, PackageIcon } from '@/components/cuenta/CuentaIcons'
 import { SectionIntro } from '@/components/cuenta/SectionIntro'
+import { isAdmin } from '@/lib/admin'
 import { ORDER_STATUS_LABEL } from '@/lib/order-status'
 import { formatCents, orders } from '@/lib/schema'
 
@@ -22,6 +23,11 @@ const dateFormat = new Intl.DateTimeFormat('es-ES', {
 export default async function PedidosPage() {
   const session = await getSession()
   if (!session?.user?.id) redirect('/entrar?volver=/cuenta/pedidos')
+
+  // «Tus pedidos» en la cuenta del taller estaría siempre vacío y, sobre todo,
+  // diría lo que no es: los pedidos que le importan a Ana no son suyos. Al taller,
+  // que es donde están los de todo el mundo. Ver `lib/admin.ts`.
+  if (await isAdmin()) redirect('/taller')
 
   const collection = await orders()
   const docs = await collection

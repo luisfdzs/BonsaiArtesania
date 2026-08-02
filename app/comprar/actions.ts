@@ -4,6 +4,7 @@ import { ObjectId } from 'mongodb'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
+import { isAdminEmail } from '@/lib/admin'
 import { readCart } from '@/lib/cart'
 import { sendOrderEmails } from '@/lib/email'
 import { checkFormGuard } from '@/lib/form-guard'
@@ -107,6 +108,14 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
 
   const session = await auth()
   if (!session?.user?.id) return { error: 'Tienes que entrar para poder enviar el pedido.' }
+
+  // La cuenta del taller gestiona pedidos, no los hace (ver `lib/admin.ts`). No
+  // debería poder llegar hasta aquí —ni tiene carrito ni ve la pantalla—, pero
+  // esto es lo que lo cierra de verdad: crear un pedido reserva unidades de piezas
+  // únicas y dispara dos correos y un aviso a Telegram.
+  if (isAdminEmail(session.user.email)) {
+    return { error: 'Esta es la cuenta del taller: gestiona los pedidos, no hace ninguno.' }
+  }
 
   const userId = new ObjectId(session.user.id)
 
