@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { NavPending } from '@/components/ui/NavPending'
 import { cn } from '@/lib/cn'
 import { navigation } from '@/lib/navigation'
+import { onHome, useActiveSection } from '@/lib/useActiveSection'
 import { useCartCount } from './CartCount'
 import { AccountIcon, CartIcon, CloseIcon, ContactIcon, HomeIcon, MenuIcon } from './NavIcons'
 
@@ -55,18 +56,25 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
 
   const close = () => setOpenedAt(null)
 
-  const homeActive = pathname === '/'
-  const contactoActive = pathname === '/contacto'
+  // La sección de la portada en la que se está, tratada igual que una ruta
+  // —ver `useActiveSection`—. Inicio sólo se enciende sin ninguna sección
+  // activa: si no, al entrar en Contacto se encenderían los dos huecos a la
+  // vez, que es peor que marcar sólo el que toca.
+  const section = useActiveSection()
+  const homeActive = onHome(pathname) && !section
+  const contactoActive = section === 'contacto'
 
   // «Contacto» sale de la barra con su propio icono; las otras tres entradas del
   // menú del sitio son las que se despliegan. Se derivan de `navigation` en vez
   // de repetirse aquí: el menú tiene que decir lo mismo en móvil y en escritorio.
-  const panelItems = navigation.filter((item) => item.href !== '/contacto')
+  const panelItems = navigation.filter((item) => item.href !== '/#contacto')
 
-  // Estando en Tienda, Encargos o El taller, ninguno de los cinco iconos diría
-  // dónde está: la sección vive detrás del menú. Así que el que la guarda se
-  // marca como activo, y la barra nunca queda sin señalar la página.
-  const inPanel = panelItems.some((item) => pathname.startsWith(item.href))
+  // Estando en Tienda o en Encargos, ninguno de los cinco iconos diría dónde
+  // está: la sección vive detrás del menú. Así que el que la guarda se marca
+  // como activo, y la barra nunca queda sin señalar la página.
+  const inPanel =
+    panelItems.some((item) => !item.href.includes('#') && pathname.startsWith(item.href)) ||
+    section === 'taller'
 
   return (
     <>
@@ -113,7 +121,7 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
           // del CSS —y el salto seco cuando el sistema pide menos movimiento.
           onClick={(event) => {
             close()
-            if (pathname === '/') {
+            if (onHome(pathname)) {
               event.preventDefault()
               window.scrollTo({ top: 0 })
             }
@@ -162,7 +170,12 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
           </NavSlot>
         )}
 
-        <NavSlot href="/contacto" label="Contacto" active={contactoActive && !open} onClick={close}>
+        <NavSlot
+          href="/#contacto"
+          label="Contacto"
+          active={contactoActive && !open}
+          onClick={close}
+        >
           <ContactIcon className="h-6 w-6" />
         </NavSlot>
 
