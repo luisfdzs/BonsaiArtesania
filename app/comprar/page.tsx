@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
 import { Checkout } from '@/components/comprar/Checkout'
+import { isAdminEmail } from '@/lib/admin'
 import { readCart } from '@/lib/cart'
 import { issueFormToken } from '@/lib/form-guard'
 import { addresses, formatCents } from '@/lib/schema'
@@ -23,6 +24,10 @@ export default async function ComprarPage() {
   // Aquí sí hace falta cuenta: el pedido tiene que quedar asociado a alguien para
   // que el cliente pueda consultarlo después. Hasta este punto se navega sin ella.
   if (!session?.user?.id) redirect('/entrar?volver=/comprar')
+
+  // La cuenta del taller no pasa por caja (ver `lib/admin.ts`). Se comprueba con
+  // la sesión que ya tenemos en la mano, sin pedir otra.
+  if (isAdminEmail(session.user.email)) redirect('/taller')
 
   const cart = await readCart()
   if (cart.lines.length === 0) redirect('/carrito')

@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { FlowerBud } from '@/components/ui/FlowerBud'
-import { ORDER_STATUS_LABEL } from '@/lib/order-status'
-import { formatCents, orders, type OrderStatus } from '@/lib/schema'
+import { ORDER_STATUS_ADMIN_LABEL, ORDER_STATUS_FLOW } from '@/lib/order-status'
+import { formatCents, orders } from '@/lib/schema'
 import { updateOrderStatus } from '../../actions'
 
 type Params = { params: Promise<{ number: string }> }
@@ -29,7 +29,7 @@ export default async function TallerPedidoPage({ params }: Params) {
 
       <header className="mt-8 flex flex-col items-center gap-2">
         <h2 className="font-serif text-title">{order.number}</h2>
-        <p className="text-small text-bark-soft">{ORDER_STATUS_LABEL[order.status]}</p>
+        <p className="text-small text-bark-soft">{ORDER_STATUS_ADMIN_LABEL[order.status]}</p>
       </header>
 
       {order.payment.provider === 'simulado' && (
@@ -88,9 +88,9 @@ export default async function TallerPedidoPage({ params }: Params) {
               Estado
             </label>
             <select id="status" name="status" defaultValue={order.status} className="field">
-              {(Object.keys(ORDER_STATUS_LABEL) as OrderStatus[]).map((status) => (
+              {ORDER_STATUS_FLOW.map((status) => (
                 <option key={status} value={status}>
-                  {ORDER_STATUS_LABEL[status]}
+                  {ORDER_STATUS_ADMIN_LABEL[status]}
                 </option>
               ))}
             </select>
@@ -129,7 +129,7 @@ export default async function TallerPedidoPage({ params }: Params) {
         <ol className="mt-6 flex flex-col gap-3">
           {[...order.history].reverse().map((entry, index) => (
             <li key={index} className="text-small text-bark-soft">
-              {dateTimeFormat.format(entry.at)} — {ORDER_STATUS_LABEL[entry.status]}
+              {dateTimeFormat.format(entry.at)} — {ORDER_STATUS_ADMIN_LABEL[entry.status]}
               {entry.note && ` · ${entry.note}`}
             </li>
           ))}

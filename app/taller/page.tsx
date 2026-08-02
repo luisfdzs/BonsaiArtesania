@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ORDER_STATUS_LABEL } from '@/lib/order-status'
+import { ORDER_STATUS_ADMIN_LABEL, ORDER_STATUS_FLOW } from '@/lib/order-status'
 import { formatCents, orders, type OrderStatus } from '@/lib/schema'
 
 type Props = {
@@ -20,7 +20,7 @@ export default async function TallerPedidosPage({ searchParams }: Props) {
 
   const collection = await orders()
   const filter =
-    estado && estado in ORDER_STATUS_LABEL
+    estado && estado in ORDER_STATUS_ADMIN_LABEL
       ? { status: estado as OrderStatus }
       : { status: { $in: PENDING } }
 
@@ -43,13 +43,13 @@ export default async function TallerPedidosPage({ searchParams }: Props) {
         >
           Por preparar
         </Link>
-        {(Object.keys(ORDER_STATUS_LABEL) as OrderStatus[]).map((status) => (
+        {ORDER_STATUS_FLOW.map((status) => (
           <Link
             key={status}
             href={`/taller?estado=${status}`}
             className={`text-small ${estado === status ? 'text-bark' : 'text-bark-faint'} link-underline tap`}
           >
-            {ORDER_STATUS_LABEL[status]} ({countBy.get(status) ?? 0})
+            {ORDER_STATUS_ADMIN_LABEL[status]} ({countBy.get(status) ?? 0})
           </Link>
         ))}
       </div>
@@ -82,7 +82,7 @@ export default async function TallerPedidosPage({ searchParams }: Props) {
                 <div>
                   <p>{formatCents(order.totals.totalCents)}</p>
                   <p className="mt-2 text-small text-bark-soft">
-                    {ORDER_STATUS_LABEL[order.status]}
+                    {ORDER_STATUS_ADMIN_LABEL[order.status]}
                   </p>
                   {order.payment.provider === 'simulado' && (
                     <p className="eyebrow mt-2 text-bark-faint">Cobro simulado</p>

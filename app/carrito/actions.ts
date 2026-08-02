@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
 import { auth } from '@/auth'
 import { getProduct } from '@/content/products'
+import { isAdmin } from '@/lib/admin'
 import { GUEST_COOKIE } from '@/lib/cart'
 import { carts } from '@/lib/schema'
 import { shopOpen } from '@/lib/shop'
@@ -17,6 +18,12 @@ import { shopOpen } from '@/lib/shop'
  *
  * Lo que llega del navegador es únicamente `slug` y `qty`. El precio no: se lee
  * del catálogo al calcular. Aceptar un importe del cliente sería regalar la tienda.
+ *
+ * Las tres empiezan descartando a la cuenta del taller: ahí no hay carrito que
+ * tocar (ver `lib/admin.ts`). La comprobación va aquí y no sólo en la pantalla
+ * porque una acción de servidor es un endpoint público al que se puede llamar
+ * directamente, y porque las fichas de la tienda se sirven estáticas: el botón de
+ * «añadir» es el mismo HTML para todo el mundo y no puede saber quién mira.
  */
 
 const MAX_QTY = 20
@@ -46,6 +53,7 @@ export async function addToCart(formData: FormData): Promise<void> {
   // sólo en la ficha: esconder el botón no protege nada, porque una acción de
   // servidor es un endpoint al que se puede llamar directamente.
   if (!shopOpen) return
+  if (await isAdmin()) return
 
   const slug = String(formData.get('slug') ?? '')
   const product = getProduct(slug)
@@ -84,6 +92,8 @@ export async function addToCart(formData: FormData): Promise<void> {
 }
 
 export async function setQty(formData: FormData): Promise<void> {
+  if (await isAdmin()) return
+
   const slug = String(formData.get('slug') ?? '')
   const qty = Number(formData.get('qty'))
 
@@ -109,6 +119,8 @@ export async function setQty(formData: FormData): Promise<void> {
 }
 
 export async function removeFromCart(formData: FormData): Promise<void> {
+  if (await isAdmin()) return
+
   const slug = String(formData.get('slug') ?? '')
   const filter = await ownerFilter()
 

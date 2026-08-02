@@ -2,6 +2,7 @@ import { ObjectId } from 'mongodb'
 import { cookies } from 'next/headers'
 import { getSession } from '@/auth'
 import { getProduct } from '@/content/products'
+import { isAdmin } from '@/lib/admin'
 import type { Image } from '@/lib/media'
 import { carts, toCents, type CartDoc } from '@/lib/schema'
 import { shippingCostCents } from '@/lib/shipping'
@@ -152,8 +153,19 @@ export async function readCart(): Promise<Cart> {
   }
 }
 
-/** Sólo el número de piezas, para el indicador de la cabecera. */
+/**
+ * Sólo el número de piezas, para el indicador de la cabecera.
+ *
+ * Para la cuenta del taller siempre cero, y no por ahorrar una consulta: la barra
+ * de móvil se sirve igual para todo el mundo —el layout es estático a propósito,
+ * ver el comentario de `app/api/carrito/count/route.ts`—, así que el icono del
+ * carrito le sale también a Ana. Al menos que no le salga con un globo encima
+ * anunciando piezas que no puede comprar; si lo pulsa, `/carrito` la devuelve al
+ * taller. Ver `lib/admin.ts`.
+ */
 export async function cartCount(): Promise<number> {
+  if (await isAdmin()) return 0
+
   const doc = await cartDoc()
   return doc?.items.reduce((total, item) => total + item.qty, 0) ?? 0
 }

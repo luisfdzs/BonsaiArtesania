@@ -1,9 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { CartPing } from '@/components/layout/CartCount'
 import { CheckIcon, TrashIcon } from '@/components/ui/CartIcons'
 import { FlowerBud } from '@/components/ui/FlowerBud'
 import { Media } from '@/components/ui/Media'
+import { isAdmin } from '@/lib/admin'
 import { readCart } from '@/lib/cart'
 import { formatCents } from '@/lib/schema'
 import { shopOpen } from '@/lib/shop'
@@ -16,6 +18,10 @@ export const metadata: Metadata = {
 }
 
 export default async function CarritoPage() {
+  // La cuenta del taller no tiene carrito, así que aquí no hay nada que enseñarle:
+  // se la manda a su sitio. Ver `lib/admin.ts`.
+  if (await isAdmin()) redirect('/taller')
+
   // La tienda cerrada no tiene carrito. Se explica en lugar de dar un 404: quien
   // llegue aquí desde un enlace guardado merece saber qué ha pasado.
   if (!shopOpen) {
