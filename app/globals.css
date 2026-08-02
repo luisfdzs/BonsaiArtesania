@@ -583,6 +583,122 @@
   gap: 0.45rem;
 }
 
+/* La barra de familias de la tienda. Antes eran botones redondos —los mismos
+   `btn btn-sm` de las acciones—, y con ocho seguidos la portada empezaba con una
+   fila de píldoras que pesaba más que el propio catálogo y que se leía como
+   «ocho cosas que pulsar» en vez de «dónde estoy». La barra dice lo mismo con un
+   filete: versalitas sobre una línea de 1px, como el resto de la web.
+
+   El contenedor es `shop-nav` y cada entrada `shop-tab`; van juntas y aquí
+   porque lo que las hace funcionar —el filete de la barra y el del activo
+   montados en el mismo píxel— no se ve en ninguna de las dos por separado. */
+@utility shop-nav {
+  position: sticky;
+  /* Justo debajo de la cabecera, que mide 5rem y 6rem a partir de `md`. */
+  top: 5rem;
+  z-index: 30;
+  /* La barra va a sangre aunque viva dentro del `page-gutter` de la página: un
+     filete que se corta antes del borde parte la pantalla en vez de dividirla. */
+  margin-inline: calc(var(--spacing-gutter) * -1);
+  border-bottom: 1px solid var(--color-line);
+  /* Translúcida como la cabecera: al pasar las fotos por debajo se nota que la
+     barra flota y no que el catálogo se corta. */
+  background: color-mix(in srgb, var(--color-linen) 90%, transparent);
+  backdrop-filter: blur(12px);
+
+  @media (width >= 48rem) {
+    top: 6rem;
+  }
+}
+
+/* El carril que scrollea. En móvil las ocho familias no caben, así que la barra
+   se arrastra de lado en vez de partirse en dos filas: una barra de dos alturas
+   deja de parecer una barra. La de scroll se esconde —el corte del último rótulo
+   ya dice que hay más— y cada entrada es un punto de anclaje, para que el gesto
+   termine siempre con un rótulo entero a la vista. */
+@utility shop-rail {
+  position: relative;
+  display: flex;
+  gap: 2rem;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  /* El sangrado lateral lo pone el carril y no la barra: así el fondo llega de
+     borde a borde y el primer rótulo sigue alineado con el texto de la página. */
+  padding-inline: var(--spacing-gutter);
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  & > * {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+  }
+}
+
+@utility shop-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  /* Alto de la barra: 2.75rem de zona pulsable repartidas arriba y abajo. */
+  padding-block: 1.1rem;
+  font-size: var(--text-micro);
+  line-height: var(--text-micro--line-height);
+  letter-spacing: var(--text-micro--letter-spacing);
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--color-bark-soft);
+  transition: color 0.6s var(--ease-out-soft);
+
+  /* El filete del activo, dibujado ENCIMA del de la barra —de ahí el `-1px`—,
+     así que la línea no se dobla: el mismo píxel cambia de color bajo la familia
+     que se está viendo. Al pasar por encima se dibuja despacio y a media tinta,
+     igual que en `link-underline`. */
+  &::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: -1px;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.45;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.6s var(--ease-out-soft);
+  }
+
+  &:hover {
+    color: var(--color-bark);
+  }
+
+  &:hover::after,
+  &:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  /* El estado activo cuelga de `aria-current` y no de una clase aparte: es el
+     atributo que ya hay que poner para que un lector de pantalla lo diga, y así
+     no hay dos formas de estar activo que puedan discrepar. */
+  &[aria-current='page'] {
+    color: var(--color-sage-deep);
+  }
+
+  &[aria-current='page']::after {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+/* El número de piezas de cada familia. Sale de la escala micro, que lleva 0.18em
+   de interletraje: con esa apertura los dígitos se descuelgan del rótulo y
+   parecen otra palabra. */
+@utility shop-tab-count {
+  letter-spacing: 0;
+  color: var(--color-bark-faint);
+}
+
 /* Tarjeta de la zona de cuenta: un pedido, una dirección, un bloque de ajustes.
    Antes eran filas separadas por un filete de 1px; con varias seguidas la página
    se leía como una tabla. Una caja con esquina redonda y un fondo apenas más
