@@ -98,10 +98,19 @@ export default async function TallerPedidoPage({ params }: Params) {
           </div>
 
           <div>
-            <label className="field-label" htmlFor="note">
-              Nota <span className="normal-case">(opcional, queda en el historial)</span>
+            {/* El rótulo va dentro del campo, como en `Field`. El del desplegable
+                de arriba no puede: un `select` ya enseña un valor, así que no le
+                queda hueco donde poner el nombre de lo que se está eligiendo. */}
+            <label className="sr-only" htmlFor="note">
+              Nota (opcional, queda en el historial)
             </label>
-            <input id="note" name="note" type="text" className="field" />
+            <input
+              id="note"
+              name="note"
+              type="text"
+              placeholder="Nota (opcional, queda en el historial)"
+              className="field"
+            />
           </div>
 
           <button type="submit" className="btn self-center">
