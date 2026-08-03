@@ -5,7 +5,9 @@ import { redirect } from 'next/navigation'
 import { checkCode, dropCode, issueCode } from '@/lib/codes'
 import { sendAlreadyRegisteredEmail, sendCodeEmail, sendNoAccountEmail } from '@/lib/email'
 import { fakeVerify, hashPassword, verifyPassword } from '@/lib/password'
-import { defaultLocale } from '@/lib/i18n/config'
+import { translator, type Locale } from '@/lib/i18n/config'
+import { localeFrom } from '@/lib/i18n/form'
+import { path } from '@/lib/i18n/routes'
 import { clientIp, consume, consumeAll, describeWait, POLICIES } from '@/lib/rate-limit'
 import { users } from '@/lib/schema'
 import { endSessions, startSession } from '@/lib/session'
@@ -44,12 +46,17 @@ export type EntrarState = {
   email?: string
 }
 
-/** Ruta interna a la que volver, saneada. Ver la regla 2 de arriba. */
-function safeBackTo(raw: unknown): string {
+/**
+ * Ruta interna a la que volver, saneada. Ver la regla 2 de arriba.
+ *
+ * El respaldo lleva idioma: quien entra desde el galego y no traía destino tiene
+ * que acabar en su cuenta en galego, no en la castellana.
+ */
+function safeBackTo(raw: unknown, locale: Locale): string {
   const value = typeof raw === 'string' ? raw : ''
   // Una sola barra al principio: `//otra-web.com` también empieza por barra y es
   // una dirección externa perfectamente válida para el navegador.
-  return /^\/(?!\/)/.test(value) ? value : '/cuenta'
+  return /^\/(?!\/)/.test(value) ? value : path(locale, '/cuenta')
 }
 
 /**
@@ -59,13 +66,23 @@ function safeBackTo(raw: unknown): string {
  */
 function sendError(
   result: Extract<Awaited<ReturnType<typeof sendCodeEmail>>, { ok: false }>,
+  locale: Locale,
 ): Record<string, string> {
+  const t = translator(locale)
   if (result.reason === 'limite') {
     return {
-      form: `Se han pedido ya varios códigos para ese correo. Busca en tu buzón el último que te llegó —incluida la carpeta de spam— o espera ${describeWait(result.retryAfterMs, defaultLocale)} antes de pedir otro.`,
+      form: t({
+        es: `Se han pedido ya varios códigos para ese correo. Busca en tu buzón el último que te llegó —incluida la carpeta de spam— o espera ${describeWait(result.retryAfterMs, 'es')} antes de pedir otro.`,
+        gl: `Xa se pediron varios códigos para ese correo. Busca no teu buzón o último que che chegou —incluída a carpeta de spam— ou agarda ${describeWait(result.retryAfterMs, 'gl')} antes de pedir outro.`,
+      }),
     }
   }
-  return { form: 'No se ha podido enviar el correo. Inténtalo otra vez en un momento.' }
+  return {
+    form: t({
+      es: 'No se ha podido enviar el correo. Inténtalo otra vez en un momento.',
+      gl: 'Non se puido enviar o correo. Inténtao outra vez nun momento.',
+    }),
+  }
 }
 
 /**
@@ -87,17 +104,22 @@ function sendError(
  * que explicarle una migración que no le interesa.
  */
 export async function pedirCodigo(_prev: EntrarState, formData: FormData): Promise<EntrarState> {
+  const locale = localeFrom(formData)
+  const t = translator(locale)
   const purpose = formData.get('purpose') === 'recuperar' ? 'recuperar' : 'alta'
-  const backTo = safeBackTo(formData.get('volver'))
+  const backTo = safeBackTo(formData.get('volver'), locale)
 
   // Se devuelve tal cual se escribió, no normalizado: quien se ha dejado una letra
   // tiene que poder ver lo que puso para corregirlo.
   const typed = String(formData.get('email') ?? '').slice(0, 160)
 
-  const parsed = emailSchema.safeParse(formData.get('email'))
+  const parsed = emailSchema(locale).safeParse(formData.get('email'))
   if (!parsed.success) {
     return {
-      errors: { email: parsed.error.issues[0]?.message ?? 'Correo no válido' },
+      errors: {
+        email:
+          parsed.error.issues[0]?.message ?? t({ es: 'Correo no válido', gl: 'Correo non válido' }),
+      },
       email: typed,
     }
   }
@@ -110,25 +132,31 @@ export async function pedirCodigo(_prev: EntrarState, formData: FormData): Promi
   const sent =
     purpose === 'alta'
       ? hasPassword
-        ? await sendAlreadyRegisteredEmail({ to: email })
-        : await sendCodeEmail({ to: email, code: await issueCode(email, 'alta'), purpose: 'alta' })
+        ? await sendAlreadyRegisteredEmail({ to: email, locale })
+        : await sendCodeEmail({
+            to: email,
+            code: await issueCode(email, 'alta'),
+            purpose: 'alta',
+            locale,
+          })
       : existing
         ? await sendCodeEmail({
             to: email,
             code: await issueCode(email, 'recuperar'),
             purpose: 'recuperar',
+            locale,
           })
-        : await sendNoAccountEmail({ to: email })
+        : await sendNoAccountEmail({ to: email, locale })
 
   if (!sent.ok) {
     // El código emitido ya no vale para nada si el correo no salió, y dejarlo vivo
     // sólo serviría para que el siguiente intento chocara con él.
     await dropCode(email, purpose)
-    return { errors: sendError(sent), email: typed }
+    return { errors: sendError(sent, locale), email: typed }
   }
 
-  await setPending({ email, purpose, backTo } satisfies Pending)
-  redirect('/entrar/codigo')
+  await setPending({ email, purpose, backTo, locale } satisfies Pending)
+  redirect(path(locale, '/entrar/codigo'))
 }
 
 /** Reenvía el código de lo que estuviera pendiente, sin volver a pedir el correo. */
@@ -137,7 +165,10 @@ export async function reenviarCodigo(
   _formData: FormData,
 ): Promise<EntrarState> {
   const pending = await readPending()
-  if (!pending) redirect('/entrar')
+  // Sin nada pendiente no se sabe el idioma en el que se estaba, así que la vuelta
+  // al formulario usa el del propio formulario que ha llegado.
+  if (!pending) redirect(path(localeFrom(_formData), '/entrar'))
+  const { locale } = pending
 
   const collection = await users()
   const existing = await collection.findOne(
@@ -150,40 +181,55 @@ export async function reenviarCodigo(
   const sent =
     pending.purpose === 'alta'
       ? existing?.passwordHash
-        ? await sendAlreadyRegisteredEmail({ to: pending.email })
+        ? await sendAlreadyRegisteredEmail({ to: pending.email, locale })
         : await sendCodeEmail({
             to: pending.email,
             code: await issueCode(pending.email, 'alta'),
             purpose: 'alta',
+            locale,
           })
       : existing
         ? await sendCodeEmail({
             to: pending.email,
             code: await issueCode(pending.email, 'recuperar'),
             purpose: 'recuperar',
+            locale,
           })
-        : await sendNoAccountEmail({ to: pending.email })
+        : await sendNoAccountEmail({ to: pending.email, locale })
 
   if (!sent.ok) {
     await dropCode(pending.email, pending.purpose)
-    return { errors: sendError(sent) }
+    return { errors: sendError(sent, locale) }
   }
 
   return { sent: true }
 }
 
 /** Frase para cada forma de fallar el código. */
-function codeError(result: Awaited<ReturnType<typeof checkCode>>): string {
+function codeError(result: Awaited<ReturnType<typeof checkCode>>, locale: Locale): string {
   if (result.ok) return ''
+  const t = translator(locale)
   if (result.reason === 'agotado') {
-    return 'Demasiados intentos con ese código. Pide uno nuevo abajo.'
+    return t({
+      es: 'Demasiados intentos con ese código. Pide uno nuevo abajo.',
+      gl: 'Demasiados intentos con ese código. Pide un novo abaixo.',
+    })
   }
   if (result.reason === 'caducado') {
-    return 'Ese código ya no vale: ha caducado o ya se ha usado. Pide uno nuevo abajo.'
+    return t({
+      es: 'Ese código ya no vale: ha caducado o ya se ha usado. Pide uno nuevo abajo.',
+      gl: 'Ese código xa non vale: caducou ou xa se usou. Pide un novo abaixo.',
+    })
   }
   return result.left === 1
-    ? 'El código no es correcto. Te queda un intento antes de tener que pedir otro.'
-    : `El código no es correcto. Te quedan ${result.left} intentos.`
+    ? t({
+        es: 'El código no es correcto. Te queda un intento antes de tener que pedir otro.',
+        gl: 'O código non é correcto. Quédache un intento antes de ter que pedir outro.',
+      })
+    : t({
+        es: `El código no es correcto. Te quedan ${result.left} intentos.`,
+        gl: `O código non é correcto. Quédanche ${result.left} intentos.`,
+      })
 }
 
 /**
@@ -191,8 +237,16 @@ function codeError(result: Awaited<ReturnType<typeof checkCode>>): string {
  * recuperación, que hasta aquí son exactamente el mismo trámite.
  */
 async function spendCode(pending: Pending, raw: unknown): Promise<{ error: string } | null> {
-  const parsed = codeSchema.safeParse(raw)
-  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Código no válido' }
+  const { locale } = pending
+  const t = translator(locale)
+
+  const parsed = codeSchema(locale).safeParse(raw)
+  if (!parsed.success) {
+    return {
+      error:
+        parsed.error.issues[0]?.message ?? t({ es: 'Código no válido', gl: 'Código non válido' }),
+    }
+  }
 
   // El código muere solo a los cinco fallos, pero eso protege a una cuenta, no al
   // que va probando cifras contra muchas a la vez. Ver POLICIES.codeCheckIp.
@@ -200,25 +254,40 @@ async function spendCode(pending: Pending, raw: unknown): Promise<{ error: strin
   const verdict = await consume('codigo:check:ip', ip, POLICIES.codeCheckIp)
   if (!verdict.ok) {
     return {
-      error: `Demasiados intentos desde aquí. Prueba dentro de ${describeWait(verdict.retryAfterMs, defaultLocale)}.`,
+      error: t({
+        es: `Demasiados intentos desde aquí. Prueba dentro de ${describeWait(verdict.retryAfterMs, 'es')}.`,
+        gl: `Demasiados intentos desde aquí. Proba dentro de ${describeWait(verdict.retryAfterMs, 'gl')}.`,
+      }),
     }
   }
 
   const result = await checkCode(pending.email, pending.purpose, parsed.data)
-  return result.ok ? null : { error: codeError(result) }
+  return result.ok ? null : { error: codeError(result, locale) }
 }
 
 /** Lee y valida las dos casillas de contraseña. */
-function parsePassword(formData: FormData): { value: string } | { errors: Record<string, string> } {
-  const parsed = passwordSchema.safeParse(formData.get('password'))
+function parsePassword(
+  formData: FormData,
+  locale: Locale,
+): { value: string } | { errors: Record<string, string> } {
+  const t = translator(locale)
+  const parsed = passwordSchema(locale).safeParse(formData.get('password'))
   if (!parsed.success) {
-    return { errors: { password: parsed.error.issues[0]?.message ?? 'Contraseña no válida' } }
+    return {
+      errors: {
+        password:
+          parsed.error.issues[0]?.message ??
+          t({ es: 'Contraseña no válida', gl: 'Contrasinal non válido' }),
+      },
+    }
   }
 
   // La repetición se comprueba aquí y no en el esquema porque no es una regla de la
   // contraseña, es una salvaguarda contra la errata: se escribe a ciegas.
   if (formData.get('password2') !== parsed.data) {
-    return { errors: { password2: 'Las dos no coinciden' } }
+    return {
+      errors: { password2: t({ es: 'Las dos no coinciden', gl: 'Os dous non coinciden' }) },
+    }
   }
 
   return { value: parsed.data }
@@ -246,10 +315,11 @@ function keepCode(formData: FormData): { code: string } {
  */
 export async function crearCuenta(_prev: EntrarState, formData: FormData): Promise<EntrarState> {
   const pending = await readPending()
-  if (!pending || pending.purpose !== 'alta') redirect('/entrar')
+  if (!pending || pending.purpose !== 'alta') redirect(path(localeFrom(formData), '/entrar'))
+  const t = translator(pending.locale)
 
   // Primero la contraseña: si está mal, no gasta ni el código ni un intento.
-  const password = parsePassword(formData)
+  const password = parsePassword(formData, pending.locale)
   if ('errors' in password) return { errors: password.errors, ...keepCode(formData) }
 
   const failed = await spendCode(pending, formData.get('code'))
@@ -286,13 +356,25 @@ export async function crearCuenta(_prev: EntrarState, formData: FormData): Promi
       result.upsertedId ??
       (await collection.findOne({ email: pending.email }, { projection: { _id: 1 } }))?._id
 
-    if (!found) return { errors: { form: 'No se ha podido crear la cuenta. Inténtalo otra vez.' } }
+    if (!found) {
+      return {
+        errors: {
+          form: t({
+            es: 'No se ha podido crear la cuenta. Inténtalo otra vez.',
+            gl: 'Non se puido crear a conta. Inténtao outra vez.',
+          }),
+        },
+      }
+    }
     userId = found
   } catch (error) {
     if ((error as { code?: number }).code === 11000) {
       return {
         errors: {
-          form: 'Esa cuenta ya tiene contraseña. Vuelve a «Iniciar sesión» y entra con ella.',
+          form: t({
+            es: 'Esa cuenta ya tiene contraseña. Vuelve a «Iniciar sesión» y entra con ella.',
+            gl: 'Esa conta xa ten contrasinal. Volve a «Iniciar sesión» e entra con el.',
+          }),
         },
       }
     }
@@ -316,9 +398,11 @@ export async function recuperarCuenta(
   formData: FormData,
 ): Promise<EntrarState> {
   const pending = await readPending()
-  if (!pending || pending.purpose !== 'recuperar') redirect('/entrar')
+  if (!pending || pending.purpose !== 'recuperar') {
+    redirect(path(localeFrom(formData), '/entrar'))
+  }
 
-  const password = parsePassword(formData)
+  const password = parsePassword(formData, pending.locale)
   if ('errors' in password) return { errors: password.errors, ...keepCode(formData) }
 
   const failed = await spendCode(pending, formData.get('code'))
@@ -327,7 +411,16 @@ export async function recuperarCuenta(
   const collection = await users()
   const user = await collection.findOne({ email: pending.email }, { projection: { _id: 1 } })
   // La cuenta se ha borrado desde que se pidió el código. Raro, pero posible.
-  if (!user) return { errors: { form: 'Esa cuenta ya no existe. Puedes crear una nueva.' } }
+  if (!user) {
+    return {
+      errors: {
+        form: translator(pending.locale)({
+          es: 'Esa cuenta ya no existe. Puedes crear una nueva.',
+          gl: 'Esa conta xa non existe. Podes crear unha nova.',
+        }),
+      },
+    }
+  }
 
   const now = new Date()
   await collection.updateOne(
@@ -360,17 +453,25 @@ export async function recuperarCuenta(
  * discreción del resto del fichero no serviría de nada.
  */
 export async function iniciarSesion(_prev: EntrarState, formData: FormData): Promise<EntrarState> {
-  const backTo = safeBackTo(formData.get('volver'))
+  const locale = localeFrom(formData)
+  const t = translator(locale)
+  const backTo = safeBackTo(formData.get('volver'), locale)
+
+  // El mismo texto para las dos formas de fallar: ver la regla 1 de arriba.
+  const malas = t({
+    es: 'El correo o la contraseña no son correctos.',
+    gl: 'O correo ou o contrasinal non son correctos.',
+  })
 
   const typed = String(formData.get('email') ?? '').slice(0, 160)
-  const parsedEmail = emailSchema.safeParse(formData.get('email'))
+  const parsedEmail = emailSchema(locale).safeParse(formData.get('email'))
   const password = String(formData.get('password') ?? '')
 
   // Sin validar la contraseña con el esquema: las reglas de complejidad son para
   // elegirla, no para escribirla. Si alguien tiene una vieja que ya no cumpliría,
   // debe poder entrar igual. Sólo se acota el tamaño, para no derivar un megabyte.
   if (!parsedEmail.success || password.length === 0 || password.length > 100) {
-    return { errors: { form: 'El correo o la contraseña no son correctos.' }, email: typed }
+    return { errors: { form: malas }, email: typed }
   }
   const email = parsedEmail.data
 
@@ -385,7 +486,10 @@ export async function iniciarSesion(_prev: EntrarState, formData: FormData): Pro
   if (!verdict.ok) {
     return {
       errors: {
-        form: `Demasiados intentos. Prueba dentro de ${describeWait(verdict.retryAfterMs, defaultLocale)}, o pon una contraseña nueva desde el enlace de abajo.`,
+        form: t({
+          es: `Demasiados intentos. Prueba dentro de ${describeWait(verdict.retryAfterMs, 'es')}, o pon una contraseña nueva desde el enlace de abajo.`,
+          gl: `Demasiados intentos. Proba dentro de ${describeWait(verdict.retryAfterMs, 'gl')}, ou pon un contrasinal novo desde a ligazón de abaixo.`,
+        }),
       },
       email: typed,
     }
@@ -407,7 +511,7 @@ export async function iniciarSesion(_prev: EntrarState, formData: FormData): Pro
      * enlace de contraseña olvidada que hay debajo del formulario, que es
      * exactamente el camino que necesitan.
      */
-    return { errors: { form: 'El correo o la contraseña no son correctos.' }, email: typed }
+    return { errors: { form: malas }, email: typed }
   }
 
   await startSession(String(user._id))

@@ -7,6 +7,23 @@ const nextConfig: NextConfig = {
     deviceSizes: [420, 640, 828, 1200, 1600, 2048],
     qualities: [75, 82],
   },
+  experimental: {
+    /**
+     * Enciende `app/global-not-found.tsx`, que es el 404 de las direcciones que no
+     * encajan con ningún segmento.
+     *
+     * Hace falta porque el layout raíz vive bajo `[locale]` —tiene que saber el
+     * idioma para pintar el `lang` del documento—, así que una dirección sin
+     * segmento válido se queda sin layout donde pintarse. Sin este fichero, Next
+     * sirve ahí su 404 de fábrica: un documento pelado, sin fuentes, sin estilos y
+     * sin ninguna salida.
+     *
+     * Es experimental y el fichero no se carga sin la bandera: se pone y no pasa
+     * nada más, pero si algún día desaparece del `experimental`, el síntoma será
+     * justo ése —el 404 vuelve a salir en blanco— y no un error de build.
+     */
+    globalNotFound: true,
+  },
   /**
    * Las dos secciones de la portada se anuncian con ruta propia mientras se
    * está en ellas —ver `useActiveSection`—, así que esas rutas tienen que

@@ -1,4 +1,4 @@
-import { FlowerLoader } from '@/components/ui/FlowerLoader'
+import { PageLoader } from '@/components/ui/PageLoader'
 
 /**
  * Se llega aquí redirigido justo después de crear el pedido, y la página vuelve a
@@ -8,5 +8,5 @@ import { FlowerLoader } from '@/components/ui/FlowerLoader'
  * ha fallado.
  */
 export default function Loading() {
-  return <FlowerLoader label="Confirmando tu pedido" />
+  return <PageLoader label={{ es: 'Confirmando tu pedido', gl: 'Confirmando o teu pedido' }} />
 }

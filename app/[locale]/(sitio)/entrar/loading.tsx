@@ -1,4 +1,4 @@
-import { FlowerLoader } from '@/components/ui/FlowerLoader'
+import { PageLoader } from '@/components/ui/PageLoader'
 
 /**
  * Parece una página quieta —un campo y un botón— y no lo es: la sesión se guarda
@@ -11,5 +11,5 @@ import { FlowerLoader } from '@/components/ui/FlowerLoader'
  * Esa espera la dice `NavPending` desde los propios enlaces; ver `page.tsx`.
  */
 export default function Loading() {
-  return <FlowerLoader label="Preparando la entrada" />
+  return <PageLoader label={{ es: 'Preparando la entrada', gl: 'Preparando a entrada' }} />
 }

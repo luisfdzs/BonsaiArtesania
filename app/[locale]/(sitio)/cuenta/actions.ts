@@ -4,11 +4,33 @@ import { ObjectId } from 'mongodb'
 import { revalidatePath } from 'next/cache'
 import { auth } from '@/auth'
 import { hashPassword, verifyPassword } from '@/lib/password'
-import { defaultLocale } from '@/lib/i18n/config'
+import { locales, translator, type Locale } from '@/lib/i18n/config'
+import { localeFrom } from '@/lib/i18n/form'
+import { path } from '@/lib/i18n/routes'
 import { consumeAll, describeWait, POLICIES } from '@/lib/rate-limit'
 import { endSessions } from '@/lib/session'
 import { addresses, users } from '@/lib/schema'
 import { addressSchema, fieldErrors, passwordSchema, profileSchema } from '@/lib/validation'
+
+/**
+ * Las dos rutas de cada revalidación: los mismos formularios los pinta la cuenta
+ * de cliente en `/cuenta` y la del taller en `/gestion/cuenta`, y quien guarda es
+ * siempre una de las dos. Y cada una existe en los dos idiomas, así que hay que
+ * refrescar las cuatro: revalidar la que no toca no cuesta nada, olvidar la que sí
+ * deja el nombre viejo en pantalla hasta la siguiente navegación.
+ */
+function revalidateCuenta(): void {
+  for (const locale of locales) {
+    revalidatePath(path(locale, '/cuenta'))
+    revalidatePath(path(locale, '/gestion/cuenta'))
+  }
+}
+
+function revalidateDirecciones(): void {
+  for (const locale of locales) {
+    revalidatePath(path(locale, '/cuenta/direcciones'))
+  }
+}
 
 /**
  * Acciones de la zona de cuenta.
@@ -39,7 +61,9 @@ async function requireUserId(): Promise<ObjectId> {
 export async function updateProfile(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const userId = await requireUserId()
 
-  const parsed = profileSchema.safeParse({
+  const locale = localeFrom(formData)
+
+  const parsed = profileSchema(locale).safeParse({
     name: formData.get('name'),
     phone: formData.get('phone'),
   })
@@ -60,12 +84,7 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
     },
   )
 
-  // Las dos rutas: los mismos formularios los pinta la cuenta de cliente en
-  // `/cuenta` y la del taller en `/gestion/cuenta`, y quien guarda es siempre
-  // una de las dos. Revalidar la que no toca no cuesta nada; olvidar la que sí
-  // deja el nombre viejo en pantalla hasta la siguiente navegación.
-  revalidatePath('/cuenta')
-  revalidatePath('/gestion/cuenta')
+  revalidateCuenta()
   return { ok: true }
 }
 
@@ -84,13 +103,21 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
  */
 export async function changePassword(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const userId = await requireUserId()
+  const locale = localeFrom(formData)
+  const t = translator(locale)
 
   const collection = await users()
   const user = await collection.findOne(
     { _id: userId },
     { projection: { email: 1, passwordHash: 1 } },
   )
-  if (!user) return { errors: { form: 'No se ha encontrado tu cuenta.' } }
+  if (!user) {
+    return {
+      errors: {
+        form: t({ es: 'No se ha encontrado tu cuenta.', gl: 'Non se atopou a túa conta.' }),
+      },
+    }
+  }
 
   const current = String(formData.get('current') ?? '')
 
@@ -103,7 +130,10 @@ export async function changePassword(_prev: ActionState, formData: FormData): Pr
   if (!verdict.ok) {
     return {
       errors: {
-        current: `Demasiados intentos. Prueba dentro de ${describeWait(verdict.retryAfterMs, defaultLocale)}.`,
+        current: t({
+          es: `Demasiados intentos. Prueba dentro de ${describeWait(verdict.retryAfterMs, 'es')}.`,
+          gl: `Demasiados intentos. Proba dentro de ${describeWait(verdict.retryAfterMs, 'gl')}.`,
+        }),
       },
     }
   }
@@ -117,24 +147,49 @@ export async function changePassword(_prev: ActionState, formData: FormData): Pr
   if (!user.passwordHash) {
     return {
       errors: {
-        form: 'Tu cuenta es de cuando se entraba con un enlace y todavía no tiene contraseña. Sal y pon una desde «No recuerdo mi contraseña».',
+        form: t({
+          es: 'Tu cuenta es de cuando se entraba con un enlace y todavía no tiene contraseña. Sal y pon una desde «No recuerdo mi contraseña».',
+          gl: 'A túa conta é de cando se entraba cunha ligazón e aínda non ten contrasinal. Sae e pon un desde «Non lembro o meu contrasinal».',
+        }),
       },
     }
   }
 
   if (!(await verifyPassword(current, user.passwordHash))) {
-    return { errors: { current: 'Esa no es tu contraseña actual' } }
+    return {
+      errors: {
+        current: t({
+          es: 'Esa no es tu contraseña actual',
+          gl: 'Ese non é o teu contrasinal actual',
+        }),
+      },
+    }
   }
 
-  const parsed = passwordSchema.safeParse(formData.get('password'))
+  const parsed = passwordSchema(locale).safeParse(formData.get('password'))
   if (!parsed.success) {
-    return { errors: { password: parsed.error.issues[0]?.message ?? 'Contraseña no válida' } }
+    return {
+      errors: {
+        password:
+          parsed.error.issues[0]?.message ??
+          t({ es: 'Contraseña no válida', gl: 'Contrasinal non válido' }),
+      },
+    }
   }
   if (formData.get('password2') !== parsed.data) {
-    return { errors: { password2: 'Las dos no coinciden' } }
+    return {
+      errors: { password2: t({ es: 'Las dos no coinciden', gl: 'Os dous non coinciden' }) },
+    }
   }
   if (parsed.data === current) {
-    return { errors: { password: 'Esa es la que ya tenías. Pon otra distinta.' } }
+    return {
+      errors: {
+        password: t({
+          es: 'Esa es la que ya tenías. Pon otra distinta.',
+          gl: 'Ese é o que xa tiñas. Pon outro distinto.',
+        }),
+      },
+    }
   }
 
   const now = new Date()
@@ -151,14 +206,13 @@ export async function changePassword(_prev: ActionState, formData: FormData): Pr
 
   const closed = await endSessions(String(userId), { keepCurrent: true })
 
-  revalidatePath('/cuenta')
-  revalidatePath('/gestion/cuenta')
+  revalidateCuenta()
   return { ok: true, closed }
 }
 
 /** Lee y valida los campos comunes de crear y editar dirección. */
-function parseAddress(formData: FormData) {
-  return addressSchema.safeParse({
+function parseAddress(formData: FormData, locale: Locale) {
+  return addressSchema(locale).safeParse({
     alias: formData.get('alias'),
     recipient: formData.get('recipient'),
     phone: formData.get('phone'),
@@ -186,7 +240,7 @@ async function ensureSingleDefault(userId: ObjectId, defaultId: ObjectId) {
 
 export async function createAddress(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const userId = await requireUserId()
-  const parsed = parseAddress(formData)
+  const parsed = parseAddress(formData, localeFrom(formData))
   if (!parsed.success) return { errors: fieldErrors(parsed.error) }
 
   const collection = await addresses()
@@ -211,18 +265,23 @@ export async function createAddress(_prev: ActionState, formData: FormData): Pro
 
   if (isDefault) await ensureSingleDefault(userId, result.insertedId)
 
-  revalidatePath('/cuenta/direcciones')
+  revalidateDirecciones()
   return { ok: true }
 }
 
 export async function updateAddress(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const userId = await requireUserId()
+  const locale = localeFrom(formData)
+  const noEncontrada = translator(locale)({
+    es: 'Dirección no encontrada',
+    gl: 'Enderezo non atopado',
+  })
 
   const rawId = String(formData.get('id') ?? '')
-  if (!ObjectId.isValid(rawId)) return { errors: { form: 'Dirección no encontrada' } }
+  if (!ObjectId.isValid(rawId)) return { errors: { form: noEncontrada } }
   const id = new ObjectId(rawId)
 
-  const parsed = parseAddress(formData)
+  const parsed = parseAddress(formData, locale)
   if (!parsed.success) return { errors: fieldErrors(parsed.error) }
 
   const collection = await addresses()
@@ -240,10 +299,10 @@ export async function updateAddress(_prev: ActionState, formData: FormData): Pro
     },
   )
 
-  if (result.matchedCount === 0) return { errors: { form: 'Dirección no encontrada' } }
+  if (result.matchedCount === 0) return { errors: { form: noEncontrada } }
   if (parsed.data.isDefault) await ensureSingleDefault(userId, id)
 
-  revalidatePath('/cuenta/direcciones')
+  revalidateDirecciones()
   return { ok: true }
 }
 
@@ -269,5 +328,5 @@ export async function deleteAddress(formData: FormData): Promise<void> {
     }
   }
 
-  revalidatePath('/cuenta/direcciones')
+  revalidateDirecciones()
 }

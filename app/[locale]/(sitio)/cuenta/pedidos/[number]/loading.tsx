@@ -1,4 +1,4 @@
-import { FlowerLoader } from '@/components/ui/FlowerLoader'
+import { PageLoader } from '@/components/ui/PageLoader'
 
 /**
  * Se llega desde la lista, pulsando un pedido concreto, y lo que se espera es
@@ -6,5 +6,5 @@ import { FlowerLoader } from '@/components/ui/FlowerLoader'
  * fichero heredaría el rótulo de la lista y parecería que se ha vuelto atrás.
  */
 export default function Loading() {
-  return <FlowerLoader label="Abriendo el pedido" />
+  return <PageLoader label={{ es: 'Abriendo el pedido', gl: 'Abrindo o pedido' }} />
 }

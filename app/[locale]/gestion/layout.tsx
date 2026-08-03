@@ -6,10 +6,19 @@ import { GestionNav } from '@/components/gestion/GestionNav'
 import { Wordmark } from '@/components/layout/Wordmark'
 import { FormPending } from '@/components/ui/FormPending'
 import { adminSession } from '@/lib/admin'
+import { isLocale, pick, translator } from '@/lib/i18n/config'
+import { path } from '@/lib/i18n/routes'
 
-export const metadata: Metadata = {
-  title: 'Gestión',
-  robots: { index: false, follow: false },
+type Params = { params: Promise<{ locale: string }> }
+
+const TITLE = { es: 'Gestión', gl: 'Xestión' }
+
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const { locale } = await params
+  return {
+    title: isLocale(locale) ? pick(TITLE, locale) : TITLE.es,
+    robots: { index: false, follow: false },
+  }
 }
 
 /**
@@ -43,7 +52,16 @@ export const metadata: Metadata = {
  * **con qué cuenta se está dentro y cómo se sale**. Los pedidos de todo el mundo
  * están detrás de esta sesión, así que cerrarla tiene que estar a mano.
  */
-export default async function GestionLayout({ children }: { children: React.ReactNode }) {
+export default async function GestionLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode
+} & Params) {
+  const { locale } = await params
+  if (!isLocale(locale)) notFound()
+  const t = translator(locale)
+
   const session = await adminSession()
   if (!session) notFound()
 
@@ -61,9 +79,12 @@ export default async function GestionLayout({ children }: { children: React.Reac
         {/* La marca, sin enlace: aquí no llevaría a ninguna parte —la portada no
             es de esta cuenta— y está sólo para decir de qué web es este panel. */}
         <Wordmark className="h-7 text-bark" />
-        <h1 className="mt-6 font-serif text-title">Gestión</h1>
+        <h1 className="mt-6 font-serif text-title">{t(TITLE)}</h1>
         <p className="mt-3 text-small text-bark-faint">
-          Los pedidos de la tienda, todos. Aquí se cambia por dónde va cada uno.
+          {t({
+            es: 'Los pedidos de la tienda, todos. Aquí se cambia por dónde va cada uno.',
+            gl: 'Os pedidos da tenda, todos. Aquí cámbiase por onde vai cada un.',
+          })}
         </p>
 
         <div className="mt-8">
@@ -74,22 +95,26 @@ export default async function GestionLayout({ children }: { children: React.Reac
       <div className="mx-auto mt-12 max-w-2xl text-center md:max-w-none">{children}</div>
 
       <div className="mx-auto mt-20 flex max-w-2xl flex-col items-center gap-6 border-t border-line pt-10 text-center md:max-w-none">
-        {email && <p className="text-small text-bark-faint">Dentro como {email}</p>}
+        {email && (
+          <p className="text-small text-bark-faint">
+            {t({ es: 'Dentro como', gl: 'Dentro como' })} {email}
+          </p>
+        )}
 
         <form
           action={async () => {
             'use server'
-            await signOut({ redirectTo: '/' })
+            await signOut({ redirectTo: path(locale, '/') })
           }}
         >
           {/* Igual que en la cuenta: salir borra la sesión de la base y luego
               lleva a la portada, y hasta el segundo viaje la gestión sigue en
               pantalla como si no se hubiera pulsado nada. */}
-          <FormPending label="Cerrando tu sesión" />
+          <FormPending label={t({ es: 'Cerrando tu sesión', gl: 'Pechando a túa sesión' })} />
 
           <button type="submit" className="btn btn-quiet btn-sm">
             <LogoutIcon className="h-4 w-4" />
-            Salir
+            {t({ es: 'Salir', gl: 'Saír' })}
           </button>
         </form>
       </div>

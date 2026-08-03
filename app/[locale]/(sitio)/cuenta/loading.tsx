@@ -1,4 +1,4 @@
-import { FlowerLoader } from '@/components/ui/FlowerLoader'
+import { PageLoader } from '@/components/ui/PageLoader'
 
 /**
  * Vale para toda la zona de cuenta —datos, pedidos, direcciones, privacidad—:
@@ -11,5 +11,5 @@ import { FlowerLoader } from '@/components/ui/FlowerLoader'
  * por petición y no dos: ver `getSession` en auth.ts.
  */
 export default function Loading() {
-  return <FlowerLoader label="Abriendo tu cuenta" />
+  return <PageLoader label={{ es: 'Abriendo tu cuenta', gl: 'Abrindo a túa conta' }} />
 }

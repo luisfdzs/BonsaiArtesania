@@ -1,9 +1,11 @@
-import { redirect } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { getSession, signOut } from '@/auth'
 import { LogoutIcon } from '@/components/cuenta/CuentaIcons'
 import { CuentaNav } from '@/components/cuenta/CuentaNav'
 import { FormPending } from '@/components/ui/FormPending'
 import { isAdminEmail } from '@/lib/admin'
+import { isLocale, translator } from '@/lib/i18n/config'
+import { path } from '@/lib/i18n/routes'
 
 /**
  * Guarda de toda la zona de cuenta. Se hace aquí, en un layout de servidor, y no
@@ -28,11 +30,23 @@ import { isAdminEmail } from '@/lib/admin'
  * vengan. Y el destino es la portada del panel y no `/gestion/cuenta`, porque
  * quien escribe `/cuenta` va a su sitio, no a un formulario concreto.
  */
-export default async function CuentaLayout({ children }: { children: React.ReactNode }) {
+export default async function CuentaLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
+  if (!isLocale(locale)) notFound()
+  const t = translator(locale)
+
   const session = await getSession()
 
-  if (!session?.user) redirect('/entrar?volver=/cuenta')
-  if (isAdminEmail(session.user.email)) redirect('/gestion')
+  if (!session?.user) {
+    redirect(`${path(locale, '/entrar')}?volver=${encodeURIComponent(path(locale, '/cuenta'))}`)
+  }
+  if (isAdminEmail(session.user.email)) redirect(path(locale, '/gestion'))
 
   const name = session.user.name?.trim()
   const email = session.user.email ?? ''
@@ -51,8 +65,8 @@ export default async function CuentaLayout({ children }: { children: React.React
           {initial}
         </span>
 
-        <p className="eyebrow mt-6">Tu cuenta</p>
-        <h1 className="mt-3 font-serif text-title">{name || 'Hola'}</h1>
+        <p className="eyebrow mt-6">{t({ es: 'Tu cuenta', gl: 'A túa conta' })}</p>
+        <h1 className="mt-3 font-serif text-title">{name || t({ es: 'Hola', gl: 'Ola' })}</h1>
         {email && <p className="mt-3 text-small text-bark-faint">{email}</p>}
       </header>
 
@@ -70,18 +84,20 @@ export default async function CuentaLayout({ children }: { children: React.React
         <form
           action={async () => {
             'use server'
-            await signOut({ redirectTo: '/' })
+            // A la portada del idioma en el que estaba: salir de la cuenta no es
+            // salir del galego.
+            await signOut({ redirectTo: path(locale, '/') })
           }}
         >
           {/* Salir borra la sesión de la base de datos y luego lleva a la portada:
               dos viajes, y hasta el segundo la cuenta sigue en pantalla como si no
               se hubiera pulsado nada. La flor cubre ese hueco —y es la última cosa
               que se ve del sitio antes de la portada, así que además despide. */}
-          <FormPending label="Cerrando tu sesión" />
+          <FormPending label={t({ es: 'Cerrando tu sesión', gl: 'Pechando a túa sesión' })} />
 
           <button type="submit" className="btn btn-quiet btn-sm">
             <LogoutIcon className="h-4 w-4" />
-            Salir
+            {t({ es: 'Salir', gl: 'Saír' })}
           </button>
         </form>
       </div>

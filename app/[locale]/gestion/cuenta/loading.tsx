@@ -1,4 +1,4 @@
-import { FlowerLoader } from '@/components/ui/FlowerLoader'
+import { PageLoader } from '@/components/ui/PageLoader'
 
 /**
  * La cuenta del taller trae el usuario de la base para rellenar los dos
@@ -6,5 +6,5 @@ import { FlowerLoader } from '@/components/ui/FlowerLoader'
  * secciones— y sin esto el hueco del contenido se quedaría en blanco.
  */
 export default function Loading() {
-  return <FlowerLoader label="Abriendo tu cuenta" />
+  return <PageLoader label={{ es: 'Abriendo tu cuenta', gl: 'Abrindo a túa conta' }} />
 }

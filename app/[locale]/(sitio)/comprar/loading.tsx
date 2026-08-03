@@ -1,4 +1,4 @@
-import { FlowerLoader } from '@/components/ui/FlowerLoader'
+import { PageLoader } from '@/components/ui/PageLoader'
 
 /**
  * El paso de confirmación es la espera más larga del sitio y la peor de aguantar
@@ -12,5 +12,5 @@ import { FlowerLoader } from '@/components/ui/FlowerLoader'
  * responder ahí.
  */
 export default function Loading() {
-  return <FlowerLoader label="Preparando tu pedido" />
+  return <PageLoader label={{ es: 'Preparando tu pedido', gl: 'Preparando o teu pedido' }} />
 }

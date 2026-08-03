@@ -1,19 +1,36 @@
 import type { Metadata } from 'next'
 import { ObjectId } from 'mongodb'
-import { redirect } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { getSession } from '@/auth'
 import { AddressList } from '@/components/cuenta/AddressList'
 import { SectionIntro } from '@/components/cuenta/SectionIntro'
+import { isLocale, pick, translator } from '@/lib/i18n/config'
+import { path } from '@/lib/i18n/routes'
 import { addresses } from '@/lib/schema'
 
-export const metadata: Metadata = {
-  title: 'Direcciones',
-  robots: { index: false, follow: false },
+type Params = { params: Promise<{ locale: string }> }
+
+const TITLE = { es: 'Direcciones', gl: 'Enderezos' }
+
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const { locale } = await params
+  return {
+    title: isLocale(locale) ? pick(TITLE, locale) : TITLE.es,
+    robots: { index: false, follow: false },
+  }
 }
 
-export default async function DireccionesPage() {
+export default async function DireccionesPage({ params }: Params) {
+  const { locale } = await params
+  if (!isLocale(locale)) notFound()
+  const t = translator(locale)
+
   const session = await getSession()
-  if (!session?.user?.id) redirect('/entrar?volver=/cuenta/direcciones')
+  if (!session?.user?.id) {
+    redirect(
+      `${path(locale, '/entrar')}?volver=${encodeURIComponent(path(locale, '/cuenta/direcciones'))}`,
+    )
+  }
 
   const collection = await addresses()
   const docs = await collection
@@ -39,8 +56,11 @@ export default async function DireccionesPage() {
 
   return (
     <section>
-      <SectionIntro title="Tus direcciones">
-        Puedes guardar varias —casa, trabajo, la de un regalo— y elegir cuál usar al pedir.
+      <SectionIntro title={t({ es: 'Tus direcciones', gl: 'Os teus enderezos' })}>
+        {t({
+          es: 'Puedes guardar varias —casa, trabajo, la de un regalo— y elegir cuál usar al pedir.',
+          gl: 'Podes gardar varios —casa, traballo, o dun agasallo— e escoller cal usar ao pedir.',
+        })}
       </SectionIntro>
 
       <div className="mt-12">

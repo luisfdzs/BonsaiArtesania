@@ -1,5 +1,7 @@
 import nodemailer from 'nodemailer'
 import { site } from '@/content/site'
+import { translator, type Locale } from '@/lib/i18n/config'
+import { path } from '@/lib/i18n/routes'
 import { type OrderDoc } from '@/lib/schema'
 import { clientIp, consumeAll, POLICIES } from '@/lib/rate-limit'
 
@@ -157,11 +159,15 @@ export async function sendCodeEmail({
   to,
   code,
   purpose,
+  locale,
 }: {
   to: string
   code: string
   purpose: 'alta' | 'recuperar'
+  locale: Locale
 }): Promise<SendResult> {
+  const t = translator(locale)
+
   // Normalizado: si no, `Ana@x.com` y `ana@x.com` serían dos cubos distintos y el
   // límite por dirección se saltaría cambiando una mayúscula.
   const address = to.trim().toLowerCase()
@@ -170,34 +176,58 @@ export async function sendCodeEmail({
   if (!quota.ok) return quota
 
   const creating = purpose === 'alta'
-  const what = creating ? 'crear tu cuenta' : 'poner una contraseña nueva'
+  const what = creating
+    ? t({ es: 'crear tu cuenta', gl: 'crear a túa conta' })
+    : t({ es: 'poner una contraseña nueva', gl: 'poñer un contrasinal novo' })
   // Escrito con un espacio en medio: así ningún cliente de correo lo confunde con
   // un teléfono y lo convierte en un enlace para llamar.
   const pretty = `${code.slice(0, 3)} ${code.slice(3)}`
 
+  const nada = creating
+    ? t({ es: 'no se ha creado ninguna cuenta', gl: 'non se creou ningunha conta' })
+    : t({
+        es: 'tu contraseña sigue siendo la de siempre',
+        gl: 'o teu contrasinal segue sendo o de sempre',
+      })
+  const ignora = t({
+    es: `Si no has sido tú, ignora este correo: sin ese código no se puede hacer nada y ${nada}.`,
+    gl: `Se non fuches ti, ignora este correo: sen ese código non se pode facer nada e ${nada}.`,
+  })
+  const caduca = t({
+    es: 'Caduca en 10 minutos y sólo funciona una vez.',
+    gl: 'Caduca en 10 minutos e só funciona unha vez.',
+  })
+  const escribelo = t({
+    es: 'Escríbelo en la pantalla donde lo has pedido',
+    gl: 'Escríbeo na pantalla onde o pediches',
+  })
+
   return deliver({
     to,
-    subject: `${pretty} · tu código de ${site.nameFull}`,
-    text: `Hola:
+    subject: `${pretty} · ${t({ es: 'tu código de', gl: 'o teu código de' })} ${site.nameFull}`,
+    text: `${t({ es: 'Hola:', gl: 'Ola:' })}
 
-Tu código para ${what} en ${site.nameFull} es:
+${t({ es: 'Tu código para', gl: 'O teu código para' })} ${what} ${t({ es: 'en', gl: 'en' })} ${site.nameFull} ${t({ es: 'es:', gl: 'é:' })}
 
     ${pretty}
 
-Escríbelo en la pantalla donde lo has pedido. Caduca en 10 minutos y sólo
-funciona una vez.
+${escribelo}. ${caduca}
 
-Si no has sido tú, ignora este correo: sin ese código no se puede hacer nada y
-${creating ? 'no se ha creado ninguna cuenta' : 'tu contraseña sigue siendo la de siempre'}.
+${ignora}
 
 Ana · ${site.nameFull}
 ${site.url}`,
     html: shell(
-      creating ? 'Tu código para crear la cuenta' : 'Tu código para la contraseña nueva',
-      `<p style="font-size:15px;line-height:1.7;color:#6e675c;margin:0 0 24px">Escríbelo en la pantalla donde lo has pedido:</p>
+      creating
+        ? t({ es: 'Tu código para crear la cuenta', gl: 'O teu código para crear a conta' })
+        : t({
+            es: 'Tu código para la contraseña nueva',
+            gl: 'O teu código para o contrasinal novo',
+          }),
+      `<p style="font-size:15px;line-height:1.7;color:#6e675c;margin:0 0 24px">${escribelo}:</p>
       <p style="font-size:34px;letter-spacing:0.22em;font-weight:400;margin:0 0 28px;color:#2c2823">${pretty}</p>
-      <p style="font-size:13px;line-height:1.6;color:#a79f91;margin:0 0 8px">Caduca en 10 minutos y sólo funciona una vez.</p>
-      <p style="font-size:13px;line-height:1.6;color:#a79f91;margin:0">Si no has sido tú, ignora este correo: sin ese código no se puede hacer nada y ${creating ? 'no se ha creado ninguna cuenta' : 'tu contraseña sigue siendo la de siempre'}.</p>`,
+      <p style="font-size:13px;line-height:1.6;color:#a79f91;margin:0 0 8px">${caduca}</p>
+      <p style="font-size:13px;line-height:1.6;color:#a79f91;margin:0">${ignora}</p>`,
     ),
   })
 }
@@ -213,37 +243,63 @@ ${site.url}`,
  * quien de verdad tiene el buzón abierto recibe este correo, que además le resuelve
  * el problema —casi siempre es alguien que no recordaba tener cuenta—.
  */
-export async function sendAlreadyRegisteredEmail({ to }: { to: string }): Promise<SendResult> {
+export async function sendAlreadyRegisteredEmail({
+  to,
+  locale,
+}: {
+  to: string
+  locale: Locale
+}): Promise<SendResult> {
+  const t = translator(locale)
   const address = to.trim().toLowerCase()
 
   const quota = await spendCodeQuota(address)
   if (!quota.ok) return quota
 
+  const entrar = `${site.url}${path(locale, '/entrar')}`
+  const recuperar = `${site.url}${path(locale, '/entrar/recuperar')}`
+  const nada = t({
+    es: 'Si no has sido tú, ignora este correo. Tu cuenta está como estaba.',
+    gl: 'Se non fuches ti, ignora este correo. A túa conta está como estaba.',
+  })
+
   return deliver({
     to,
-    subject: `Ya tienes cuenta en ${site.nameFull}`,
-    text: `Hola:
+    subject: `${t({ es: 'Ya tienes cuenta en', gl: 'Xa tes conta en' })} ${site.nameFull}`,
+    text: `${t({ es: 'Hola:', gl: 'Ola:' })}
 
-Alguien ha intentado crear una cuenta en ${site.nameFull} con esta dirección, y
-resulta que ya tienes una. No se ha creado ninguna cuenta nueva ni ha cambiado
-nada de la tuya.
+${t({
+  es: `Alguien ha intentado crear una cuenta en ${site.nameFull} con esta dirección, y resulta que ya tienes una. No se ha creado ninguna cuenta nueva ni ha cambiado nada de la tuya.`,
+  gl: `Alguén intentou crear unha conta en ${site.nameFull} con este enderezo, e resulta que xa tes unha. Non se creou ningunha conta nova nin cambiou nada da túa.`,
+})}
 
-Si has sido tú: entra con tu contraseña en ${site.url}/entrar
+${t({ es: 'Si has sido tú: entra con tu contraseña en', gl: 'Se fuches ti: entra co teu contrasinal en' })} ${entrar}
 
-¿No la recuerdas? Puedes poner otra desde ${site.url}/entrar/recuperar
+${t({ es: '¿No la recuerdas? Puedes poner otra desde', gl: 'Non o lembras? Podes poñer outro desde' })} ${recuperar}
 
-Si no has sido tú, ignora este correo. Tu cuenta está como estaba.
+${nada}
 
 Ana · ${site.nameFull}
 ${site.url}`,
     html: shell(
-      'Ya tienes cuenta',
-      `<p style="font-size:15px;line-height:1.7;color:#6e675c;margin:0 0 24px">Alguien ha intentado crear una cuenta con esta dirección, y resulta que ya tienes una. No se ha creado nada nuevo ni ha cambiado nada de la tuya.</p>
+      t({ es: 'Ya tienes cuenta', gl: 'Xa tes conta' }),
+      `<p style="font-size:15px;line-height:1.7;color:#6e675c;margin:0 0 24px">${t({
+        es: 'Alguien ha intentado crear una cuenta con esta dirección, y resulta que ya tienes una. No se ha creado nada nuevo ni ha cambiado nada de la tuya.',
+        gl: 'Alguén intentou crear unha conta con este enderezo, e resulta que xa tes unha. Non se creou nada novo nin cambiou nada da túa.',
+      })}</p>
       <p style="margin:0 0 24px">
-        <a href="${site.url}/entrar" style="display:inline-block;background:#6b7a62;color:#faf7f2;text-decoration:none;padding:14px 32px;border-radius:999px;font-size:13px;letter-spacing:0.1em;text-transform:uppercase">Entrar con mi contraseña</a>
+        <a href="${entrar}" style="display:inline-block;background:#6b7a62;color:#faf7f2;text-decoration:none;padding:14px 32px;border-radius:999px;font-size:13px;letter-spacing:0.1em;text-transform:uppercase">${t(
+          { es: 'Entrar con mi contraseña', gl: 'Entrar co meu contrasinal' },
+        )}</a>
       </p>
-      <p style="font-size:15px;line-height:1.7;color:#6e675c;margin:0 0 24px">¿No la recuerdas? Puedes <a href="${site.url}/entrar/recuperar" style="color:#6b7a62">poner otra</a>.</p>
-      <p style="font-size:13px;line-height:1.6;color:#a79f91;margin:0">Si no has sido tú, ignora este correo. Tu cuenta está como estaba.</p>`,
+      <p style="font-size:15px;line-height:1.7;color:#6e675c;margin:0 0 24px">${t({
+        es: '¿No la recuerdas? Puedes',
+        gl: 'Non o lembras? Podes',
+      })} <a href="${recuperar}" style="color:#6b7a62">${t({
+        es: 'poner otra',
+        gl: 'poñer outro',
+      })}</a>.</p>
+      <p style="font-size:13px;line-height:1.6;color:#a79f91;margin:0">${nada}</p>`,
     ),
   })
 }
@@ -256,37 +312,66 @@ ${site.url}`,
  * convertirse en un comprobador de direcciones— y encima suele ser útil: casi
  * siempre es alguien que se registró con otro correo y no se acuerda de cuál.
  */
-export async function sendNoAccountEmail({ to }: { to: string }): Promise<SendResult> {
+export async function sendNoAccountEmail({
+  to,
+  locale,
+}: {
+  to: string
+  locale: Locale
+}): Promise<SendResult> {
+  const t = translator(locale)
   const address = to.trim().toLowerCase()
 
   const quota = await spendCodeQuota(address)
   if (!quota.ok) return quota
 
+  const crear = `${site.url}${path(locale, '/entrar')}?modo=crear`
+  const nada = t({
+    es: 'Si no has sido tú, ignora este correo: no hay nada que hacer.',
+    gl: 'Se non fuches ti, ignora este correo: non hai nada que facer.',
+  })
+  const otroCorreo = t({
+    es: 'Si eres cliente, puede que te registraras con otro correo: mira si tienes algún pedido antiguo nuestro, que llegaría a la dirección buena.',
+    gl: 'Se es cliente, pode que te rexistrases con outro correo: mira se tes algún pedido antigo noso, que chegaría ao enderezo bo.',
+  })
+
   return deliver({
     to,
-    subject: `No hay ninguna cuenta con este correo · ${site.nameFull}`,
-    text: `Hola:
+    subject: `${t({
+      es: 'No hay ninguna cuenta con este correo',
+      gl: 'Non hai ningunha conta con este correo',
+    })} · ${site.nameFull}`,
+    text: `${t({ es: 'Hola:', gl: 'Ola:' })}
 
-Alguien ha pedido recuperar la contraseña de ${site.nameFull} con esta dirección,
-pero aquí no hay ninguna cuenta asociada a ella.
+${t({
+  es: `Alguien ha pedido recuperar la contraseña de ${site.nameFull} con esta dirección, pero aquí no hay ninguna cuenta asociada a ella.`,
+  gl: `Alguén pediu recuperar o contrasinal de ${site.nameFull} con este enderezo, pero aquí non hai ningunha conta asociada a el.`,
+})}
 
-Si eres cliente, puede que te registraras con otro correo: prueba a mirar en tu
-buzón si tienes algún pedido antiguo nuestro, que llegaría a la dirección buena.
+${otroCorreo}
 
-Y si todavía no tienes cuenta, puedes crearla en ${site.url}/entrar?modo=crear
+${t({ es: 'Y si todavía no tienes cuenta, puedes crearla en', gl: 'E se aínda non tes conta, podes creala en' })} ${crear}
 
-Si no has sido tú, ignora este correo: no hay nada que hacer.
+${nada}
 
 Ana · ${site.nameFull}
 ${site.url}`,
     html: shell(
-      'No hay ninguna cuenta con este correo',
-      `<p style="font-size:15px;line-height:1.7;color:#6e675c;margin:0 0 24px">Alguien ha pedido recuperar la contraseña con esta dirección, pero no hay ninguna cuenta asociada a ella.</p>
-      <p style="font-size:15px;line-height:1.7;color:#6e675c;margin:0 0 24px">Si eres cliente, puede que te registraras con otro correo: mira si tienes algún pedido antiguo nuestro, que llegaría a la dirección buena.</p>
+      t({
+        es: 'No hay ninguna cuenta con este correo',
+        gl: 'Non hai ningunha conta con este correo',
+      }),
+      `<p style="font-size:15px;line-height:1.7;color:#6e675c;margin:0 0 24px">${t({
+        es: 'Alguien ha pedido recuperar la contraseña con esta dirección, pero no hay ninguna cuenta asociada a ella.',
+        gl: 'Alguén pediu recuperar o contrasinal con este enderezo, pero non hai ningunha conta asociada a el.',
+      })}</p>
+      <p style="font-size:15px;line-height:1.7;color:#6e675c;margin:0 0 24px">${otroCorreo}</p>
       <p style="margin:0 0 24px">
-        <a href="${site.url}/entrar?modo=crear" style="display:inline-block;background:#6b7a62;color:#faf7f2;text-decoration:none;padding:14px 32px;border-radius:999px;font-size:13px;letter-spacing:0.1em;text-transform:uppercase">Crear una cuenta</a>
+        <a href="${crear}" style="display:inline-block;background:#6b7a62;color:#faf7f2;text-decoration:none;padding:14px 32px;border-radius:999px;font-size:13px;letter-spacing:0.1em;text-transform:uppercase">${t(
+          { es: 'Crear una cuenta', gl: 'Crear unha conta' },
+        )}</a>
       </p>
-      <p style="font-size:13px;line-height:1.6;color:#a79f91;margin:0">Si no has sido tú, ignora este correo: no hay nada que hacer.</p>`,
+      <p style="font-size:13px;line-height:1.6;color:#a79f91;margin:0">${nada}</p>`,
     ),
   })
 }
@@ -324,24 +409,29 @@ function addressBlock(order: OrderDoc): string {
  *
  * Sin cifras de ninguna clase, igual que la web y la pantalla del taller.
  */
-function customerBody(order: OrderDoc): string {
-  return `¡Gracias por tu pedido!
+function customerBody(order: OrderDoc, locale: Locale): string {
+  const t = translator(locale)
+  return `${t({ es: '¡Gracias por tu pedido!', gl: 'Grazas polo teu pedido!' })}
 
-Pedido ${order.number}
+${t({ es: 'Pedido', gl: 'Pedido' })} ${order.number}
 
 ${itemLines(order)}
 
-Ana te escribirá en cuanto pueda 🌸
+${t({ es: 'Ana te escribirá en cuanto pueda 🌸', gl: 'Ana escribirache en canto poida 🌸' })}
 
-Se enviaría a:
+${t({ es: 'Se enviaría a:', gl: 'Enviaríase a:' })}
 ${addressBlock(order)}
 
-Muchísimas gracias por tu pedido. Cada pieza se hace a mano para ti, así que la
-preparación lleva entre una y tres semanas, y Ana te escribe en cuanto haya
-novedades.
+${t({
+  es: 'Muchísimas gracias por tu pedido. Cada pieza se hace a mano para ti, así que la preparación lleva entre una y tres semanas, y Ana te escribe en cuanto haya novedades.',
+  gl: 'Moitísimas grazas polo teu pedido. Cada peza faise a man para ti, así que a preparación leva entre unha e tres semanas, e Ana escríbeche en canto haxa novidades.',
+})}
 
-Puedes consultar cómo va tu pedido cuando quieras en
-${site.url}/cuenta/pedidos
+${t({
+  es: 'Puedes consultar cómo va tu pedido cuando quieras en',
+  gl: 'Podes consultar como vai o teu pedido cando queiras en',
+})}
+${site.url}${path(locale, '/cuenta/pedidos')}
 
 Ana · ${site.nameFull}
 ${site.url}`
@@ -360,7 +450,8 @@ function escapeHtml(text: string): string {
  * Versión en HTML del correo anterior. Misma tabla sobria que el enlace de acceso:
  * es lo único que pintan igual Gmail, Outlook y el correo de Apple.
  */
-function customerHtml(order: OrderDoc): string {
+function customerHtml(order: OrderDoc, locale: Locale): string {
+  const t = translator(locale)
   const rows = order.items
     .map(
       (item) => `<tr>
@@ -375,15 +466,15 @@ function customerHtml(order: OrderDoc): string {
   <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="max-width:480px;margin:0 auto">
     <tr><td>
       <p style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#a79f91;margin:0 0 24px">${site.nameFull}</p>
-      <h1 style="font-size:24px;font-weight:400;margin:0 0 20px">¡Gracias por tu pedido!</h1>
-      <p style="font-size:13px;letter-spacing:0.06em;color:#a79f91;margin:0 0 24px">Pedido ${escapeHtml(order.number)}</p>
+      <h1 style="font-size:24px;font-weight:400;margin:0 0 20px">${t({ es: '¡Gracias por tu pedido!', gl: 'Grazas polo teu pedido!' })}</h1>
+      <p style="font-size:13px;letter-spacing:0.06em;color:#a79f91;margin:0 0 24px">${t({ es: 'Pedido', gl: 'Pedido' })} ${escapeHtml(order.number)}</p>
 
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-top:1px solid #e4dccf;margin:0 0 8px">
         ${rows}
       </table>
-      <p style="border-top:1px solid #e4dccf;padding-top:16px;font-size:14px;line-height:1.6;color:#6e675c;margin:0">Ana te escribirá en cuanto pueda 🌸</p>
+      <p style="border-top:1px solid #e4dccf;padding-top:16px;font-size:14px;line-height:1.6;color:#6e675c;margin:0">${t({ es: 'Ana te escribirá en cuanto pueda 🌸', gl: 'Ana escribirache en canto poida 🌸' })}</p>
 
-      <p style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#a79f91;margin:32px 0 8px">Se enviaría a</p>
+      <p style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#a79f91;margin:32px 0 8px">${t({ es: 'Se enviaría a', gl: 'Enviaríase a' })}</p>
       <p style="font-size:15px;line-height:1.7;color:#6e675c;margin:0 0 32px">
         ${escapeHtml(address.recipient)}<br>
         ${escapeHtml(address.line1)}${address.line2 ? `, ${escapeHtml(address.line2)}` : ''}<br>
@@ -391,12 +482,12 @@ function customerHtml(order: OrderDoc): string {
         ${escapeHtml(address.phone)}
       </p>
 
-      <p style="background:#f4e7e7;padding:16px;font-size:14px;line-height:1.6;color:#6e675c;margin:0 0 32px">Muchísimas gracias por tu pedido. Cada pieza se hace a mano para ti, así que la preparación lleva entre una y tres semanas, y Ana te escribe en cuanto haya novedades.</p>
+      <p style="background:#f4e7e7;padding:16px;font-size:14px;line-height:1.6;color:#6e675c;margin:0 0 32px">${t({ es: 'Muchísimas gracias por tu pedido. Cada pieza se hace a mano para ti, así que la preparación lleva entre una y tres semanas, y Ana te escribe en cuanto haya novedades.', gl: 'Moitísimas grazas polo teu pedido. Cada peza faise a man para ti, así que a preparación leva entre unha e tres semanas, e Ana escríbeche en canto haxa novidades.' })}</p>
 
-      <p style="font-size:13px;line-height:1.6;color:#a79f91;margin:0 0 32px">Puedes consultar cómo va tu pedido cuando quieras, desde aquí:</p>
+      <p style="font-size:13px;line-height:1.6;color:#a79f91;margin:0 0 32px">${t({ es: 'Puedes consultar cómo va tu pedido cuando quieras, desde aquí:', gl: 'Podes consultar como vai o teu pedido cando queiras, desde aquí:' })}</p>
 
       <p style="margin:0 0 32px">
-        <a href="${site.url}/cuenta/pedidos" style="display:inline-block;background:#6b7a62;color:#faf7f2;text-decoration:none;padding:14px 32px;border-radius:999px;font-size:13px;letter-spacing:0.1em;text-transform:uppercase">Ver mis pedidos</a>
+        <a href="${site.url}${path(locale, '/cuenta/pedidos')}" style="display:inline-block;background:#6b7a62;color:#faf7f2;text-decoration:none;padding:14px 32px;border-radius:999px;font-size:13px;letter-spacing:0.1em;text-transform:uppercase">${t({ es: 'Ver mis pedidos', gl: 'Ver os meus pedidos' })}</a>
       </p>
 
       <p style="border-top:1px solid #e4dccf;padding-top:20px;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#a79f91;margin:0">Ana · ${site.nameFull}</p>
@@ -405,7 +496,18 @@ function customerHtml(order: OrderDoc): string {
 </div>`
 }
 
+/**
+ * El aviso que le llega a Ana. **Se queda en castellano a propósito**, y no por
+ * dejadez: no es una superficie con dos públicos, es una orden de trabajo con un
+ * único destinatario que no cambia de idioma. Traducirlo según el pedido sólo
+ * conseguiría que su bandeja mezclara dos lenguas para el mismo trámite.
+ *
+ * Lo que sí lleva es **en qué idioma pidió el cliente**, que es el dato que Ana
+ * necesita de verdad: es el idioma en el que tiene que contestarle.
+ */
 function shopBody(order: OrderDoc): string {
+  const idioma = order.locale === 'gl' ? 'galego' : 'castellano'
+
   return `Nueva petición ${order.number}
 
 ${itemLines(order)}
@@ -413,10 +515,12 @@ ${itemLines(order)}
 Enviar a:
 ${addressBlock(order)}
 
+Te escribió en ${idioma}: contéstale en ese idioma.
+
 Escríbele tú: ese contacto es el único paso que cierra el encargo. En su correo
 se le ha dicho que te pones con ello enseguida, así que no lo dejes dormir.
 
-Gestionar: ${site.url}/gestion/pedidos/${order.number}`
+Gestionar: ${site.url}${path('es', `/gestion/pedidos/${order.number}`)}`
 }
 
 /**
@@ -424,6 +528,10 @@ Gestionar: ${site.url}/gestion/pedidos/${order.number}`
  * falle uno no debe impedir el otro.
  */
 export async function sendOrderEmails(order: OrderDoc, customerEmail: string): Promise<void> {
+  // El idioma del pedido, no el de quien mira: este correo puede salir semanas
+  // después, disparado por Ana desde el taller. Los pedidos anteriores al galego no
+  // lo traen y caen al castellano, que es en el que se hicieron.
+  const locale: Locale = order.locale ?? 'es'
   const mailer = transport()
 
   if (!mailer) {
@@ -437,8 +545,8 @@ export async function sendOrderEmails(order: OrderDoc, customerEmail: string): P
     {
       to: customerEmail,
       subject: `Tu pedido ${order.number} · ${site.nameFull}`,
-      text: customerBody(order),
-      html: customerHtml(order),
+      text: customerBody(order, locale),
+      html: customerHtml(order, locale),
     },
     {
       to: site.contact.email,

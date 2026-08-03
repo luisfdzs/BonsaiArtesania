@@ -1,4 +1,7 @@
+'use client'
+
 import { cn } from '@/lib/cn'
+import { useTranslator } from '@/lib/i18n/useLocale'
 
 type Props = {
   name: string
@@ -22,9 +25,17 @@ type Props = {
 }
 
 /**
- * Campo de texto con etiqueta y error. Es un componente de servidor: el error
- * llega ya calculado, así que no necesita estado ni JavaScript en el cliente.
+ * Campo de texto con etiqueta y error. No tiene estado: el error llega ya
+ * calculado desde la acción.
  *
+ * Es de cliente por una sola palabra, «(opcional)», que es el único texto que este
+ * componente pone de su cosecha —el resto lo trae la llamada, ya traducido— y que
+ * necesita saber el idioma. Marcarlo de cliente no cuesta nada porque los seis
+ * formularios que lo usan ya lo son todos; la alternativa era bajarle el idioma
+ * como prop desde seis sitios o repetir en cada uno la regla de cuándo poner el
+ * sufijo.
+ *
+
  * El rótulo **no se pinta encima del campo**: viaja dentro como `placeholder`,
  * de modo que cada campo ocupa una línea en vez de dos y el formulario entero
  * queda más compacto. La etiqueta sigue existiendo en el HTML —sólo oculta a la
@@ -51,6 +62,7 @@ export function Field({
   placeholder,
   inputClassName,
 }: Props) {
+  const t = useTranslator()
   const errorId = `${name}-error`
   const hintId = `${name}-hint`
 
@@ -63,7 +75,7 @@ export function Field({
   // cuando éste se mete dentro del campo. Si la llamada trae su propio
   // `placeholder` (un ejemplo de correo, las seis cifras del código) manda ése:
   // es más concreto que repetir el nombre del campo.
-  const labelText = required ? label : `${label} (opcional)`
+  const labelText = required ? label : `${label} (${t({ es: 'opcional', gl: 'opcional' })})`
   const placeholderText = placeholder ?? labelText
 
   return (

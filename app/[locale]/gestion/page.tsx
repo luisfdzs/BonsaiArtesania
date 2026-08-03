@@ -1,29 +1,37 @@
 import Link from 'next/link'
+import { notFound } from 'next/navigation'
 import { cn } from '@/lib/cn'
-import { ORDER_STATUS_ADMIN_LABEL, ORDER_STATUS_FLOW } from '@/lib/order-status'
+import { isLocale, localeHtmlLang, translator } from '@/lib/i18n/config'
+import { path } from '@/lib/i18n/routes'
+import { orderStatusAdminLabel, ORDER_STATUS_FLOW } from '@/lib/order-status'
 import { orders, type OrderStatus } from '@/lib/schema'
 
 type Props = {
+  params: Promise<{ locale: string }>
   searchParams: Promise<{ estado?: string }>
 }
-
-const dateFormat = new Intl.DateTimeFormat('es-ES', {
-  day: '2-digit',
-  month: '2-digit',
-  year: 'numeric',
-})
 
 /** Lo que Ana quiere ver primero: lo que hay que preparar. */
 const PENDING: OrderStatus[] = ['pendiente_pago', 'preparando']
 
-export default async function GestionPedidosPage({ searchParams }: Props) {
+export default async function GestionPedidosPage({ params, searchParams }: Props) {
+  const { locale } = await params
+  if (!isLocale(locale)) notFound()
+  const t = translator(locale)
+
+  const dateFormat = new Intl.DateTimeFormat(localeHtmlLang[locale], {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  })
+
   const { estado } = await searchParams
 
   const collection = await orders()
-  const filter =
-    estado && estado in ORDER_STATUS_ADMIN_LABEL
-      ? { status: estado as OrderStatus }
-      : { status: { $in: PENDING } }
+  // Contra la lista de estados y no contra el objeto de rótulos, que ya no existe
+  // como tal: `ORDER_STATUS_FLOW` es la única lista de estados del proyecto.
+  const known = (ORDER_STATUS_FLOW as string[]).includes(estado ?? '')
+  const filter = known ? { status: estado as OrderStatus } : { status: { $in: PENDING } }
 
   const docs = await collection.find(filter).sort({ createdAt: -1 }).limit(100).toArray()
 
@@ -39,11 +47,16 @@ export default async function GestionPedidosPage({ searchParams }: Props) {
   // la mesa—, así que va delante y sin contador. El resto son los estados en el
   // orden en que ocurren, cada uno con cuántos pedidos hay.
   const tabs = [
-    { key: 'pendientes', href: '/gestion', label: 'Por preparar', active: !estado },
+    {
+      key: 'pendientes',
+      href: path(locale, '/gestion'),
+      label: t({ es: 'Por preparar', gl: 'Por preparar' }),
+      active: !estado,
+    },
     ...ORDER_STATUS_FLOW.map((status) => ({
       key: status,
-      href: `/gestion?estado=${status}`,
-      label: `${ORDER_STATUS_ADMIN_LABEL[status]} (${countBy.get(status) ?? 0})`,
+      href: `${path(locale, '/gestion')}?estado=${status}`,
+      label: `${orderStatusAdminLabel(status, locale)} (${countBy.get(status) ?? 0})`,
       active: estado === status,
     })),
   ]
@@ -58,7 +71,7 @@ export default async function GestionPedidosPage({ searchParams }: Props) {
 
           Sigue siendo servidor: lo que está encendido sale de `?estado=`, que ya
           está aquí, y no hace falta `usePathname` ni bajar nada al navegador. */}
-      <nav aria-label="Estado de los pedidos">
+      <nav aria-label={t({ es: 'Estado de los pedidos', gl: 'Estado dos pedidos' })}>
         <ul className="flex flex-wrap justify-center gap-x-2 gap-y-1">
           {tabs.map(({ key, href, label, active }) => (
             <li key={key}>
@@ -80,7 +93,7 @@ export default async function GestionPedidosPage({ searchParams }: Props) {
       </nav>
 
       {docs.length === 0 ? (
-        <p className="mt-12 text-bark-soft">Nada por aquí.</p>
+        <p className="mt-12 text-bark-soft">{t({ es: 'Nada por aquí.', gl: 'Nada por aquí.' })}</p>
       ) : (
         <ul className="mt-12 flex flex-col">
           {docs.map((order) => (
@@ -108,7 +121,7 @@ export default async function GestionPedidosPage({ searchParams }: Props) {
                   debajo. El total ya no está —aquí tampoco se enseña ninguna
                   cifra—, así que abajo queda sólo por dónde va. */}
               <Link
-                href={`/gestion/pedidos/${order.number}`}
+                href={path(locale, `/gestion/pedidos/${order.number}`)}
                 className="-mx-4 flex flex-col items-center gap-3 px-4 py-5 transition-colors duration-500 hover:bg-sage-deep/8 focus-visible:bg-sage-deep/8"
               >
                 <div>
@@ -125,7 +138,7 @@ export default async function GestionPedidosPage({ searchParams }: Props) {
                 </div>
 
                 <p className="text-small text-bark-soft">
-                  {ORDER_STATUS_ADMIN_LABEL[order.status]}
+                  {orderStatusAdminLabel(order.status, locale)}
                 </p>
               </Link>
             </li>

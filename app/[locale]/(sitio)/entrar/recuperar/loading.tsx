@@ -1,6 +1,6 @@
-import { FlowerLoader } from '@/components/ui/FlowerLoader'
+import { PageLoader } from '@/components/ui/PageLoader'
 
 /** Ver `app/entrar/loading.tsx`: la comprobación de sesión es un viaje a la base. */
 export default function Loading() {
-  return <FlowerLoader label="Preparando la entrada" />
+  return <PageLoader label={{ es: 'Preparando la entrada', gl: 'Preparando a entrada' }} />
 }

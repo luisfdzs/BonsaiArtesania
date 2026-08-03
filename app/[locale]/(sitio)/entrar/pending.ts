@@ -1,5 +1,7 @@
 import { cookies } from 'next/headers'
 import type { CodePurpose } from '@/lib/codes'
+import { defaultLocale, isLocale, type Locale } from '@/lib/i18n/config'
+import { path } from '@/lib/i18n/routes'
 
 /**
  * Qué código se está esperando en este navegador.
@@ -32,6 +34,16 @@ export type Pending = {
   purpose: CodePurpose
   /** A dónde volver al terminar. Se fija en el servidor; nunca llega de un campo. */
   backTo: string
+  /**
+   * El idioma en el que se pidió el código.
+   *
+   * Va aquí y no sólo en el formulario porque el reenvío se dispara desde la
+   * pantalla del código sin volver a pedir nada, y el correo que sale tiene que
+   * estar en la misma lengua que el primero. Si estuviera sólo en el formulario,
+   * bastaría con que alguien cambiara de idioma a mitad para recibir dos correos en
+   * lenguas distintas por el mismo trámite.
+   */
+  locale: Locale
 }
 
 export async function setPending(pending: Pending): Promise<void> {
@@ -54,16 +66,22 @@ export async function readPending(): Promise<Pending | null> {
     if (typeof parsed.email !== 'string' || !parsed.email) return null
     if (parsed.purpose !== 'alta' && parsed.purpose !== 'recuperar') return null
 
+    // El idioma se valida como todo lo demás. Una cookie de antes de que existiera
+    // el galego no lo trae, y cae al castellano, que es en el que se pidió.
+    const locale =
+      typeof parsed.locale === 'string' && isLocale(parsed.locale) ? parsed.locale : defaultLocale
+
     return {
       email: parsed.email,
       purpose: parsed.purpose,
+      locale,
       // El destino se sanea al leerlo, no al escribirlo: una ruta que no empiece
       // por una sola barra podría ser `//otra-web.com` y sacar a la persona del
       // sitio justo después de entrar.
       backTo:
         typeof parsed.backTo === 'string' && /^\/(?!\/)/.test(parsed.backTo)
           ? parsed.backTo
-          : '/cuenta',
+          : path(locale, '/cuenta'),
     }
   } catch {
     return null

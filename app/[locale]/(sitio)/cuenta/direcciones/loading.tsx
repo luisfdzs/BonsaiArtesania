@@ -1,4 +1,4 @@
-import { FlowerLoader } from '@/components/ui/FlowerLoader'
+import { PageLoader } from '@/components/ui/PageLoader'
 
 /**
  * Como el de pedidos: la flor ya salía heredada de `/cuenta`, lo que cambia es
@@ -6,5 +6,5 @@ import { FlowerLoader } from '@/components/ui/FlowerLoader'
  * de direcciones— y no «Abriendo tu cuenta», que aquí ya está abierta.
  */
 export default function Loading() {
-  return <FlowerLoader label="Buscando tus direcciones" />
+  return <PageLoader label={{ es: 'Buscando tus direcciones', gl: 'Buscando os teus enderezos' }} />
 }

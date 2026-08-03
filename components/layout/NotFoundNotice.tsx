@@ -1,24 +1,21 @@
-'use client'
-
 import Link from 'next/link'
 import { HomeIcon } from '@/components/layout/NavIcons'
 import { Leaf } from '@/components/ui/Media'
+import { translator, type Locale } from '@/lib/i18n/config'
 import { path } from '@/lib/i18n/routes'
-import { useLocale, useTranslator } from '@/lib/i18n/useLocale'
 
 /**
- * Lo que se lee en el 404. Está aparte de `not-found.tsx` y es de cliente por una
- * razón concreta: Next pinta esa página **sin `params`**, así que el idioma no se
- * puede leer del segmento de ruta como en el resto del sitio. Aquí se saca de la
- * dirección —ver `useLocale`—, que es la que el visitante tiene delante.
+ * Lo que se lee en el 404. Está aparte de `not-found.tsx` por comodidad: el 404 de
+ * las rutas con idioma y el de las que no lo tienen —ver `app/global-not-found.tsx`—
+ * dicen lo mismo, y ninguno de los dos ficheros puede compartir nada más.
  *
- * Sin esto, el 404 de `/gl/lo-que-sea` saldría en castellano y con el botón de
- * casa apuntando a la portada castellana: perder el idioma justo cuando algo ya ha
- * ido mal.
+ * Es de servidor y recibe el idioma como prop, igual que el resto del sitio. Que
+ * `not-found.tsx` no reciba `params` no obliga a bajar esto al navegador: el idioma
+ * llega por la cabecera que pone `proxy.ts` —ver `requestLocale`—, y así el texto
+ * del 404 viaja en el HTML en vez de aparecer al hidratar.
  */
-export function NotFoundNotice() {
-  const locale = useLocale()
-  const t = useTranslator()
+export function NotFoundNotice({ locale }: { locale: Locale }) {
+  const t = translator(locale)
 
   return (
     <div className="page-gutter grid min-h-[60svh] place-items-center py-24 text-center">

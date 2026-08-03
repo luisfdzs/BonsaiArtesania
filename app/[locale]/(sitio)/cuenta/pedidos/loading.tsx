@@ -1,4 +1,4 @@
-import { FlowerLoader } from '@/components/ui/FlowerLoader'
+import { PageLoader } from '@/components/ui/PageLoader'
 
 /**
  * Existiendo ya el de `/cuenta`, éste no está por la flor —esa saldría igual—
@@ -10,5 +10,5 @@ import { FlowerLoader } from '@/components/ui/FlowerLoader'
  * La espera es real: sesión y luego una consulta a Atlas por `userId`.
  */
 export default function Loading() {
-  return <FlowerLoader label="Buscando tus pedidos" />
+  return <PageLoader label={{ es: 'Buscando tus pedidos', gl: 'Buscando os teus pedidos' }} />
 }

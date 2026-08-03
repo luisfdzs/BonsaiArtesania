@@ -4,6 +4,8 @@ import { useActionState } from 'react'
 import { pedirCodigo, type EntrarState } from '@/app/[locale]/(sitio)/entrar/actions'
 import { Field } from '@/components/ui/Field'
 import { FormPending } from '@/components/ui/FormPending'
+import { LocaleField } from '@/components/ui/LocaleField'
+import { useTranslator } from '@/lib/i18n/useLocale'
 
 const initial: EntrarState = {}
 
@@ -28,11 +30,13 @@ type Props = {
 export function RequestCodeForm({ purpose, backTo }: Props) {
   const [state, action, pending] = useActionState(pedirCodigo, initial)
   const creating = purpose === 'alta'
+  const t = useTranslator()
 
   return (
     <form action={action} className="mt-10 flex flex-col gap-6 text-left">
-      <FormPending label="Enviando tu código" />
+      <FormPending label={t({ es: 'Enviando tu código', gl: 'Enviando o teu código' })} />
 
+      <LocaleField />
       <input type="hidden" name="purpose" value={purpose} />
       <input type="hidden" name="volver" value={backTo} />
 
@@ -44,11 +48,11 @@ export function RequestCodeForm({ purpose, backTo }: Props) {
 
       <Field
         name="email"
-        label="Correo"
+        label={t({ es: 'Correo', gl: 'Correo' })}
         type="email"
         required
         autoComplete="email"
-        placeholder="tucorreo@ejemplo.com"
+        placeholder={t({ es: 'tucorreo@ejemplo.com', gl: 'oteucorreo@exemplo.com' })}
         // `key` para que React rehaga el campo cuando vuelve otro valor: sin ella
         // `defaultValue` sólo contaría en el primer pintado. Ver `CodeForm`.
         key={state.email ?? ''}
@@ -58,7 +62,11 @@ export function RequestCodeForm({ purpose, backTo }: Props) {
 
       <div className="flex justify-center pt-2">
         <button type="submit" className="btn" disabled={pending}>
-          {pending ? 'Enviando…' : creating ? 'Enviarme el código' : 'Enviarme un código'}
+          {pending
+            ? t({ es: 'Enviando…', gl: 'Enviando…' })
+            : creating
+              ? t({ es: 'Enviarme el código', gl: 'Enviarme o código' })
+              : t({ es: 'Enviarme un código', gl: 'Enviarme un código' })}
         </button>
       </div>
     </form>

@@ -3,6 +3,8 @@
 import { ObjectId } from 'mongodb'
 import { auth, signOut } from '@/auth'
 import { getDb } from '@/lib/db'
+import { localeFrom } from '@/lib/i18n/form'
+import { path } from '@/lib/i18n/routes'
 import { addresses, carts, orders, users } from '@/lib/schema'
 
 /**
@@ -12,7 +14,7 @@ import { addresses, carts, orders, users } from '@/lib/schema'
  * identifica a la persona: se vacían nombre, teléfono y dirección del pedido y se
  * desliga de la cuenta. Queda, por tanto: qué se pidió y cuándo. Sin a quién.
  */
-export async function deleteAccount(): Promise<void> {
+export async function deleteAccount(formData: FormData): Promise<void> {
   const session = await auth()
   if (!session?.user?.id) return
 
@@ -53,5 +55,7 @@ export async function deleteAccount(): Promise<void> {
   await userCollection.deleteOne({ _id: userId })
 
   // La sesión ya no puede seguir viva: apunta a un usuario que no existe.
-  await signOut({ redirectTo: '/' })
+  // A la portada del idioma en el que estaba: borrar la cuenta no es salir del
+  // galego, y ésta es la última pantalla que verá del sitio.
+  await signOut({ redirectTo: path(localeFrom(formData), '/') })
 }

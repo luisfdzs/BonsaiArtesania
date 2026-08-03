@@ -2,6 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { adminSession } from '@/lib/admin'
+import { locales } from '@/lib/i18n/config'
+import { path } from '@/lib/i18n/routes'
 import { ORDER_STATUS_FLOW } from '@/lib/order-status'
 import { orders, type OrderStatus } from '@/lib/schema'
 
@@ -41,7 +43,11 @@ export async function updateOrderStatus(formData: FormData): Promise<void> {
     },
   )
 
-  revalidatePath('/gestion')
-  revalidatePath(`/gestion/pedidos/${number}`)
-  revalidatePath('/cuenta/pedidos')
+  // En los dos idiomas: el panel lo puede tener Ana abierto en cualquiera de
+  // ellos, y la lista del cliente existe en los dos.
+  for (const locale of locales) {
+    revalidatePath(path(locale, '/gestion'))
+    revalidatePath(path(locale, `/gestion/pedidos/${number}`))
+    revalidatePath(path(locale, '/cuenta/pedidos'))
+  }
 }

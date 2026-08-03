@@ -1,4 +1,4 @@
-import { FlowerLoader } from '@/components/ui/FlowerLoader'
+import { PageLoader } from '@/components/ui/PageLoader'
 
 /**
  * La portada de la gestión es la lista de pedidos, y no es barata: además de
@@ -17,5 +17,5 @@ import { FlowerLoader } from '@/components/ui/FlowerLoader'
  * no mejor: aquí se entra todos los días.
  */
 export default function Loading() {
-  return <FlowerLoader label="Abriendo los pedidos" />
+  return <PageLoader label={{ es: 'Abriendo los pedidos', gl: 'Abrindo os pedidos' }} />
 }

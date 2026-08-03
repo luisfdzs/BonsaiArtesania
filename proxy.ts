@@ -21,13 +21,32 @@ import { defaultLocale, locales } from '@/lib/i18n/config'
  * En Next 16 este fichero se llama `proxy.ts` (antes `middleware.ts`) y la
  * función exportada, `proxy`.
  */
+/**
+ * La cabecera con la que el proxy le pasa el idioma al servidor.
+ *
+ * Existe para las páginas que Next pinta **sin `params`** —`not-found.tsx`—: ahí no
+ * hay segmento del que sacar el idioma, y sin esto el 404 tendría que traducirse en
+ * el navegador, con lo que su texto no estaría en el HTML que llega. Ver
+ * `lib/i18n/server.ts`.
+ *
+ * No la puede falsear nadie de fuera: `NextResponse.next({ request })` la añade a la
+ * petición ya dentro, así que una cabecera con este nombre enviada desde el
+ * navegador queda sustituida, no sumada.
+ */
+export const LOCALE_HEADER = 'x-bonsai-locale'
+
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  const hasLocale = locales.some(
+  const current = locales.find(
     (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`),
   )
-  if (hasLocale) return NextResponse.next()
+
+  if (current) {
+    const headers = new Headers(request.headers)
+    headers.set(LOCALE_HEADER, current)
+    return NextResponse.next({ request: { headers } })
+  }
 
   const url = request.nextUrl.clone()
   url.pathname = `/${defaultLocale}${pathname === '/' ? '' : pathname}`

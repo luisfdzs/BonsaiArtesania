@@ -3,6 +3,21 @@
 import { randomUUID } from 'node:crypto'
 import { ObjectId } from 'mongodb'
 import { revalidatePath } from 'next/cache'
+import { locales } from '@/lib/i18n/config'
+import { path } from '@/lib/i18n/routes'
+
+/**
+ * El carrito y la pantalla de confirmar, en los dos idiomas: las dos existen en
+ * `/es` y en `/gl`, y quien añade una pieza puede cambiar de idioma justo después.
+ * Revalidar la versión que no se está mirando no cuesta nada; olvidarla deja un
+ * carrito viejo esperando al otro lado del selector.
+ */
+function revalidateCarrito(): void {
+  for (const locale of locales) {
+    revalidatePath(path(locale, '/carrito'))
+    revalidatePath(path(locale, '/comprar'))
+  }
+}
 import { cookies } from 'next/headers'
 import { auth } from '@/auth'
 import { getProduct } from '@/content/products'
@@ -87,7 +102,7 @@ export async function addToCart(formData: FormData): Promise<void> {
     )
   }
 
-  revalidatePath('/carrito')
+  revalidateCarrito()
   revalidatePath(`/tienda/${slug}`)
 }
 
@@ -114,8 +129,7 @@ export async function setQty(formData: FormData): Promise<void> {
     )
   }
 
-  revalidatePath('/carrito')
-  revalidatePath('/comprar')
+  revalidateCarrito()
 }
 
 export async function removeFromCart(formData: FormData): Promise<void> {
@@ -130,6 +144,5 @@ export async function removeFromCart(formData: FormData): Promise<void> {
     $set: { updatedAt: new Date() },
   })
 
-  revalidatePath('/carrito')
-  revalidatePath('/comprar')
+  revalidateCarrito()
 }

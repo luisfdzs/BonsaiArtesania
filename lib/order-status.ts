@@ -1,3 +1,4 @@
+import { pick, type Locale, type Localized } from '@/lib/i18n/config'
 import type { OrderStatus } from '@/lib/schema'
 
 /**
@@ -20,16 +21,19 @@ import type { OrderStatus } from '@/lib/schema'
  * único momento en que el cliente sabe que hay una persona detrás trabajando en
  * su pieza, y desaprovecharlo con un gerundio administrativo sería una lástima.
  */
-export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
+const CUSTOMER: Record<OrderStatus, Localized> = {
   // El nombre en base es heredado y así se queda —renombrarlo es una migración—,
   // pero en pantalla no aparece nunca: quien pide sólo ha pedido algo y espera que
   // Ana le escriba, y «Sin confirmar» describe justo eso.
-  pendiente_pago: 'Sin confirmar',
-  preparando: 'Ana está creando tus joyas bonsái',
-  enviado: 'En tránsito',
-  en_reparto: 'En reparto',
-  entregado: 'Entregado',
-  cancelado: 'Cancelado',
+  pendiente_pago: { es: 'Sin confirmar', gl: 'Sen confirmar' },
+  preparando: {
+    es: 'Ana está creando tus joyas bonsái',
+    gl: 'Ana está creando as túas xoias bonsái',
+  },
+  enviado: { es: 'En tránsito', gl: 'En tránsito' },
+  en_reparto: { es: 'En reparto', gl: 'En reparto' },
+  entregado: { es: 'Entregado', gl: 'Entregado' },
+  cancelado: { es: 'Cancelado', gl: 'Cancelado' },
 }
 
 /**
@@ -40,9 +44,23 @@ export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
  * cliente donde la frase larga no entraría — el resto se dice igual a propósito,
  * para que al teléfono con un cliente las dos pantallas usen la misma palabra.
  */
-export const ORDER_STATUS_ADMIN_LABEL: Record<OrderStatus, string> = {
-  ...ORDER_STATUS_LABEL,
-  preparando: 'En el taller',
+const ADMIN: Record<OrderStatus, Localized> = {
+  ...CUSTOMER,
+  preparando: { es: 'En el taller', gl: 'No taller' },
+}
+
+/**
+ * Los dos vocabularios son funciones del idioma y no dos constantes, porque el
+ * pedido se lee en la lengua de quien lo mira: el cliente en la suya —la que
+ * quedó guardada en `OrderDoc.locale`, o la de la página que esté viendo— y Ana en
+ * la del panel.
+ */
+export function orderStatusLabel(status: OrderStatus, locale: Locale): string {
+  return pick(CUSTOMER[status], locale)
+}
+
+export function orderStatusAdminLabel(status: OrderStatus, locale: Locale): string {
+  return pick(ADMIN[status], locale)
 }
 
 /**

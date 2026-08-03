@@ -3,6 +3,8 @@
 import { type AnimationEvent, type CSSProperties, useState } from 'react'
 import { addToCart } from '@/app/[locale]/(sitio)/carrito/actions'
 import { CartPing } from '@/components/layout/CartCount'
+import { LocaleField } from '@/components/ui/LocaleField'
+import { useTranslator } from '@/lib/i18n/useLocale'
 
 /**
  * Botón de añadir al carrito.
@@ -52,6 +54,7 @@ export function AddToCart({ slug }: { slug: string }) {
   // reinician la animación en vez de que el segundo no se vea porque el nodo
   // sigue siendo el mismo. Vuelve a 0 cuando el grupo acaba de desvanecerse.
   const [burst, setBurst] = useState(0)
+  const t = useTranslator()
 
   // Los pétalos también animan, y su `animationend` burbujea hasta el grupo: sin
   // comprobar el objetivo se desmontaría todo con el primero que termine,
@@ -62,12 +65,13 @@ export function AddToCart({ slug }: { slug: string }) {
 
   return (
     <form action={addToCart} className="relative mx-auto w-fit">
+      <LocaleField />
       <input type="hidden" name="slug" value={slug} />
       {/* Avisa al contador de la barra de móvil cuando la pieza ya está dentro.
           No pinta nada y no toca el envío, que sigue funcionando sin JS. */}
       <CartPing />
       <button type="submit" onClick={() => setBurst((n) => n + 1)} className="btn">
-        Añadir al carrito
+        {t({ es: 'Añadir al carrito', gl: 'Engadir ao carro' })}
       </button>
 
       {burst > 0 ? (

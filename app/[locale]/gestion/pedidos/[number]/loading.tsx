@@ -1,4 +1,4 @@
-import { FlowerLoader } from '@/components/ui/FlowerLoader'
+import { PageLoader } from '@/components/ui/PageLoader'
 
 /**
  * Se abre desde la lista para atender un pedido concreto. Sin este fichero
@@ -6,5 +6,5 @@ import { FlowerLoader } from '@/components/ui/FlowerLoader'
  * salir, y parecería que el clic no ha llevado a ninguna parte.
  */
 export default function Loading() {
-  return <FlowerLoader label="Abriendo el pedido" />
+  return <PageLoader label={{ es: 'Abriendo el pedido', gl: 'Abrindo o pedido' }} />
 }

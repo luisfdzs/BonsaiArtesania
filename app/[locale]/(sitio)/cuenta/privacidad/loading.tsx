@@ -1,4 +1,4 @@
-import { FlowerLoader } from '@/components/ui/FlowerLoader'
+import { PageLoader } from '@/components/ui/PageLoader'
 
 /**
  * La cuarta pestaña de la cuenta, que se quedó fuera cuando se pusieron las otras
@@ -11,5 +11,7 @@ import { FlowerLoader } from '@/components/ui/FlowerLoader'
  * hasta aquí sigue siendo un viaje a Atlas.
  */
 export default function Loading() {
-  return <FlowerLoader label="Abriendo datos y privacidad" />
+  return (
+    <PageLoader label={{ es: 'Abriendo datos y privacidad', gl: 'Abrindo datos e privacidade' }} />
+  )
 }

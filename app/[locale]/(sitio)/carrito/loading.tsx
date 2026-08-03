@@ -1,4 +1,4 @@
-import { FlowerLoader } from '@/components/ui/FlowerLoader'
+import { PageLoader } from '@/components/ui/PageLoader'
 
 /**
  * El carrito no se puede generar de antemano: hay que mirar quién pregunta y leer
@@ -11,5 +11,5 @@ import { FlowerLoader } from '@/components/ui/FlowerLoader'
  * arregla en el servidor—, pero la navegación deja de parecer que se ha colgado.
  */
 export default function Loading() {
-  return <FlowerLoader label="Preparando tu carrito" />
+  return <PageLoader label={{ es: 'Preparando tu carrito', gl: 'Preparando o teu carro' }} />
 }
