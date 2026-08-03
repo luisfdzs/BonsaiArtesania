@@ -2,9 +2,12 @@
 
 import Link from 'next/link'
 import { useActionState } from 'react'
-import { iniciarSesion, type EntrarState } from '@/app/(sitio)/entrar/actions'
+import { iniciarSesion, type EntrarState } from '@/app/[locale]/(sitio)/entrar/actions'
 import { Field } from '@/components/ui/Field'
 import { FormPending } from '@/components/ui/FormPending'
+import { LocaleField } from '@/components/ui/LocaleField'
+import { path } from '@/lib/i18n/routes'
+import { useLocale, useTranslator } from '@/lib/i18n/useLocale'
 
 const initial: EntrarState = {}
 
@@ -24,10 +27,14 @@ const initial: EntrarState = {}
  */
 export function LoginForm({ backTo }: { backTo: string }) {
   const [state, action, pending] = useActionState(iniciarSesion, initial)
+  const locale = useLocale()
+  const t = useTranslator()
 
   return (
     <form action={action} className="mt-10 flex flex-col gap-6 text-left">
-      <FormPending label="Entrando en tu cuenta" />
+      <FormPending label={t({ es: 'Entrando en tu cuenta', gl: 'Entrando na túa conta' })} />
+
+      <LocaleField />
 
       {/* El destino viaja en el formulario, pero la acción lo sanea antes de usarlo:
           aquí sólo se conserva a través del envío, no se confía en él. */}
@@ -43,7 +50,7 @@ export function LoginForm({ backTo }: { backTo: string }) {
           `defaultValue` sólo contaría en el primer pintado. Ver `CodeForm`. */}
       <Field
         name="email"
-        label="Correo"
+        label={t({ es: 'Correo', gl: 'Correo' })}
         type="email"
         required
         autoComplete="email"
@@ -53,7 +60,7 @@ export function LoginForm({ backTo }: { backTo: string }) {
 
       <Field
         name="password"
-        label="Contraseña"
+        label={t({ es: 'Contraseña', gl: 'Contrasinal' })}
         type="password"
         required
         autoComplete="current-password"
@@ -61,11 +68,14 @@ export function LoginForm({ backTo }: { backTo: string }) {
 
       <div className="flex flex-col items-center gap-4 pt-2">
         <button type="submit" className="btn" disabled={pending}>
-          {pending ? 'Entrando…' : 'Entrar'}
+          {pending ? t({ es: 'Entrando…', gl: 'Entrando…' }) : t({ es: 'Entrar', gl: 'Entrar' })}
         </button>
 
-        <Link href="/entrar/recuperar" className="tap text-small text-bark-faint underline">
-          No recuerdo mi contraseña
+        <Link
+          href={path(locale, '/entrar/recuperar')}
+          className="tap text-small text-bark-faint underline"
+        >
+          {t({ es: 'No recuerdo mi contraseña', gl: 'Non lembro o meu contrasinal' })}
         </Link>
       </div>
     </form>

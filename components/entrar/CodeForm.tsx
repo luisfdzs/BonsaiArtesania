@@ -6,15 +6,15 @@ import {
   recuperarCuenta,
   reenviarCodigo,
   type EntrarState,
-} from '@/app/(sitio)/entrar/actions'
+} from '@/app/[locale]/(sitio)/entrar/actions'
 import { Field } from '@/components/ui/Field'
 import { FlowerBud } from '@/components/ui/FlowerBud'
 import { FormPending } from '@/components/ui/FormPending'
+import { LocaleField } from '@/components/ui/LocaleField'
+import { useTranslator } from '@/lib/i18n/useLocale'
+import { PASSWORD_HINT } from '@/components/cuenta/PasswordForm'
 
 const initial: EntrarState = {}
-
-/** Las mismas reglas que comprueba `passwordSchema`, dichas antes de fallar. */
-const HINT = 'Ocho caracteres o más, con una mayúscula, un número y un símbolo.'
 
 /**
  * El segundo y último paso: el código que ha llegado al correo y la contraseña.
@@ -31,11 +31,23 @@ const HINT = 'Ocho caracteres o más, con una mayúscula, un número y un símbo
 export function CodeForm({ purpose, email }: { purpose: 'alta' | 'recuperar'; email: string }) {
   const creating = purpose === 'alta'
   const [state, action, pending] = useActionState(creating ? crearCuenta : recuperarCuenta, initial)
+  const t = useTranslator()
 
   return (
     <>
       <form action={action} className="mt-10 flex flex-col gap-6 text-left">
-        <FormPending label={creating ? 'Creando tu cuenta' : 'Guardando la contraseña'} />
+        <FormPending
+          label={
+            creating
+              ? t({ es: 'Creando tu cuenta', gl: 'Creando a túa conta' })
+              : t({ es: 'Guardando la contraseña', gl: 'Gardando o contrasinal' })
+          }
+        />
+
+        {/* El idioma también viaja aquí, aunque el de la cookie manda para los
+            correos: sirve para la vuelta a `/entrar` cuando no hay nada pendiente,
+            que es el único camino en el que la cookie no existe. */}
+        <LocaleField />
 
         {state.errors?.form && (
           <p className="field-error" role="alert">
@@ -48,7 +60,7 @@ export function CodeForm({ purpose, email }: { purpose: 'alta' | 'recuperar'; em
             —es la causa número uno de «no me llega nada»— y para que el gestor de
             contraseñas sepa a qué cuenta asociar la que se está eligiendo. */}
         <div>
-          <p className="field-label">Correo</p>
+          <p className="field-label">{t({ es: 'Correo', gl: 'Correo' })}</p>
           <p className="py-[0.6rem] break-all text-bark-soft">{email}</p>
         </div>
         {/* `hidden` y no `type="hidden"`: los gestores de contraseñas ignoran los
@@ -58,7 +70,7 @@ export function CodeForm({ purpose, email }: { purpose: 'alta' | 'recuperar'; em
 
         <Field
           name="code"
-          label="Código"
+          label={t({ es: 'Código', gl: 'Código' })}
           required
           inputMode="numeric"
           maxLength={7}
@@ -78,17 +90,21 @@ export function CodeForm({ purpose, email }: { purpose: 'alta' | 'recuperar'; em
 
         <Field
           name="password"
-          label={creating ? 'Contraseña' : 'Contraseña nueva'}
+          label={
+            creating
+              ? t({ es: 'Contraseña', gl: 'Contrasinal' })
+              : t({ es: 'Contraseña nueva', gl: 'Contrasinal novo' })
+          }
           type="password"
           required
           autoComplete="new-password"
-          hint={HINT}
+          hint={t(PASSWORD_HINT)}
           error={state.errors?.password}
         />
 
         <Field
           name="password2"
-          label="Repítela"
+          label={t({ es: 'Repítela', gl: 'Repíteo' })}
           type="password"
           required
           autoComplete="new-password"
@@ -97,7 +113,11 @@ export function CodeForm({ purpose, email }: { purpose: 'alta' | 'recuperar'; em
 
         <div className="flex justify-center pt-2">
           <button type="submit" className="btn" disabled={pending}>
-            {pending ? 'Un momento…' : creating ? 'Crear mi cuenta' : 'Guardar y entrar'}
+            {pending
+              ? t({ es: 'Un momento…', gl: 'Un momento…' })
+              : creating
+                ? t({ es: 'Crear mi cuenta', gl: 'Crear a miña conta' })
+                : t({ es: 'Guardar y entrar', gl: 'Gardar e entrar' })}
           </button>
         </div>
       </form>
@@ -117,18 +137,33 @@ export function CodeForm({ purpose, email }: { purpose: 'alta' | 'recuperar'; em
  */
 function ResendForm() {
   const [state, action, pending] = useActionState(reenviarCodigo, initial)
+  const t = useTranslator()
 
   return (
     <form action={action} className="mt-10 border-t border-line pt-8 text-center">
-      <p className="text-small text-bark-faint">¿No te ha llegado? Mira en la carpeta de spam.</p>
+      <LocaleField />
+
+      <p className="text-small text-bark-faint">
+        {t({
+          es: '¿No te ha llegado? Mira en la carpeta de spam.',
+          gl: 'Non che chegou? Mira na carpeta de spam.',
+        })}
+      </p>
 
       <button type="submit" className="btn btn-quiet mt-4" disabled={pending}>
         <FlowerBud />
-        {pending ? 'Enviando…' : 'Enviarme otro código'}
+        {pending
+          ? t({ es: 'Enviando…', gl: 'Enviando…' })
+          : t({ es: 'Enviarme otro código', gl: 'Enviarme outro código' })}
       </button>
 
       <span role="status" className="mt-3 block min-h-5 text-small text-sage-deep">
-        {state.sent && !pending ? 'Te he enviado otro. Vale el último que llegue.' : ''}
+        {state.sent && !pending
+          ? t({
+              es: 'Te he enviado otro. Vale el último que llegue.',
+              gl: 'Envieiche outro. Vale o último que chegue.',
+            })
+          : ''}
       </span>
 
       {state.errors?.form && (

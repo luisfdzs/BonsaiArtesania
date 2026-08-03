@@ -1,0 +1,106 @@
+import { notFound, redirect } from 'next/navigation'
+import { getSession, signOut } from '@/auth'
+import { LogoutIcon } from '@/components/cuenta/CuentaIcons'
+import { CuentaNav } from '@/components/cuenta/CuentaNav'
+import { FormPending } from '@/components/ui/FormPending'
+import { isAdminEmail } from '@/lib/admin'
+import { isLocale, translator } from '@/lib/i18n/config'
+import { path } from '@/lib/i18n/routes'
+
+/**
+ * Guarda de toda la zona de cuenta. Se hace aquí, en un layout de servidor, y no
+ * en `middleware.ts`: las sesiones están en base de datos y el middleware corre
+ * antes de poder consultarla sin arrastrar el driver de Mongo al edge. Un layout
+ * ya se ejecuta en el servidor con acceso completo, y protege por igual a todas
+ * las rutas hijas presentes y futuras.
+ *
+ * Toda la zona es una sola columna centrada, como el resto de las páginas de
+ * texto del sitio: la cuenta de una tienda de cuatro secciones no necesita un
+ * panel con barra lateral, y centrado se lee igual en móvil que en escritorio sin
+ * dos maquetaciones distintas.
+ *
+ * ## Esta zona es de los clientes, y sólo de ellos
+ *
+ * La cuenta del taller entraba por aquí y se le enseñaba una versión recortada
+ * —sin «Pedidos» ni «Direcciones», con una pestaña de más hacia el panel—. Ya no:
+ * lo suyo vive entero bajo `/gestion`, incluida la contraseña, así que aquí se la
+ * manda para allá y esta zona vuelve a significar una sola cosa. Ver `lib/admin.ts`.
+ *
+ * Va en el layout y no en cada página: cierra por igual las que hay y las que
+ * vengan. Y el destino es la portada del panel y no `/gestion/cuenta`, porque
+ * quien escribe `/cuenta` va a su sitio, no a un formulario concreto.
+ */
+export default async function CuentaLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
+  if (!isLocale(locale)) notFound()
+  const t = translator(locale)
+
+  const session = await getSession()
+
+  if (!session?.user) {
+    redirect(`${path(locale, '/entrar')}?volver=${encodeURIComponent(path(locale, '/cuenta'))}`)
+  }
+  if (isAdminEmail(session.user.email)) redirect(path(locale, '/gestion'))
+
+  const name = session.user.name?.trim()
+  const email = session.user.email ?? ''
+  // La inicial del nombre, y si aún no lo ha rellenado, la del correo. En
+  // mayúscula desde CSS (`uppercase`) y no aquí, para no romper letras que se
+  // mayusculizan en dos caracteres.
+  const initial = (name || email || '·').slice(0, 1)
+
+  return (
+    <div className="page-gutter pt-16 pb-(--spacing-section) md:pt-24">
+      <header className="mx-auto flex max-w-2xl flex-col items-center text-center">
+        <span
+          aria-hidden
+          className="flex h-16 w-16 items-center justify-center rounded-full border border-line bg-petal-soft font-serif text-lead text-bark-soft uppercase"
+        >
+          {initial}
+        </span>
+
+        <p className="eyebrow mt-6">{t({ es: 'Tu cuenta', gl: 'A túa conta' })}</p>
+        <h1 className="mt-3 font-serif text-title">{name || t({ es: 'Hola', gl: 'Ola' })}</h1>
+        {email && <p className="mt-3 text-small text-bark-faint">{email}</p>}
+      </header>
+
+      <div className="mx-auto mt-10 max-w-2xl border-t border-line pt-8">
+        <CuentaNav />
+      </div>
+
+      <div className="mx-auto mt-14 max-w-xl text-center">{children}</div>
+
+      {/* Salir vive al final de la columna y no arriba a la derecha: arriba
+          quedaría pegado a las pestañas, y es el único gesto de aquí que saca a
+          alguien de su cuenta. Abajo se encuentra cuando se busca y no se pulsa
+          sin querer. */}
+      <div className="mx-auto mt-20 max-w-xl border-t border-line pt-10 text-center">
+        <form
+          action={async () => {
+            'use server'
+            // A la portada del idioma en el que estaba: salir de la cuenta no es
+            // salir del galego.
+            await signOut({ redirectTo: path(locale, '/') })
+          }}
+        >
+          {/* Salir borra la sesión de la base de datos y luego lleva a la portada:
+              dos viajes, y hasta el segundo la cuenta sigue en pantalla como si no
+              se hubiera pulsado nada. La flor cubre ese hueco —y es la última cosa
+              que se ve del sitio antes de la portada, así que además despide. */}
+          <FormPending label={t({ es: 'Cerrando tu sesión', gl: 'Pechando a túa sesión' })} />
+
+          <button type="submit" className="btn btn-quiet btn-sm">
+            <LogoutIcon className="h-4 w-4" />
+            {t({ es: 'Salir', gl: 'Saír' })}
+          </button>
+        </form>
+      </div>
+    </div>
+  )
+}

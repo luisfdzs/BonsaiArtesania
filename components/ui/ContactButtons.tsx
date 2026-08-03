@@ -26,22 +26,29 @@ type Props = {
 }
 
 export function ContactButtons({ message, subject, action, withSocial, className }: Props) {
+  // El infinitivo lo trae `action` ya traducido de cada página; aquí sólo se le
+  // pega el camino. «por WhatsApp» y «por correo» se escriben igual en los dos
+  // idiomas, así que no pasan por el traductor: fingir que se traducen sería
+  // ruido para quien lea esto luego.
+  const byWhatsApp = `${action} por WhatsApp`
+  const byMail = `${action} por correo`
+
   return (
     <div className={cn('flex flex-wrap items-center gap-x-2 gap-y-3', className)}>
       <a
         href={whatsappLink(message)}
         target="_blank"
         rel="noreferrer"
-        aria-label={`${action} por WhatsApp`}
-        title={`${action} por WhatsApp`}
+        aria-label={byWhatsApp}
+        title={byWhatsApp}
         className="btn btn-icon"
       >
         <WhatsAppIcon className="h-4 w-4" />
       </a>
       <a
         href={mailtoLink(subject, message)}
-        aria-label={`${action} por correo`}
-        title={`${action} por correo`}
+        aria-label={byMail}
+        title={byMail}
         className="btn btn-icon btn-quiet"
       >
         <GmailIcon className="h-4 w-4" />

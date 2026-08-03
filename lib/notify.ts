@@ -1,4 +1,5 @@
 import { site } from '@/content/site'
+import { path } from '@/lib/i18n/routes'
 import { type OrderDoc } from '@/lib/schema'
 
 /**
@@ -36,13 +37,18 @@ function orderMessage(order: OrderDoc): string {
 
   return [
     `🌸 <b>Nueva petición ${escape(order.number)}</b>`,
+    // En qué idioma pidió, que es el idioma en el que Ana tiene que contestarle.
+    // El aviso en sí se queda en castellano: es una orden de trabajo con un único
+    // destinatario, no una superficie con dos públicos. Ver `shopBody` en
+    // `lib/email.ts`, que sigue el mismo criterio.
+    order.locale === 'gl' ? 'Escribió en galego' : 'Escribió en castellano',
     '',
     items,
     '',
     `Para ${escape(address.recipient)} — ${escape(address.city)} (${escape(address.province)})`,
     `Tel. ${escape(address.phone)}`,
     '',
-    `${site.url}/gestion/pedidos/${escape(order.number)}`,
+    `${site.url}${path('es', `/gestion/pedidos/${order.number}`)}`,
   ]
     .join('\n')
     .slice(0, MAX_LENGTH)

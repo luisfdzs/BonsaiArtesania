@@ -5,9 +5,12 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { NavPending } from '@/components/ui/NavPending'
 import { cn } from '@/lib/cn'
+import { localeOf, path, routeOf } from '@/lib/i18n/routes'
+import { useTranslator } from '@/lib/i18n/useLocale'
 import { navigation } from '@/lib/navigation'
 import { onHome, useActiveSection } from '@/lib/useActiveSection'
 import { useCartCount } from './CartCount'
+import { LocalePicker } from './LocalePicker'
 import { AccountIcon, CartIcon, CloseIcon, ContactIcon, HomeIcon, MenuIcon } from './NavIcons'
 
 /**
@@ -27,9 +30,15 @@ import { AccountIcon, CartIcon, CloseIcon, ContactIcon, HomeIcon, MenuIcon } fro
  * Sólo iconos, sin rótulo: cinco palabras en versalitas a lo ancho de un móvil de
  * 360px o se cortan o se aprietan hasta ser ilegibles. El nombre accesible va en
  * `aria-label` de cada uno.
+ *
+ * El idioma no baja como prop: se lee de la propia dirección, que siempre lo
+ * lleva delante. Ver `useLocale`.
  */
 export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
   const pathname = usePathname()
+  const locale = localeOf(pathname)
+  const route = routeOf(pathname)
+  const t = useTranslator()
 
   /**
    * Igual que hacía la cabecera: el panel guarda la ruta en la que se abrió, no
@@ -67,13 +76,16 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
   // «Contacto» sale de la barra con su propio icono; las otras tres entradas del
   // menú del sitio son las que se despliegan. Se derivan de `navigation` en vez
   // de repetirse aquí: el menú tiene que decir lo mismo en móvil y en escritorio.
-  const panelItems = navigation.filter((item) => item.href !== '/#contacto')
+  const panelItems = navigation.filter((item) => item.route !== '/#contacto')
 
   // Estando en Tienda o en Encargos, ninguno de los cinco iconos diría dónde
   // está: la sección vive detrás del menú. Así que el que la guarda se marca
   // como activo, y la barra nunca queda sin señalar la página.
+  //
+  // Se compara contra `route` —la ruta sin idioma— y no contra `pathname`: con
+  // el idioma delante, `/gl/tienda` no empieza por `/tienda`.
   const inPanel =
-    panelItems.some((item) => !item.href.includes('#') && pathname.startsWith(item.href)) ||
+    panelItems.some((item) => !item.route.includes('#') && route.startsWith(item.route)) ||
     section === 'taller'
 
   return (
@@ -91,18 +103,22 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
       >
         <nav
           className="flex min-h-full flex-col items-center justify-center gap-7 py-12 text-center"
-          aria-label="Secciones"
+          aria-label={t({ es: 'Secciones', gl: 'Seccións' })}
         >
           {panelItems.map((item) => (
             <Link
-              key={item.href}
-              href={item.href}
+              key={item.route}
+              href={path(locale, item.route)}
               className="font-serif text-title"
               onClick={close}
             >
-              {item.label}
+              {t(item.label)}
             </Link>
           ))}
+
+          {/* El idioma, debajo de las tres secciones y detrás de un filete. Ver
+              `LocalePicker`. */}
+          <LocalePicker onNavigate={close} />
         </nav>
       </div>
 
@@ -111,8 +127,8 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
         className="fixed inset-x-0 bottom-0 z-50 flex h-(--spacing-nav-mobile) items-stretch border-t border-line bg-linen/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden"
       >
         <NavSlot
-          href="/"
-          label="Inicio"
+          href={path(locale, '/')}
+          label={t({ es: 'Inicio', gl: 'Inicio' })}
           active={homeActive && !open}
           // Estando ya en la portada, Next no navega y el toque no haría nada:
           // quien esté en el pie se quedaría en el pie. La casa debe llevar
@@ -134,25 +150,33 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
             el paso previo obligado sin sesión, y quien lo ve tiene que seguir
             leyendo el mismo hueco encendido, no uno apagado de golpe. */}
         <NavSlot
-          href="/cuenta"
-          label="Cuenta"
-          active={(pathname.startsWith('/cuenta') || pathname.startsWith('/entrar')) && !open}
+          href={path(locale, '/cuenta')}
+          label={t({ es: 'Cuenta', gl: 'Conta' })}
+          active={(route.startsWith('/cuenta') || route.startsWith('/entrar')) && !open}
           onClick={close}
         >
           <AccountIcon className="h-6 w-6" />
           {/* Cuenta es el único hueco que espera de verdad: los demás llevan a
               páginas ya generadas. Ver `NavPending`. */}
-          <NavPending label="Abriendo tu cuenta" />
+          <NavPending label={t({ es: 'Abriendo tu cuenta', gl: 'Abrindo a túa conta' })} />
         </NavSlot>
 
         {/* Sin tienda abierta no hay carrito que enseñar, como en la cabecera. */}
         {shopOpen && (
           <NavSlot
-            href="/carrito"
+            href={path(locale, '/carrito')}
             // El número también en el nombre accesible: el globo es un dato, no
             // un adorno, y quien no lo ve tiene que enterarse igual.
-            label={count ? `Carrito, ${count} ${count === 1 ? 'pieza' : 'piezas'}` : 'Carrito'}
-            active={pathname === '/carrito' && !open}
+            label={
+              count
+                ? `${t({ es: 'Carrito', gl: 'Carro' })}, ${count} ${
+                    count === 1
+                      ? t({ es: 'pieza', gl: 'peza' })
+                      : t({ es: 'piezas', gl: 'pezas' })
+                  }`
+                : t({ es: 'Carrito', gl: 'Carro' })
+            }
+            active={route === '/carrito' && !open}
             onClick={close}
           >
             <span className="relative">
@@ -171,8 +195,8 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
         )}
 
         <NavSlot
-          href="/#contacto"
-          label="Contacto"
+          href={path(locale, '/#contacto')}
+          label={t({ es: 'Contacto', gl: 'Contacto' })}
           active={contactoActive && !open}
           onClick={close}
         >
@@ -184,7 +208,11 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
           onClick={() => setOpenedAt(open ? null : pathname)}
           aria-expanded={open}
           aria-controls="menu-movil"
-          aria-label={open ? 'Cerrar el menú' : 'Más secciones'}
+          aria-label={
+            open
+              ? t({ es: 'Cerrar el menú', gl: 'Pechar o menú' })
+              : t({ es: 'Más secciones', gl: 'Máis seccións' })
+          }
           className={cn(slotClass, slotState(open || inPanel))}
         >
           {open ? <CloseIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}

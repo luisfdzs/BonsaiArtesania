@@ -1,5 +1,6 @@
 import type { Collection, ObjectId } from 'mongodb'
 import { getDb } from './db'
+import type { Locale } from '@/lib/i18n/config'
 
 /**
  * Forma de los documentos y acceso tipado a las colecciones.
@@ -117,6 +118,18 @@ export type OrderDoc = {
   /** Referencia legible para hablar con el cliente: BA-2026-0001. */
   number: string
   userId: ObjectId
+  /**
+   * El idioma en el que se hizo el pedido.
+   *
+   * Se guarda con él porque los correos no salen todos a la vez: el de
+   * confirmación sale en el momento, pero los de cambio de estado los dispara Ana
+   * desde el taller días o semanas después, y ahí el idioma de la petición es el
+   * del panel de Ana, no el de quien va a leer el correo.
+   *
+   * Opcional porque los pedidos anteriores al galego no lo llevan. Quien lo lee
+   * cae al castellano, que es en el que se hicieron. No hace falta migrar nada.
+   */
+  locale?: Locale
   status: OrderStatus
   items: OrderItem[]
   /** Copia de la dirección, no una referencia. Ver comentario en AddressDoc. */
