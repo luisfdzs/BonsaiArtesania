@@ -26,8 +26,8 @@
   --color-petal-soft: #f3e5e0; /* fondo de etiquetas y notas */
 
   /* --- Tipografía --------------------------------------------------------
-     Una serif humanista de trazo fino para las voces (títulos, precios, nombres
-     de pieza) y una geométrica ligera para lo funcional. La serif es la que da
+     Una serif humanista de trazo fino para las voces (títulos y nombres de
+     pieza) y una geométrica ligera para lo funcional. La serif es la que da
      el tono femenino y sereno; la sans se aparta y deja leer. */
   --font-serif: var(--font-cormorant), ui-serif, Georgia, serif;
   --font-sans: var(--font-jost), ui-sans-serif, system-ui, sans-serif;
