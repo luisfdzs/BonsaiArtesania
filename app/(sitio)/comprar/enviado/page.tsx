@@ -75,9 +75,7 @@ export default async function EnviadoPage({ searchParams }: Props) {
 
         <div className="mt-10 border border-line bg-linen-deep/50 p-8 text-left">
           <p className="text-bark-soft">
-            Muchísimas gracias por tu pedido. Ya está en el taller y Ana se pone con él enseguida:
-            aunque esto parezca una herramienta de gestión automatizada, al otro lado sólo está
-            ella, que preparará tus piezas con mucha paz y alegría.
+            Muchísimas gracias por tu pedido. Ana te escribirá en cuanto pueda 🌸
           </p>
           <p className="mt-5 text-small text-bark-faint">
             Cada pieza se hace a mano para ti, así que la preparación lleva entre una y tres
