@@ -291,15 +291,19 @@ ${site.url}`,
   })
 }
 
-/** Lista de líneas en texto plano, que es lo que leen todos los clientes. */
-function itemLines(order: OrderDoc): string {
+/**
+ * Lista de líneas en texto plano, que es lo que leen todos los clientes.
+ *
+ * Con importes o sin ellos según a quién se escriba: el aviso interno los lleva
+ * —Ana necesita saber qué encargo tiene delante— y el correo al cliente no, igual
+ * que no los lleva ninguna página de la web.
+ */
+function itemLines(order: OrderDoc, withPrices: boolean): string {
   return order.items
-    .map(
-      (item) =>
-        `  · ${item.name}${item.qty > 1 ? ` × ${item.qty}` : ''} — ${formatCents(
-          item.unitPriceCents * item.qty,
-        )}`,
-    )
+    .map((item) => {
+      const line = `  · ${item.name}${item.qty > 1 ? ` × ${item.qty}` : ''}`
+      return withPrices ? `${line} — ${formatCents(item.unitPriceCents * item.qty)}` : line
+    })
     .join('\n')
 }
 
@@ -324,17 +328,19 @@ function addressBlock(order: OrderDoc): string {
  * son encargos, y el correo tiene que sonar a eso —gracias, ya está en marcha, y
  * puedes mirar cómo va cuando quieras—. Sólo se promete lo que se cumple: el aviso
  * de novedades lo da Ana, y el estado sale de `/cuenta/pedidos`.
+ *
+ * Tampoco lleva importes, por lo mismo que no los lleva la web: ni las piezas ni
+ * el envío tienen precio publicado, y ponerlo aquí sería la única cifra que el
+ * cliente habría visto en todo el recorrido.
  */
 function customerBody(order: OrderDoc): string {
   return `¡Gracias por tu pedido!
 
 Pedido ${order.number}
 
-${itemLines(order)}
+${itemLines(order, false)}
 
-Subtotal: ${formatCents(order.totals.subtotalCents)}
-Envío: ${order.totals.shippingCents === 0 ? 'Gratis' : formatCents(order.totals.shippingCents)}
-Total: ${formatCents(order.totals.totalCents)}
+Ana te escribe con el precio de las piezas y del envío antes de que cierres nada.
 
 Se enviaría a:
 ${addressBlock(order)}
@@ -374,14 +380,11 @@ function customerHtml(order: OrderDoc): string {
     .map(
       (item) => `<tr>
         <td style="padding:8px 0;font-size:15px;color:#6e675c">${escapeHtml(item.name)}${item.qty > 1 ? ` × ${item.qty}` : ''}</td>
-        <td style="padding:8px 0;font-size:15px;text-align:right;white-space:nowrap">${formatCents(item.unitPriceCents * item.qty)}</td>
       </tr>`,
     )
     .join('')
 
   const address = order.shipping.address
-  const shipping =
-    order.totals.shippingCents === 0 ? 'Gratis' : formatCents(order.totals.shippingCents)
 
   return `<div style="background:#faf7f2;padding:40px 20px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#2c2823">
   <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="max-width:480px;margin:0 auto">
@@ -393,11 +396,7 @@ function customerHtml(order: OrderDoc): string {
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-top:1px solid #e4dccf;margin:0 0 8px">
         ${rows}
       </table>
-      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-top:1px solid #e4dccf;padding-top:8px">
-        <tr><td style="padding:6px 0;font-size:14px;color:#6e675c">Subtotal</td><td style="padding:6px 0;font-size:14px;text-align:right">${formatCents(order.totals.subtotalCents)}</td></tr>
-        <tr><td style="padding:6px 0;font-size:14px;color:#6e675c">Envío</td><td style="padding:6px 0;font-size:14px;text-align:right">${shipping}</td></tr>
-        <tr><td style="padding:10px 0 0;font-size:16px">Total</td><td style="padding:10px 0 0;font-size:16px;text-align:right">${formatCents(order.totals.totalCents)}</td></tr>
-      </table>
+      <p style="border-top:1px solid #e4dccf;padding-top:16px;font-size:14px;line-height:1.6;color:#6e675c;margin:0">Ana te escribe con el precio de las piezas y del envío antes de que cierres nada.</p>
 
       <p style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#a79f91;margin:32px 0 8px">Se enviaría a</p>
       <p style="font-size:15px;line-height:1.7;color:#6e675c;margin:0 0 32px">
@@ -427,9 +426,13 @@ function customerHtml(order: OrderDoc): string {
 function shopBody(order: OrderDoc): string {
   return `Nueva petición ${order.number}
 
-${itemLines(order)}
+${itemLines(order, true)}
 
 Total: ${formatCents(order.totals.totalCents)}
+
+(El cliente no ha visto ningún importe: ni en la web ni en su correo. Estas cifras
+son las del catálogo, para que sepas de qué encargo se trata; el precio se lo dices
+tú al escribirle.)
 
 Enviar a:
 ${addressBlock(order)}

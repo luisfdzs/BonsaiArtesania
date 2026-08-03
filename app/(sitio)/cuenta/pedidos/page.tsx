@@ -6,7 +6,7 @@ import { getSession } from '@/auth'
 import { BagIcon, PackageIcon } from '@/components/cuenta/CuentaIcons'
 import { SectionIntro } from '@/components/cuenta/SectionIntro'
 import { ORDER_STATUS_LABEL } from '@/lib/order-status'
-import { formatCents, orders } from '@/lib/schema'
+import { orders } from '@/lib/schema'
 
 export const metadata: Metadata = {
   title: 'Mis pedidos',
@@ -74,7 +74,6 @@ export default async function PedidosPage() {
                 <p className="mt-2 text-small text-bark-faint">
                   {dateFormat.format(order.createdAt)} · {pieces} pieza{pieces === 1 ? '' : 's'}
                 </p>
-                <p className="mt-4 text-bark-soft">{formatCents(order.totals.totalCents)}</p>
               </Link>
             </li>
           )

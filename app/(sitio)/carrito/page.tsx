@@ -7,9 +7,7 @@ import { FlowerBud } from '@/components/ui/FlowerBud'
 import { Media } from '@/components/ui/Media'
 import { isAdmin } from '@/lib/admin'
 import { readCart } from '@/lib/cart'
-import { formatCents } from '@/lib/schema'
 import { shopOpen } from '@/lib/shop'
-import { missingForFreeShippingCents } from '@/lib/shipping'
 import { removeFromCart, setQty } from './actions'
 
 export const metadata: Metadata = {
@@ -45,7 +43,6 @@ export default async function CarritoPage() {
   }
 
   const cart = await readCart()
-  const missing = missingForFreeShippingCents(cart.subtotalCents)
 
   if (cart.lines.length === 0) {
     return (
@@ -102,14 +99,9 @@ export default async function CarritoPage() {
                   >
                     {line.name}
                   </Link>
-                  <p className="mt-2 text-small text-bark-faint">
-                    {formatCents(line.unitPriceCents)} por unidad
-                  </p>
                 </div>
 
                 <div className="flex shrink-0 items-center justify-between gap-5 sm:flex-col sm:items-end sm:gap-4">
-                  <p className="text-lead">{formatCents(line.lineTotalCents)}</p>
-
                   <div className="flex items-center gap-3">
                     {/* Un `input` numérico que se envía al pulsar el visto es lo
                         más simple que funciona con y sin JavaScript; sin él sigue
@@ -177,26 +169,17 @@ export default async function CarritoPage() {
           <div className="border border-line bg-linen-deep/50 p-8 sm:p-10">
             <h2 className="eyebrow">Resumen</h2>
 
-            <dl className="mt-8 flex flex-col gap-3">
-              <div className="flex justify-between">
-                <dt className="text-bark-soft">Subtotal</dt>
-                <dd>{formatCents(cart.subtotalCents)}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-bark-soft">Envío</dt>
-                <dd>{cart.shippingCents === 0 ? 'Gratis' : formatCents(cart.shippingCents)}</dd>
-              </div>
-              <div className="mt-3 flex items-baseline justify-between border-t border-line pt-5">
-                <dt className="font-serif text-lead">Total</dt>
-                <dd className="font-serif text-title">{formatCents(cart.totalCents)}</dd>
-              </div>
-            </dl>
+            {/* Ni subtotal, ni envío, ni total: la web no publica importes. Lo que
+                queda del resumen es lo único que aquí se puede afirmar —cuántas
+                piezas se piden— y el aviso de que el precio lo pone Ana. */}
+            <p className="mt-8 font-serif text-lead">
+              {cart.count} {cart.count === 1 ? 'pieza' : 'piezas'}
+            </p>
 
-            {missing !== null && (
-              <p className="mt-6 bg-petal-soft p-4 text-small text-bark-soft">
-                Te faltan {formatCents(missing)} para que el envío salga gratis.
-              </p>
-            )}
+            <p className="mt-6 bg-petal-soft p-4 text-small text-bark-soft">
+              Enviar el pedido no cuesta nada ni te compromete a nada: es una petición. Ana te
+              escribe con el precio de las piezas y del envío antes de que decidas.
+            </p>
 
             <Link href="/comprar" className="btn mt-8 w-full">
               Continuar

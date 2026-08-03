@@ -5,7 +5,7 @@ import { notFound, redirect } from 'next/navigation'
 import { getSession } from '@/auth'
 import { ArrowLeftIcon, PinIcon } from '@/components/cuenta/CuentaIcons'
 import { ORDER_STATUS_LABEL } from '@/lib/order-status'
-import { formatCents, orders } from '@/lib/schema'
+import { orders } from '@/lib/schema'
 
 type Params = { params: Promise<{ number: string }> }
 
@@ -53,9 +53,8 @@ export default async function PedidoPage({ params }: Params) {
         <p className="mt-3 text-small text-bark-faint">{dateFormat.format(order.createdAt)}</p>
       </header>
 
-      {/* Las piezas y las cuentas, dentro de la misma tarjeta: son una sola cosa.
-          Aquí el texto va a los lados —concepto a la izquierda, importe a la
-          derecha— porque es lo que permite recorrer la columna de precios. */}
+      {/* Sólo las piezas: los importes del pedido están guardados, pero no se
+          enseñan aquí. El precio se acuerda hablando con Ana. */}
       <div className="panel mt-12 text-left">
         <h3 className="eyebrow text-center">Piezas</h3>
 
@@ -65,39 +64,13 @@ export default async function PedidoPage({ params }: Params) {
               key={item.slug}
               className="flex justify-between gap-4 border-b border-line py-5 first:border-t"
             >
-              <div>
-                <Link href={`/tienda/${item.slug}`} className="link-underline tap">
-                  {item.name}
-                </Link>
-                {item.qty > 1 && (
-                  <p className="mt-2 text-small text-bark-faint">
-                    {item.qty} × {formatCents(item.unitPriceCents)}
-                  </p>
-                )}
-              </div>
-              <p className="shrink-0">{formatCents(item.unitPriceCents * item.qty)}</p>
+              <Link href={`/tienda/${item.slug}`} className="link-underline tap">
+                {item.name}
+              </Link>
+              {item.qty > 1 && <p className="shrink-0 text-small text-bark-faint">× {item.qty}</p>}
             </li>
           ))}
         </ul>
-
-        <dl className="mt-8 flex flex-col gap-3">
-          <div className="flex justify-between">
-            <dt className="text-bark-soft">Subtotal</dt>
-            <dd>{formatCents(order.totals.subtotalCents)}</dd>
-          </div>
-          <div className="flex justify-between">
-            <dt className="text-bark-soft">Envío</dt>
-            <dd>
-              {order.totals.shippingCents === 0
-                ? 'Gratis'
-                : formatCents(order.totals.shippingCents)}
-            </dd>
-          </div>
-          <div className="mt-3 flex justify-between border-t border-line pt-4 text-lead">
-            <dt>Total</dt>
-            <dd>{formatCents(order.totals.totalCents)}</dd>
-          </div>
-        </dl>
       </div>
 
       <div className="panel mt-4">
