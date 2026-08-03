@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { cn } from '@/lib/cn'
 import { ORDER_STATUS_ADMIN_LABEL, ORDER_STATUS_FLOW } from '@/lib/order-status'
-import { formatCents, orders, type OrderStatus } from '@/lib/schema'
+import { orders, type OrderStatus } from '@/lib/schema'
 
 type Props = {
   searchParams: Promise<{ estado?: string }>
@@ -88,7 +88,7 @@ export default async function GestionPedidosPage({ searchParams }: Props) {
               {/* El enlace envuelve la fila entera y no sólo el número. Antes
                   había que acertarle a «BA-2026-0004» —nueve caracteres en una
                   fila de cinco líneas—, y todo lo demás, que es lo que de verdad
-                  se está mirando (el nombre, las piezas, el importe), no hacía
+                  se está mirando (el nombre, las piezas, el estado), no hacía
                   nada al pulsarlo. Dentro no hay ningún otro botón ni enlace, así
                   que no hay nada que anidar y el bloque puede ser el enlace.
 
@@ -104,8 +104,9 @@ export default async function GestionPedidosPage({ searchParams }: Props) {
                   el tabulador.
 
                   Antes eran dos columnas, pedido a la izquierda y total a la
-                  derecha. Centrado se apilan: el número primero, y el importe y
-                  el estado debajo. */}
+                  derecha. Centrado se apilan: el número primero y el estado
+                  debajo. El total ya no está —aquí tampoco se enseñan
+                  importes—, así que abajo queda sólo por dónde va. */}
               <Link
                 href={`/gestion/pedidos/${order.number}`}
                 className="-mx-4 flex flex-col items-center gap-3 px-4 py-5 transition-colors duration-500 hover:bg-sage-deep/8 focus-visible:bg-sage-deep/8"
@@ -123,12 +124,9 @@ export default async function GestionPedidosPage({ searchParams }: Props) {
                   </p>
                 </div>
 
-                <div>
-                  <p>{formatCents(order.totals.totalCents)}</p>
-                  <p className="mt-2 text-small text-bark-soft">
-                    {ORDER_STATUS_ADMIN_LABEL[order.status]}
-                  </p>
-                </div>
+                <p className="text-small text-bark-soft">
+                  {ORDER_STATUS_ADMIN_LABEL[order.status]}
+                </p>
               </Link>
             </li>
           ))}
