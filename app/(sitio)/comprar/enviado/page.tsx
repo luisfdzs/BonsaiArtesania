@@ -74,13 +74,10 @@ export default async function EnviadoPage({ searchParams }: Props) {
         </p>
 
         <div className="mt-10 border border-line bg-linen-deep/50 p-8 text-left">
-          <p className="text-bark-soft">
-            Muchísimas gracias por tu pedido. Ana te escribirá en cuanto pueda 🌸
-          </p>
-          <p className="mt-5 text-small text-bark-faint">
-            Cada pieza se hace a mano para ti, así que la preparación lleva entre una y tres
-            semanas. Puedes consultar cómo va tu pedido cuando quieras desde «Mis pedidos», y Ana te
-            escribe en cuanto haya novedades.
+          <p className="text-small text-bark-faint">
+            Muchísimas gracias por tu pedido. Cada pieza se hace a mano para ti, así que la
+            preparación lleva entre una y tres semanas. Puedes consultar cómo va tu pedido cuando
+            quieras desde «Mis pedidos», y Ana te escribe en cuanto haya novedades.
           </p>
           <p className="mt-5 text-small text-bark-faint">
             Se enviará a {address.line1}
