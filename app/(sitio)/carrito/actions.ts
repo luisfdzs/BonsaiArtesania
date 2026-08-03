@@ -16,8 +16,8 @@ import { shopOpen } from '@/lib/shop'
  * identificador de invitado en una cookie y el carrito se guarda igual, para que
  * nadie tenga que registrarse antes de poder mirar lo que lleva.
  *
- * Lo que llega del navegador es únicamente `slug` y `qty`. El precio no: se lee
- * del catálogo al calcular. Aceptar un importe del cliente sería regalar la tienda.
+ * Lo que llega del navegador es únicamente `slug` y `qty`. Ninguna cifra: las del
+ * catálogo se leen en el servidor, y nada que venga del cliente las toca.
  *
  * Las tres empiezan descartando a la cuenta del taller: ahí no hay carrito que
  * tocar (ver `lib/admin.ts`). La comprobación va aquí y no sólo en la pantalla
@@ -58,8 +58,8 @@ export async function addToCart(formData: FormData): Promise<void> {
   const slug = String(formData.get('slug') ?? '')
   const product = getProduct(slug)
 
-  // Una pieza a medida no tiene precio cerrado: se acuerda hablando, así que no
-  // entra al carrito. El botón ya lleva a WhatsApp, esto es la comprobación real.
+  // Una pieza a medida se organiza hablando, así que no entra al carrito. El botón
+  // ya lleva a WhatsApp, esto es la comprobación real.
   if (!product || product.price === null) return
 
   const filter = await ownerFilter()

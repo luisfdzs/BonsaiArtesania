@@ -21,10 +21,10 @@ export const metadata: Metadata = {
  * `/cuenta` pasa a ser sólo de los clientes.
  *
  * Lo que no viene es el resto de aquella zona, y no por descuido: «Pedidos» y
- * «Direcciones» no significan nada en una cuenta que no compra ni recibe envíos,
- * y «Privacidad» —descargar tus datos, borrar tu cuenta— es el derecho de un
- * cliente sobre sus datos, no un botón que deba tener a mano la única cuenta que
- * gestiona la tienda. Ver `lib/admin.ts`.
+ * «Direcciones» no significan nada en una cuenta que no pide ni recibe envíos, y
+ * «Privacidad» —descargar tus datos, borrar tu cuenta— es de quien tiene datos
+ * ahí, no un botón que deba tener a mano la única cuenta que gestiona todo esto.
+ * Ver `lib/admin.ts`.
  *
  * Los formularios son los mismos que usa un cliente, con sus mismas acciones: la
  * contraseña se cambia igual la tenga quien la tenga.

@@ -9,12 +9,12 @@ import { shippingCostCents } from '@/lib/shipping'
 
 /**
  * Carrito. Vive en la base de datos, no en la cookie: así sobrevive al cambio de
- * dispositivo y, sobre todo, el precio con el que se cuenta nunca llega del
- * navegador. La cookie sólo guarda un identificador opaco de invitado.
+ * dispositivo y ninguna cifra llega del navegador. La cookie sólo guarda un
+ * identificador opaco de invitado.
  *
- * De la línea sólo se persiste `slug` y `qty`. El precio se lee del catálogo cada
- * vez que se pinta el carrito: si Ana corrige un precio, nadie se queda con un
- * importe viejo guardado. Congelarlo es cosa del pedido, no del carrito.
+ * De la línea sólo se persiste `slug` y `qty`. Las cifras del catálogo se leen cada
+ * vez, así que nadie se queda con una vieja guardada. Congelarlas es cosa de la
+ * petición archivada, no del carrito.
  *
  * **No hay existencias que consultar.** Ninguna pieza se agota: todas se hacen a
  * mano bajo pedido y Ana puede repetir cualquiera, así que una línea del carrito
@@ -113,7 +113,8 @@ export async function cartDoc(): Promise<CartDoc | null> {
 }
 
 /**
- * Carrito listo para pintar: líneas con nombre y precio del catálogo y totales.
+ * Carrito listo para pintar: líneas con nombre del catálogo, y las cifras que sólo
+ * viajan al documento archivado.
  *
  * Una línea cuyo `slug` ya no existe en el catálogo —pieza retirada— se descarta
  * en silencio. Es preferible a romper la página del carrito por un slug muerto.
@@ -124,7 +125,7 @@ export async function readCart(): Promise<Cart> {
 
   const lines = doc.items.flatMap((item) => {
     const product = getProduct(item.slug)
-    // `price === null` son las piezas a medida: no tienen importe que cobrar y no
+    // `price === null` son las piezas a medida: se organizan hablando y no
     // deberían haber entrado al carrito. Si alguna se colara, se ignora.
     if (!product || product.price === null) return []
 
@@ -160,7 +161,7 @@ export async function readCart(): Promise<Cart> {
  * de móvil se sirve igual para todo el mundo —el layout es estático a propósito,
  * ver el comentario de `app/api/carrito/count/route.ts`—, así que el icono del
  * carrito le sale también a Ana. Al menos que no le salga con un globo encima
- * anunciando piezas que no puede comprar; si lo pulsa, `/carrito` la devuelve al
+ * anunciando piezas que no puede pedir; si lo pulsa, `/carrito` la devuelve al
  * taller. Ver `lib/admin.ts`.
  */
 export async function cartCount(): Promise<number> {

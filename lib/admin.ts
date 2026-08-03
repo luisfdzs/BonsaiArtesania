@@ -15,8 +15,8 @@ import { auth, getSession } from '@/auth'
  *
  * Estar en esa lista no significa «lo de siempre, y además el panel». Es lo
  * contrario: la cuenta del taller **gestiona los pedidos de todo el mundo y no
- * hace ninguno**. No tiene carrito, no pasa por caja y no tiene «Tus pedidos»,
- * porque los pedidos que le importan no son suyos, son de los clientes.
+ * hace ninguno**. No tiene carrito ni «Tus pedidos», porque los pedidos que le
+ * importan no son suyos, son de quien los manda.
  *
  * Llevado hasta el final, esa cuenta **no tiene web**: no tiene portada, ni
  * tienda, ni encargos, ni la sección del taller, ni siquiera `/cuenta`. Todo lo
@@ -27,14 +27,13 @@ import { auth, getSession } from '@/auth'
  * Se hace así, y no con una cuenta que pudiera las dos cosas, por dos razones. La
  * primera es que no habría forma de leer la pantalla: «Pedidos» significaría dos
  * cosas distintas —los que Ana ha hecho y los que tiene que preparar— en el mismo
- * sitio. La segunda es que el carrito y las existencias de una tienda de piezas
- * únicas son la misma cuenta corriente: que la dueña pueda reservarse una pieza
- * desde la web es una forma silenciosa de quitársela a un cliente.
+ * sitio. La segunda es que en un catálogo de piezas únicas, que la dueña pueda
+ * apartarse una desde la web es una forma silenciosa de quitársela a alguien.
  *
- * Quien quiera comprar y gestionar —Luis, probando— usa dos correos. Es más
- * barato que cualquier interruptor de «modo cliente».
+ * Quien quiera pedir y gestionar —Luis, probando— usa dos correos. Es más barato
+ * que cualquier interruptor de «modo cliente».
  *
- * El bloqueo real está repartido por los sitios donde se compra, y siempre en el
+ * El bloqueo real está repartido por los sitios donde se pide, y siempre en el
  * servidor: `app/(sitio)/carrito/actions.ts`, `app/(sitio)/comprar/actions.ts`,
  * las páginas de `/carrito` y `/comprar`, y el layout de `/cuenta`. Esconder un
  * botón no cierra nada, porque una acción de servidor es un endpoint público.
@@ -69,7 +68,7 @@ export async function adminSession() {
  * ¿Quien hace esta petición es la cuenta del taller?
  *
  * La versión corta de `adminSession`, para los sitios que sólo necesitan saber
- * «esta cuenta no compra» y no van a usar la sesión para nada más. Va por
+ * «esta cuenta no pide» y no van a usar la sesión para nada más. Va por
  * `getSession`, que es la lectura cacheada por petición, y se cachea a su vez:
  * en una misma navegación lo comprueban el layout, la página y la acción, y
  * ninguna de las tres debería costar otra consulta.

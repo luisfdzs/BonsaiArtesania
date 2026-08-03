@@ -11,16 +11,11 @@ import { HONEYPOT_FIELD, TOKEN_FIELD } from '@/lib/form-fields'
 const initial: CheckoutState = {}
 
 /**
- * Elección de dirección y envío del pedido.
+ * Elección de dirección y envío de la petición.
  *
- * Aquí **no se cobra nada**, y por eso ni el botón ni el correo mencionan un pago:
- * dicen lo que de verdad ha pasado —el encargo queda recibido y Ana se pone con él
- * y escribe—. Escrito así, el texto es cierto tal cual y la tienda puede estar
- * abierta al público sin engañar a nadie; no es un placeholder que haya que tapar.
- *
- * El pedido se guarda como `simulado` / `pendiente_pago` (ver `app/comprar/actions.ts`).
- * Cuando se conecte el cobro de verdad, este componente es uno de los sitios que
- * pasa a poder hablar de pago.
+ * El botón y el correo dicen lo que de verdad ha pasado —la petición queda recibida
+ * y Ana escribe—, así que el texto es cierto tal cual y esto puede estar abierto al
+ * público sin engañar a nadie.
  *
  * Al terminar ya no se abre un modal: la acción redirige a `/comprar/enviado`, que
  * es una página de verdad y aguanta que alguien la recargue o vuelva a ella.

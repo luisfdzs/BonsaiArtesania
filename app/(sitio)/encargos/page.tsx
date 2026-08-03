@@ -114,8 +114,8 @@ export default function EncargosPage() {
 
       <Reveal className="mt-(--spacing-section) border-t border-line pt-12 text-center">
         <p className="mx-auto max-w-2xl font-serif text-title">
-          «No hay dos ramos iguales, así que tampoco hay dos precios iguales. Cuéntame el tuyo y lo
-          vemos con calma.»
+          «No hay dos ramos iguales, así que no hay dos piezas iguales. Cuéntame el tuyo y lo vemos
+          con calma.»
         </p>
         <p className="mt-6 text-small text-bark-faint">Ana</p>
       </Reveal>

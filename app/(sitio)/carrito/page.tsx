@@ -20,15 +20,15 @@ export default async function CarritoPage() {
   // se la manda a su sitio. Ver `lib/admin.ts`.
   if (await isAdmin()) redirect('/gestion')
 
-  // La tienda cerrada no tiene carrito. Se explica en lugar de dar un 404: quien
-  // llegue aquí desde un enlace guardado merece saber qué ha pasado.
+  // Sin carrito abierto no hay nada que enseñar. Se explica en lugar de dar un
+  // 404: quien llegue aquí desde un enlace guardado merece saber qué ha pasado.
   if (!shopOpen) {
     return (
       <div className="page-gutter pt-16 md:pt-24">
-        <h1 className="font-serif text-title">La tienda abre pronto</h1>
+        <h1 className="font-serif text-title">Muy pronto</h1>
         <p className="mt-6 max-w-md text-bark-soft">
-          Todavía no se puede comprar directamente desde la web. Cada pieza se sigue encargando
-          hablando, que es como Ana trabaja hoy: escríbele y lo organizáis.
+          Cada pieza se sigue encargando hablando, que es como Ana trabaja hoy: escríbele y lo
+          organizáis.
         </p>
         <div className="mt-10 flex flex-col gap-2 sm:flex-row">
           <Link href="/tienda" className="btn">
@@ -169,9 +169,9 @@ export default async function CarritoPage() {
           <div className="border border-line bg-linen-deep/50 p-8 sm:p-10">
             <h2 className="eyebrow">Resumen</h2>
 
-            {/* Ni subtotal, ni envío, ni total: la web no publica importes. Lo que
-                queda del resumen es lo único que aquí se puede afirmar —cuántas
-                piezas se piden— y el aviso de que Ana escribirá. */}
+            {/* Ni subtotal, ni envío, ni total: la web no publica ninguna cifra.
+                Lo que queda del resumen es lo único que aquí se puede afirmar
+                —cuántas piezas se piden— y el aviso de que Ana escribirá. */}
             <p className="mt-8 font-serif text-lead">
               {cart.count} {cart.count === 1 ? 'pieza' : 'piezas'}
             </p>

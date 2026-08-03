@@ -9,13 +9,13 @@ import { CartPing } from '@/components/layout/CartCount'
  *
  * Sigue siendo un formulario con acción de servidor, así que funciona sin
  * JavaScript: es cliente sólo por el estallido de pétalos, y una animación que no
- * corre no impide comprar. Si el navegador no ejecuta JS, el `onClick` no hace
- * nada y el `submit` va igual.
+ * corre no impide pedir. Si el navegador no ejecuta JS, el `onClick` no hace nada
+ * y el `submit` va igual.
  *
  * A propósito **no** consulta si la pieza ya está en el carrito. Hacerlo obligaría
  * a leer la base de datos en la ficha y las 14 fichas dejarían de generarse en
- * build para pasar a renderizarse en cada visita. Cambiar el botón no paga ese
- * precio; quien quiera ver lo que lleva tiene el contador de la barra de móvil.
+ * build para pasar a renderizarse en cada visita. Cambiar el botón no compensa eso;
+ * quien quiera ver lo que lleva tiene el contador de la barra de móvil.
  *
  * Lleva rótulo escrito, «Añadir al carrito», en vez del icono de la bolsa con el
  * «+»: la acción principal de la ficha se lee sin tener que descifrar un dibujo,

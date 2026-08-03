@@ -16,10 +16,10 @@ export const metadata: Metadata = {
  * El panel de gestión: **lo único que tiene la cuenta del taller**.
  *
  * Antes vivía en `/taller` y era una página más de la web: llegaba con la
- * cabecera de la tienda encima —portada, tienda, encargos, carrito— y con el pie
- * legal debajo. Nada de eso le sirve a Ana, que entra a preparar pedidos y no a
- * comprar, y el carrito era además un enlace a una página que su propia cuenta
- * tiene cerrada. Ahora el panel es su propio armazón: cuelga de la raíz y no del
+ * cabecera del sitio encima —portada, tienda, encargos, carrito— y con el pie
+ * debajo. Nada de eso le sirve a Ana, que entra a preparar pedidos y no a pedir, y
+ * el carrito era además un enlace a una página que su propia cuenta tiene
+ * cerrada. Ahora el panel es su propio armazón: cuelga de la raíz y no del
  * grupo `(sitio)`, así que no hereda ninguna de esas dos cosas. Ver
  * `components/layout/SiteChrome.tsx` para el reparto.
  *

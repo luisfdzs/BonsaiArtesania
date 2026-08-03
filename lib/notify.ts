@@ -1,5 +1,5 @@
 import { site } from '@/content/site'
-import { formatCents, type OrderDoc } from '@/lib/schema'
+import { type OrderDoc } from '@/lib/schema'
 
 /**
  * El aviso que le suena a Ana en el móvil, por un bot de Telegram.
@@ -10,10 +10,10 @@ import { formatCents, type OrderDoc } from '@/lib/schema'
  * es esto lo que la cumple: sin el aviso, «enseguida» depende de cuándo abra ella
  * el buzón.
  *
- * Telegram y no un SMS ni una app propia: es gratis, no hay que dar de alta ningún
- * servicio de pago, la API es una llamada HTTP sin dependencias y la notificación
- * llega igual de rápido. Si algún día hace falta algo más serio, este módulo es el
- * único sitio que hay que tocar.
+ * Telegram y no un SMS ni una app propia: no hay que dar de alta ningún servicio,
+ * la API es una llamada HTTP sin dependencias y la notificación llega igual de
+ * rápido. Si algún día hace falta algo más serio, este módulo es el único sitio
+ * que hay que tocar.
  *
  * **Nunca lanza.** Se llama después de que el pedido esté guardado: un bot caído no
  * puede deshacer un pedido. Si falla, queda en el log y el correo a `bonsai@` sigue
@@ -38,8 +38,6 @@ function orderMessage(order: OrderDoc): string {
     `🌸 <b>Nueva petición ${escape(order.number)}</b>`,
     '',
     items,
-    '',
-    `Total: <b>${formatCents(order.totals.totalCents)}</b> · sin cobrar`,
     '',
     `Para ${escape(address.recipient)} — ${escape(address.city)} (${escape(address.province)})`,
     `Tel. ${escape(address.phone)}`,

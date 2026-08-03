@@ -105,8 +105,8 @@ export default async function GestionPedidosPage({ searchParams }: Props) {
 
                   Antes eran dos columnas, pedido a la izquierda y total a la
                   derecha. Centrado se apilan: el número primero y el estado
-                  debajo. El total ya no está —aquí tampoco se enseñan
-                  importes—, así que abajo queda sólo por dónde va. */}
+                  debajo. El total ya no está —aquí tampoco se enseña ninguna
+                  cifra—, así que abajo queda sólo por dónde va. */}
               <Link
                 href={`/gestion/pedidos/${order.number}`}
                 className="-mx-4 flex flex-col items-center gap-3 px-4 py-5 transition-colors duration-500 hover:bg-sage-deep/8 focus-visible:bg-sage-deep/8"

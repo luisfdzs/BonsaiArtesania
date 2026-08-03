@@ -41,10 +41,8 @@ export default function PrivacidadCuentaPage() {
           Se borran tu cuenta, tus direcciones y tu carrito. No se puede deshacer.
         </p>
         <p className="mt-4 text-small text-bark-faint">
-          Tus pedidos no se borran, se anonimizan: la ley obliga a conservar las ventas y sus
-          importes unos años. Se les quita tu nombre, tu teléfono y tu dirección, y dejan de estar
-          ligados a ti. Queda qué se vendió y por cuánto, sin a quién. Está explicado en la{' '}
-          <Link href="/legal/privacidad">política de privacidad</Link>.
+          Tus pedidos no se borran, se anonimizan: se les quita tu nombre, tu teléfono y tu
+          dirección, y dejan de estar ligados a ti. Queda qué se pidió, sin a quién.
         </p>
 
         <DeleteAccount />

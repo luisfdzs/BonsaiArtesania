@@ -10,7 +10,7 @@ import { emailCodes, type EmailCodeDoc } from '@/lib/schema'
  * resto del sitio no aparecen — para entrar día a día está la contraseña.
  *
  * **Por qué un código de seis cifras y no el enlace de antes.** El enlace obligaba
- * a abrir el correo *en el mismo navegador* donde estabas comprando; quien lo
+ * a abrir el correo *en el mismo navegador* donde estabas mirando; quien lo
  * abría en el móvil teniendo el carrito en el portátil acababa con la sesión en el
  * sitio equivocado. Un código se lee en cualquier pantalla y se teclea donde toca.
  * Además el enlace daba acceso completo a la cuenta con sólo pulsarlo, y quedaba

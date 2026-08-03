@@ -111,7 +111,7 @@ export function MailIcon({ className }: IconProps) {
   )
 }
 
-/** «Ver la tienda»: bolsa y no carrito, porque lleva a mirar, no a pagar. */
+/** «Ver la tienda»: bolsa y no carrito, porque lleva a mirar. */
 export function BagIcon({ className }: IconProps) {
   return (
     <svg {...common} aria-hidden className={className}>

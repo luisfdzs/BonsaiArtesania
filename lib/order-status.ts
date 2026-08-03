@@ -21,16 +21,9 @@ import type { OrderStatus } from '@/lib/schema'
  * su pieza, y desaprovecharlo con un gerundio administrativo sería una lástima.
  */
 export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
-  // El estado en base se llama `pendiente_pago` y así se queda, porque es lo que
-  // es. Pero en pantalla no se le puede llamar así mientras no haya pasarela: el
-  // cliente no ha dejado ningún pago a medias, sólo ha pedido algo y espera que Ana
-  // le escriba. «Sin confirmar» describe eso sin mentir en ninguno de los dos casos.
-  //
-  // No hay «Pagado» entre medias. Mientras el cobro sea un placeholder no
-  // significaba nada —ningún pedido llegaba ahí solo—, y para Ana era un paso
-  // más que marcar a mano entre confirmar el pedido y ponerse con él. El pago
-  // sí se sigue guardando, pero en `payment.status`, que es su sitio: es un
-  // dato del cobro, no una etapa del viaje del pedido.
+  // El nombre en base es heredado y así se queda —renombrarlo es una migración—,
+  // pero en pantalla no aparece nunca: quien pide sólo ha pedido algo y espera que
+  // Ana le escriba, y «Sin confirmar» describe justo eso.
   pendiente_pago: 'Sin confirmar',
   preparando: 'Ana está creando tus joyas bonsái',
   enviado: 'En tránsito',

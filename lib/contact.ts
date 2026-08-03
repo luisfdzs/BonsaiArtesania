@@ -1,10 +1,9 @@
 import { site } from '@/content/site'
 
 /**
- * En esta primera versión no hay carrito ni pasarela de pago: los pedidos se
- * cierran por mensaje, que es como Ana ya trabaja hoy en Instagram. Lo único que
- * hace la web es dejar el mensaje escrito para que el cliente sólo tenga que
- * darle a enviar.
+ * Los encargos se organizan por mensaje, que es como Ana ya trabaja hoy en
+ * Instagram. Lo único que hace la web es dejar el mensaje escrito para que quien
+ * escribe sólo tenga que darle a enviar.
  */
 export function whatsappLink(message: string): string {
   return `https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent(message)}`

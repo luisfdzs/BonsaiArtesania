@@ -93,19 +93,19 @@ export default async function ProductPage({ params }: Params) {
             <dd className="mt-3 text-small">{product.materials.join(' · ')}</dd>
           </dl>
 
-          {/* Con la tienda cerrada, cualquier pieza se encarga hablando: es como
-              funcionaba la web antes de tener carrito, así que no se pierde nada.
-              Una pieza con precio se pide desde el carrito, y ésa es aquí la única
+          {/* Con el carrito cerrado, cualquier pieza se encarga hablando: es como
+              funcionaba la web antes de tenerlo, así que no se pierde nada.
+              Una pieza de catálogo se pide desde el carrito, y ésa es aquí la única
               acción: los iconos de WhatsApp y correo que la acompañaban bajo un
               «¿Alguna duda?» se quitaron porque la sección de contacto ya está
               para eso y aquí sólo repartían la atención.
-              Las piezas a medida no tienen precio cerrado y no pasan por el
-              carrito, así que ahí escribir sigue siendo la única acción. */}
+              Las piezas a medida no pasan por el carrito, así que ahí escribir
+              sigue siendo la única acción. */}
           {product.price === null || !shopOpen ? (
             <ContactButtons
               message={message}
               subject={`Encargo · ${product.name}`}
-              action={product.price === null ? 'Pedir presupuesto' : 'Encargar esta pieza'}
+              action={product.price === null ? 'Escribir a Ana' : 'Encargar esta pieza'}
               className="mt-11"
             />
           ) : (
