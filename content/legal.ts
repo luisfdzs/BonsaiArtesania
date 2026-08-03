@@ -1,3 +1,4 @@
+import { pick, type Locale, type Localized } from '@/lib/i18n/config'
 import { site } from '@/content/site'
 
 /**
@@ -23,26 +24,48 @@ export const legal = {
   /** Fecha de la última revisión del texto. */
   updated: '2026-08-03',
 
-  /** El nombre de quien responde, con el del taller como respaldo. */
-  get responsible(): string {
-    return this.holder ?? `${site.nameFull} (taller artesanal en ${site.location})`
+  /**
+   * El nombre de quien responde, con el del taller como respaldo. El respaldo
+   * lleva una descripción, y ésa sí se traduce: el nombre propio no.
+   */
+  responsible(locale: Locale): string {
+    return (
+      this.holder ??
+      `${site.nameFull} (${pick(
+        { es: `taller artesanal en ${site.location}`, gl: `taller artesanal en ${site.location}` },
+        locale,
+      )})`
+    )
   },
 
   /**
    * Encargados del tratamiento: terceros que tratan datos por cuenta nuestra.
    * Hay que mantener esta lista al día, es parte de la información obligatoria.
+   *
+   * El nombre de la empresa no se traduce —es su razón social—; el para qué y el
+   * dónde sí, que es lo que se lee.
    */
   processors: [
-    { name: 'Vercel Inc.', purpose: 'Alojamiento de la web', location: 'EE. UU. (con CCT)' },
+    {
+      name: 'Vercel Inc.',
+      purpose: { es: 'Alojamiento de la web', gl: 'Aloxamento da web' } satisfies Localized,
+      location: { es: 'EE. UU. (con CCT)', gl: 'EE. UU. (con CCT)' } satisfies Localized,
+    },
     {
       name: 'MongoDB Inc. (Atlas)',
-      purpose: 'Base de datos de cuentas y peticiones',
-      location: 'UE (París)',
+      purpose: {
+        es: 'Base de datos de cuentas y peticiones',
+        gl: 'Base de datos de contas e peticións',
+      } satisfies Localized,
+      location: { es: 'UE (París)', gl: 'UE (París)' } satisfies Localized,
     },
     {
       name: 'IONOS SE',
-      purpose: 'Correo electrónico (códigos de acceso y avisos) y dominio',
-      location: 'UE (Alemania)',
+      purpose: {
+        es: 'Correo electrónico (códigos de acceso y avisos) y dominio',
+        gl: 'Correo electrónico (códigos de acceso e avisos) e dominio',
+      } satisfies Localized,
+      location: { es: 'UE (Alemania)', gl: 'UE (Alemaña)' } satisfies Localized,
     },
   ],
 } as const

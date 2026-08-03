@@ -2,11 +2,13 @@
 
 import Link from 'next/link'
 import { useActionState } from 'react'
-import { placeOrder, type CheckoutState } from '@/app/(sitio)/comprar/actions'
+import { placeOrder, type CheckoutState } from '@/app/[locale]/(sitio)/comprar/actions'
 import type { AddressValues } from '@/components/cuenta/AddressForm'
 import { FormPending } from '@/components/ui/FormPending'
 import { SendIcon } from '@/components/ui/SocialIcons'
 import { HONEYPOT_FIELD, TOKEN_FIELD } from '@/lib/form-fields'
+import { path } from '@/lib/i18n/routes'
+import { useLocale, useTranslator } from '@/lib/i18n/useLocale'
 
 const initial: CheckoutState = {}
 
@@ -22,11 +24,20 @@ const initial: CheckoutState = {}
  */
 export function Checkout({ addresses, token }: { addresses: AddressValues[]; token: string }) {
   const [state, action, pending] = useActionState(placeOrder, initial)
+  const locale = useLocale()
+  const t = useTranslator()
+
+  const enviando = t({ es: 'Enviando tu pedido', gl: 'Enviando o teu pedido' })
+  const enviar = t({ es: 'Enviar mi pedido', gl: 'Enviar o meu pedido' })
 
   const preselected = addresses.find((address) => address.isDefault) ?? addresses[0]
 
   return (
     <form action={action}>
+      {/* El idioma va con el formulario: una acción de servidor no recibe `params`,
+          y sin esto los errores volverían en castellano y la confirmación se
+          abriría en la otra versión del sitio. */}
+      <input type="hidden" name="idioma" value={locale} />
       {/* El envío del pedido es la escritura más larga del sitio: guarda el pedido,
           manda el correo y avisa a Ana por Telegram.
           El botón apagado ya avisaba, pero es un rótulo de 13px para
@@ -34,7 +45,7 @@ export function Checkout({ addresses, token }: { addresses: AddressValues[]; tok
           «Añadir o editar direcciones» y salir de aquí a mitad de la escritura. La
           flor lo dice a pantalla completa y cierra el paso hasta que hay respuesta,
           que es lo que corresponde al único gesto del sitio que crea un pedido. */}
-      <FormPending label="Enviando tu pedido" />
+      <FormPending label={enviando} />
 
       {/* Las dos trampas de `lib/form-guard.ts`. El testigo lo firma el servidor al
           pintar la página; el campo de abajo tiene que llegar vacío. */}
@@ -43,12 +54,14 @@ export function Checkout({ addresses, token }: { addresses: AddressValues[]; tok
         {/* Fuera de la pantalla y no `display:none`: así cae también el bot que
             sólo rellena lo que el navegador considera visible, y quien navega con
             teclado no llega nunca por el `tabIndex`. */}
-        <label htmlFor="apellidos">No rellenes este campo</label>
+        <label htmlFor="apellidos">
+          {t({ es: 'No rellenes este campo', gl: 'Non enchas este campo' })}
+        </label>
         <input id="apellidos" name={HONEYPOT_FIELD} type="text" tabIndex={-1} autoComplete="off" />
       </div>
 
       <fieldset>
-        <legend className="eyebrow">Enviar a</legend>
+        <legend className="eyebrow">{t({ es: 'Enviar a', gl: 'Enviar a' })}</legend>
 
         <div className="mt-6 flex flex-col">
           {addresses.map((address) => (
@@ -76,8 +89,11 @@ export function Checkout({ addresses, token }: { addresses: AddressValues[]; tok
         </div>
       </fieldset>
 
-      <Link href="/cuenta/direcciones" className="link-underline tap mt-6 inline-block text-small">
-        Añadir o editar direcciones
+      <Link
+        href={path(locale, '/cuenta/direcciones')}
+        className="link-underline tap mt-6 inline-block text-small"
+      >
+        {t({ es: 'Añadir o editar direcciones', gl: 'Engadir ou editar enderezos' })}
       </Link>
 
       {state.error && (
@@ -94,8 +110,8 @@ export function Checkout({ addresses, token }: { addresses: AddressValues[]; tok
         <button
           type="submit"
           disabled={pending}
-          aria-label={pending ? 'Enviando tu pedido' : 'Enviar mi pedido'}
-          title={pending ? 'Enviando tu pedido' : 'Enviar mi pedido'}
+          aria-label={pending ? enviando : enviar}
+          title={pending ? enviando : enviar}
           className="btn btn-icon btn-icon-lg"
         >
           <SendIcon className="h-5 w-5" />
@@ -103,7 +119,7 @@ export function Checkout({ addresses, token }: { addresses: AddressValues[]; tok
         {/* `aria-hidden` porque repite el `aria-label` del botón: quien lo oiga dos
             veces no entiende que es el mismo control. */}
         <p aria-hidden className="text-small text-bark-faint">
-          {pending ? 'Enviando…' : 'Enviar mi pedido'}
+          {pending ? t({ es: 'Enviando…', gl: 'Enviando…' }) : enviar}
         </p>
       </div>
     </form>

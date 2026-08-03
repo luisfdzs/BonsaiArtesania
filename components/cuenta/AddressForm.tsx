@@ -1,11 +1,17 @@
 'use client'
 
 import { useActionState, useEffect } from 'react'
-import { createAddress, updateAddress, type ActionState } from '@/app/(sitio)/cuenta/actions'
+import {
+  createAddress,
+  updateAddress,
+  type ActionState,
+} from '@/app/[locale]/(sitio)/cuenta/actions'
 import { CloseIcon } from '@/components/layout/NavIcons'
 import { CheckIcon } from '@/components/ui/CartIcons'
 import { Field } from '@/components/ui/Field'
 import { FlowerBud } from '@/components/ui/FlowerBud'
+import { useTranslator } from '@/lib/i18n/useLocale'
+import { LocaleField } from '@/components/ui/LocaleField'
 import { PlusIcon } from './CuentaIcons'
 
 export type AddressValues = {
@@ -36,6 +42,7 @@ export function AddressForm({
   values?: AddressValues
   onDone?: () => void
 }) {
+  const t = useTranslator()
   const editing = Boolean(values.id)
   const [state, action, pending] = useActionState(editing ? updateAddress : createAddress, initial)
 
@@ -48,11 +55,12 @@ export function AddressForm({
 
   return (
     <form action={action} className="flex flex-col gap-8 text-left">
+      <LocaleField />
       {editing && <input type="hidden" name="id" value={values.id} />}
 
       <Field
         name="alias"
-        label="Nombre de la dirección"
+        label={t({ es: 'Nombre de la dirección', gl: 'Nome do enderezo' })}
         required
         defaultValue={values.alias}
         error={state.errors?.alias}
@@ -60,7 +68,7 @@ export function AddressForm({
 
       <Field
         name="recipient"
-        label="Quién recibe"
+        label={t({ es: 'Quién recibe', gl: 'Quen recibe' })}
         required
         autoComplete="name"
         defaultValue={values.recipient}
@@ -69,7 +77,7 @@ export function AddressForm({
 
       <Field
         name="phone"
-        label="Teléfono"
+        label={t({ es: 'Teléfono', gl: 'Teléfono' })}
         type="tel"
         required
         autoComplete="tel"
@@ -79,7 +87,7 @@ export function AddressForm({
 
       <Field
         name="line1"
-        label="Calle y número"
+        label={t({ es: 'Calle y número', gl: 'Rúa e número' })}
         required
         autoComplete="address-line1"
         defaultValue={values.line1}
@@ -88,7 +96,7 @@ export function AddressForm({
 
       <Field
         name="line2"
-        label="Piso, puerta, escalera"
+        label={t({ es: 'Piso, puerta, escalera', gl: 'Piso, porta, escaleira' })}
         autoComplete="address-line2"
         defaultValue={values.line2}
         error={state.errors?.line2}
@@ -97,7 +105,7 @@ export function AddressForm({
       <div className="grid gap-8 sm:grid-cols-[8rem_1fr]">
         <Field
           name="postalCode"
-          label="Código postal"
+          label={t({ es: 'Código postal', gl: 'Código postal' })}
           required
           autoComplete="postal-code"
           defaultValue={values.postalCode}
@@ -105,7 +113,7 @@ export function AddressForm({
         />
         <Field
           name="city"
-          label="Localidad"
+          label={t({ es: 'Localidad', gl: 'Localidade' })}
           required
           autoComplete="address-level2"
           defaultValue={values.city}
@@ -115,7 +123,7 @@ export function AddressForm({
 
       <Field
         name="province"
-        label="Provincia"
+        label={t({ es: 'Provincia', gl: 'Provincia' })}
         required
         autoComplete="address-level1"
         defaultValue={values.province}
@@ -129,7 +137,7 @@ export function AddressForm({
           defaultChecked={values.isDefault}
           className="size-4 accent-sage-deep"
         />
-        Usar esta dirección por defecto
+        {t({ es: 'Usar esta dirección por defecto', gl: 'Usar este enderezo por defecto' })}
       </label>
 
       {state.errors?.form && (
@@ -148,7 +156,11 @@ export function AddressForm({
           <FlowerBud>
             {editing ? <CheckIcon className="h-4 w-4" /> : <PlusIcon className="h-4 w-4" />}
           </FlowerBud>
-          {pending ? 'Guardando…' : editing ? 'Guardar cambios' : 'Añadir dirección'}
+          {pending
+            ? t({ es: 'Guardando…', gl: 'Gardando…' })
+            : editing
+              ? t({ es: 'Guardar cambios', gl: 'Gardar cambios' })
+              : t({ es: 'Añadir dirección', gl: 'Engadir enderezo' })}
         </button>
         {onDone && (
           <button
@@ -158,7 +170,7 @@ export function AddressForm({
             disabled={pending}
           >
             <CloseIcon className="h-4 w-4" />
-            Cancelar
+            {t({ es: 'Cancelar', gl: 'Cancelar' })}
           </button>
         )}
       </div>
