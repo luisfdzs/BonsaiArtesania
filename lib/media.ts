@@ -24,6 +24,17 @@ export function img(key: ImageKey, alt: string): Image {
 }
 
 /**
+ * Sólo la ruta de una foto, sin dimensiones ni texto alternativo.
+ *
+ * Para los sitios donde la imagen no es un `<img>` y por tanto no hay alt que poner:
+ * hoy, el `poster` del vídeo de la portada. Pasar por `img(clave, '')` daría lo mismo,
+ * pero dejaría un alt vacío escrito a mano que parece un olvido.
+ */
+export function imgSrc(key: ImageKey): string {
+  return manifest[key].src
+}
+
+/**
  * La ruta de un vídeo de `public/reel/`.
  *
  * No pasa por el manifiesto: los vídeos no se generan en variantes ni llevan

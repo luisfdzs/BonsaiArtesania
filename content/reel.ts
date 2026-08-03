@@ -1,12 +1,11 @@
 import type { ImageKey } from '@/lib/media'
 
 /**
- * Los vídeos de la portada, en el orden en que se ven.
+ * Los vídeos del fondo de la portada, en el orden en que se ven.
  *
  * **Dos, y encadenados en bucle:** cuando termina el primero entra el segundo, y al
- * acabar el segundo vuelve el primero. No es una rejilla de vídeos ni un carrusel
- * con flechas —eso convertiría la portada en otra cosa—: es una sola ventana en la
- * que van pasando dos trozos del taller.
+ * acabar el segundo vuelve el primero. Ocupan la primera pantalla entera y el texto
+ * va encima; ver `components/sections/Hero.tsx`.
  *
  * El orden cuenta algo. El primero es la prensa: las flores secas saliendo de la
  * carpeta y entrando en el molde. El segundo es el final del camino: la pieza ya
@@ -26,18 +25,22 @@ import type { ImageKey } from '@/lib/media'
  * una web propia, así que se cae al comprimir. No se pierde nada: lo que hay que ver
  * son unas manos trabajando.
  *
- * Lista vacía = no hay vídeos, y entonces la sección **no se pinta**.
+ * Lista vacía = no hay vídeos, y entonces la portada se queda con el póster —o con
+ * el fondo de tinta si tampoco lo hay—, pero no se rompe.
  */
 export type Reel = {
   /** Nombre del fichero dentro de `public/reel/`. */
   file: string
   /**
    * Fotograma de portada: una clave del manifiesto de fotos, como cualquier otra
-   * imagen de la web. Sólo hace falta el del primero —es el único que se ve antes
-   * de pulsar—, así que en los demás puede ir a `null`.
+   * imagen de la web. Sólo hace falta el del primero —es el único que se ve antes de
+   * que arranque el vídeo—, así que en los demás puede ir a `null`.
    */
   poster: ImageKey | null
-  /** Para el nombre accesible del vídeo. Uno por clip: no enseñan lo mismo. */
+  /**
+   * Qué se ve en el clip. **No llega al HTML**: el vídeo es fondo y va `aria-hidden`,
+   * así que esto es documentación para quien lea el fichero y no un texto alternativo.
+   */
   alt: string
   /** La publicación original, para poder rastrear de dónde salió cada uno. */
   sourceUrl: string
