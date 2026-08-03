@@ -13,18 +13,17 @@ import { site } from '@/content/site'
  * LSSI a quien presta servicios con ánimo de lucro, y no es lo que esta web hace.
  * Para identificar al responsable basta un nombre y un medio de contacto.
  *
- * PENDIENTE (Ana): `holder` debería llevar su nombre y apellidos. Mientras esté a
- * `null`, el aviso se identifica con el nombre del taller y el buzón, que es cierto
- * y sirve para ejercer derechos, pero nombrar a la persona es más limpio.
+ * El nombre de `holder` es el de la persona que responde, y aparece tal cual en el
+ * aviso: si alguna vez hay que corregirlo, se corrige aquí y en ningún otro sitio.
  */
 export const legal = {
   /** Nombre y apellidos de quien responde. `null` → se usa el nombre del taller. */
-  holder: null as string | null,
+  holder: 'Ana Ribera Sánchez' as string | null,
 
   /** Fecha de la última revisión del texto. */
   updated: '2026-08-03',
 
-  /** Cómo se identifica al responsable cuando `holder` está sin rellenar. */
+  /** El nombre de quien responde, con el del taller como respaldo. */
   get responsible(): string {
     return this.holder ?? `${site.nameFull} (taller artesanal en ${site.location})`
   },
