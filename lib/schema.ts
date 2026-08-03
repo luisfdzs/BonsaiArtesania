@@ -114,7 +114,7 @@ export type OrderItem = {
  * distintas: «ha salido del taller» y «llega hoy».
  */
 export type OrderStatus =
-  'pendiente_pago' | 'pagado' | 'preparando' | 'enviado' | 'en_reparto' | 'entregado' | 'cancelado'
+  'pendiente_pago' | 'preparando' | 'enviado' | 'en_reparto' | 'entregado' | 'cancelado'
 
 export type OrderDoc = {
   _id: ObjectId

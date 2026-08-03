@@ -25,8 +25,13 @@ export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
   // es. Pero en pantalla no se le puede llamar así mientras no haya pasarela: el
   // cliente no ha dejado ningún pago a medias, sólo ha pedido algo y espera que Ana
   // le escriba. «Sin confirmar» describe eso sin mentir en ninguno de los dos casos.
+  //
+  // No hay «Pagado» entre medias. Mientras el cobro sea un placeholder no
+  // significaba nada —ningún pedido llegaba ahí solo—, y para Ana era un paso
+  // más que marcar a mano entre confirmar el pedido y ponerse con él. El pago
+  // sí se sigue guardando, pero en `payment.status`, que es su sitio: es un
+  // dato del cobro, no una etapa del viaje del pedido.
   pendiente_pago: 'Sin confirmar',
-  pagado: 'Pagado',
   preparando: 'Ana está creando tus joyas bonsái',
   enviado: 'En tránsito',
   en_reparto: 'En reparto',
@@ -57,7 +62,6 @@ export const ORDER_STATUS_ADMIN_LABEL: Record<OrderStatus, string> = {
  */
 export const ORDER_STATUS_FLOW: OrderStatus[] = [
   'pendiente_pago',
-  'pagado',
   'preparando',
   'enviado',
   'en_reparto',

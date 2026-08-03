@@ -125,7 +125,7 @@ const validators = {
       number: { bsonType: 'string', pattern: '^BA-[0-9]{4}-[0-9]{4}$' },
       userId: { bsonType: 'objectId' },
       status: {
-        enum: ['pendiente_pago', 'pagado', 'preparando', 'enviado', 'entregado', 'cancelado'],
+        enum: ['pendiente_pago', 'preparando', 'enviado', 'en_reparto', 'entregado', 'cancelado'],
       },
       items: {
         bsonType: 'array',

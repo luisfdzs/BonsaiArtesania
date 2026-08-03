@@ -50,7 +50,11 @@ export default async function GestionCuentaPage() {
   if (!user) notFound()
 
   return (
-    <section>
+    // La única del panel que se queda estrecha en ordenador. Lo ancho es para
+    // los pedidos —una lista que se barre y una ficha con secciones—; aquí hay
+    // dos formularios cortos, y un campo de texto de 1400px no se rellena mejor
+    // por ser más largo.
+    <section className="mx-auto max-w-2xl">
       <SectionIntro title="La cuenta del taller">
         Con la que entras aquí. El nombre y el teléfono son los que salen cuando escribes a un
         cliente desde la tienda.
