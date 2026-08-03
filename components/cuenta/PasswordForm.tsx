@@ -1,15 +1,21 @@
 'use client'
 
 import { useActionState } from 'react'
-import { changePassword, type ActionState } from '@/app/(sitio)/cuenta/actions'
+import { changePassword, type ActionState } from '@/app/[locale]/(sitio)/cuenta/actions'
 import { CheckIcon } from '@/components/ui/CartIcons'
 import { Field } from '@/components/ui/Field'
 import { FlowerBud } from '@/components/ui/FlowerBud'
+import type { Localized } from '@/lib/i18n/config'
+import { useTranslator } from '@/lib/i18n/useLocale'
+import { LocaleField } from '@/components/ui/LocaleField'
 
 const initial: ActionState = {}
 
 /** Las mismas reglas que comprueba `passwordSchema`, dichas antes de fallar. */
-const HINT = 'Ocho caracteres o más, con una mayúscula, un número y un símbolo.'
+export const PASSWORD_HINT: Localized = {
+  es: 'Ocho caracteres o más, con una mayúscula, un número y un símbolo.',
+  gl: 'Oito caracteres ou máis, cunha maiúscula, un número e un símbolo.',
+}
 
 /**
  * Cambiar la contraseña sin salir de la cuenta.
@@ -25,21 +31,36 @@ const HINT = 'Ocho caracteres o más, con una mayúscula, un número y un símbo
  */
 export function PasswordForm({ hasPassword }: { hasPassword: boolean }) {
   const [state, action, pending] = useActionState(changePassword, initial)
+  const t = useTranslator()
 
   if (!hasPassword) {
     return (
       <div className="panel text-left">
         <p className="text-bark-soft">
-          Tu cuenta es de cuando se entraba con un enlace al correo y todavía no tiene contraseña.
-          Para ponerle una, sal de la sesión y usa «No recuerdo mi contraseña» en la pantalla de
-          entrada: te llegará un código y podrás elegirla.
+          {t({
+            es: 'Tu cuenta es de cuando se entraba con un enlace al correo y todavía no tiene contraseña. Para ponerle una, sal de la sesión y usa «No recuerdo mi contraseña» en la pantalla de entrada: te llegará un código y podrás elegirla.',
+            gl: 'A túa conta é de cando se entraba cunha ligazón ao correo e aínda non ten contrasinal. Para poñerlle un, sae da sesión e usa «Non lembro o meu contrasinal» na pantalla de entrada: chegarache un código e poderás escollelo.',
+          })}
         </p>
       </div>
     )
   }
 
+  // «Cambiada» concuerda con «contraseña» en castellano y con «contrasinal» en
+  // galego, que es masculino: por eso no es la misma palabra con otra ortografía.
+  const cambiada = t({ es: 'Cambiada.', gl: 'Cambiado.' })
+  const cerradas = state.closed
+    ? state.closed === 1
+      ? t({ es: 'se ha cerrado 1 sesión', gl: 'pechouse 1 sesión' })
+      : t({
+          es: `se han cerrado ${state.closed} sesiones`,
+          gl: `pecháronse ${state.closed} sesións`,
+        })
+    : ''
+
   return (
     <form action={action} className="panel flex flex-col gap-8 text-left">
+      <LocaleField />
       {state.errors?.form && (
         <p className="field-error" role="alert">
           {state.errors.form}
@@ -48,7 +69,7 @@ export function PasswordForm({ hasPassword }: { hasPassword: boolean }) {
 
       <Field
         name="current"
-        label="Contraseña actual"
+        label={t({ es: 'Contraseña actual', gl: 'Contrasinal actual' })}
         type="password"
         required
         autoComplete="current-password"
@@ -57,17 +78,17 @@ export function PasswordForm({ hasPassword }: { hasPassword: boolean }) {
 
       <Field
         name="password"
-        label="Contraseña nueva"
+        label={t({ es: 'Contraseña nueva', gl: 'Contrasinal novo' })}
         type="password"
         required
         autoComplete="new-password"
-        hint={HINT}
+        hint={t(PASSWORD_HINT)}
         error={state.errors?.password}
       />
 
       <Field
         name="password2"
-        label="Repítela"
+        label={t({ es: 'Repítela', gl: 'Repíteo' })}
         type="password"
         required
         autoComplete="new-password"
@@ -79,7 +100,9 @@ export function PasswordForm({ hasPassword }: { hasPassword: boolean }) {
           <FlowerBud>
             <CheckIcon className="h-4 w-4" />
           </FlowerBud>
-          {pending ? 'Guardando…' : 'Cambiar la contraseña'}
+          {pending
+            ? t({ es: 'Guardando…', gl: 'Gardando…' })
+            : t({ es: 'Cambiar la contraseña', gl: 'Cambiar o contrasinal' })}
         </button>
 
         {/* El hueco se reserva siempre: si apareciera al guardar, empujaría el botón
@@ -87,8 +110,11 @@ export function PasswordForm({ hasPassword }: { hasPassword: boolean }) {
         <span role="status" className="block min-h-5 text-center text-small text-sage-deep">
           {state.ok && !pending
             ? state.closed
-              ? `Cambiada. Se ${state.closed === 1 ? 'ha cerrado 1 sesión' : `han cerrado ${state.closed} sesiones`} en otros dispositivos.`
-              : 'Cambiada.'
+              ? `${cambiada} ${t({ es: 'Además,', gl: 'Ademais,' })} ${cerradas} ${t({
+                  es: 'en otros dispositivos.',
+                  gl: 'noutros dispositivos.',
+                })}`
+              : cambiada
             : ''}
         </span>
       </div>

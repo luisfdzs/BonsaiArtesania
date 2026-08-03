@@ -1,11 +1,14 @@
 import Link from 'next/link'
 import { cn } from '@/lib/cn'
 import { categories, productsByCategory } from '@/content/products'
+import { translator, type Locale } from '@/lib/i18n/config'
+import { path } from '@/lib/i18n/routes'
 import { ShopRail } from './ShopRail'
 
 type Props = {
   /** Familia que se está viendo; en `/tienda` no hay ninguna activa. */
   current?: string
+  locale: Locale
   className?: string
 }
 
@@ -25,7 +28,8 @@ type Props = {
  * Las familias vacías no se listan: un enlace a una página sin piezas es una vía
  * muerta. Y la que se está viendo se queda como texto, no como enlace a sí misma.
  */
-export function CategoryNav({ current, className }: Props) {
+export function CategoryNav({ current, locale, className }: Props) {
+  const t = translator(locale)
   const visible = categories
     .map((category) => ({ ...category, count: productsByCategory(category.key).length }))
     .filter((category) => category.count > 0)
@@ -33,17 +37,25 @@ export function CategoryNav({ current, className }: Props) {
   const total = visible.reduce((sum, category) => sum + category.count, 0)
 
   return (
-    <nav aria-label="Familias de la tienda" className={cn('shop-nav', className)}>
+    <nav
+      aria-label={t({ es: 'Familias de la tienda', gl: 'Familias da tenda' })}
+      className={cn('shop-nav', className)}
+    >
       <ShopRail>
         {/* «Todo» abre la fila y no se distingue del resto: es una familia más
             —la de todas—, no la acción principal de la barra. */}
-        <Tab href="/tienda" label="Todo" count={total} active={!current} />
+        <Tab
+          href={path(locale, '/tienda')}
+          label={t({ es: 'Todo', gl: 'Todo' })}
+          count={total}
+          active={!current}
+        />
 
         {visible.map((category) => (
           <Tab
             key={category.key}
-            href={`/tienda/categoria/${category.key}`}
-            label={category.label}
+            href={path(locale, `/tienda/categoria/${category.key}`)}
+            label={t(category.label)}
             count={category.count}
             active={category.key === current}
           />

@@ -1,5 +1,6 @@
 import { headers } from 'next/headers'
 import { getDb } from '@/lib/db'
+import { pick, type Locale } from '@/lib/i18n/config'
 
 /**
  * Límites de uso, contados en Mongo.
@@ -229,11 +230,19 @@ export async function peek(bucket: string, key: string, policy: Policy): Promise
   }
 }
 
-/** «media hora», «un par de minutos»: para decirle a alguien cuándo reintentar. */
-export function describeWait(ms: number): string {
+/**
+ * «un minuto», «tres horas»: para decirle a alguien cuándo reintentar.
+ *
+ * Va dentro de una frase que ya está traducida, así que necesita el idioma. En
+ * galego la única diferencia es el artículo —«unha hora»—, pero es la clase de
+ * detalle que canta si se deja en castellano.
+ */
+export function describeWait(ms: number, locale: Locale): string {
   const minutes = Math.ceil(ms / MINUTE)
-  if (minutes <= 1) return 'un minuto'
-  if (minutes < 60) return `${minutes} minutos`
+  if (minutes <= 1) return pick({ es: 'un minuto', gl: 'un minuto' }, locale)
+  if (minutes < 60) return `${minutes} ${pick({ es: 'minutos', gl: 'minutos' }, locale)}`
   const hours = Math.ceil(minutes / 60)
-  return hours === 1 ? 'una hora' : `${hours} horas`
+  return hours === 1
+    ? pick({ es: 'una hora', gl: 'unha hora' }, locale)
+    : `${hours} ${pick({ es: 'horas', gl: 'horas' }, locale)}`
 }

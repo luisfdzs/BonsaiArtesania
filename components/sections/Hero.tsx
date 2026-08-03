@@ -1,6 +1,7 @@
 import { ReelBackdrop } from '@/components/ui/ReelBackdrop'
 import { reels } from '@/content/reel'
 import { site } from '@/content/site'
+import { translator, type Locale } from '@/lib/i18n/config'
 import { imgSrc } from '@/lib/media'
 
 /**
@@ -36,8 +37,13 @@ import { imgSrc } from '@/lib/media'
  *
  * El `bg-bark` de debajo no se ve nunca con el vídeo puesto, y está para el instante
  * anterior a que cargue el póster: sin él ese instante es lino, y el texto es lino.
+ *
+ * Los vídeos y el póster no llevan idioma: no hay texto dentro. El `alt` tampoco,
+ * porque el fondo es decorativo y `ReelBackdrop` lo marca `aria-hidden` — lo que se
+ * lee de esta pantalla es el titular, y ése sí está en los dos.
  */
-export function Hero() {
+export function Hero({ locale }: { locale: Locale }) {
+  const t = translator(locale)
   const first = reels[0]
 
   return (
@@ -76,13 +82,31 @@ export function Hero() {
 
       {/* `animate-bloom` como antes: la portada se asienta, no aparece de golpe. */}
       <div className="page-gutter animate-bloom relative pt-32 pb-20 md:pb-28">
-        <p className="eyebrow text-linen/75">Hecho a mano en {site.location}</p>
+        <p className="eyebrow text-linen/75">
+          {t({ es: 'Hecho a mano en', gl: 'Feito a man en' })} {site.location}
+        </p>
+        {/* El salto de línea va a mano y no al azar del ancho: el titular es una frase
+            de dos tiempos y se lee mejor partida donde la partiría quien la dice en voz
+            alta. En galego el corte cae en el mismo sitio, después del sujeto. */}
         <h1 className="mt-7 font-serif text-display text-linen">
-          Flores que
-          <br />
-          no se marchitan
+          {t({
+            es: (
+              <>
+                Flores que
+                <br />
+                no se marchitan
+              </>
+            ),
+            gl: (
+              <>
+                Flores que
+                <br />
+                non murchan
+              </>
+            ),
+          })}
         </h1>
-        <p className="mt-8 max-w-md text-linen/85">{site.intro}</p>
+        <p className="mt-8 max-w-md text-linen/85">{t(site.intro)}</p>
       </div>
     </section>
   )

@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { getSession } from '@/auth'
 import { getProduct } from '@/content/products'
 import { isAdmin } from '@/lib/admin'
+import { pick, type Locale } from '@/lib/i18n/config'
 import type { Image } from '@/lib/media'
 import { carts, toCents, type CartDoc } from '@/lib/schema'
 import { shippingCostCents } from '@/lib/shipping'
@@ -119,7 +120,7 @@ export async function cartDoc(): Promise<CartDoc | null> {
  * Una línea cuyo `slug` ya no existe en el catálogo —pieza retirada— se descarta
  * en silencio. Es preferible a romper la página del carrito por un slug muerto.
  */
-export async function readCart(): Promise<Cart> {
+export async function readCart(locale: Locale): Promise<Cart> {
   const doc = await cartDoc()
   if (!doc || doc.items.length === 0) return EMPTY
 
@@ -133,11 +134,16 @@ export async function readCart(): Promise<Cart> {
     return [
       {
         slug: item.slug,
-        name: product.name,
+        // El nombre y el `alt` se resuelven aquí, al leer, y no se guardan
+        // traducidos: del carrito sólo se persisten `slug` y `qty`, así que el
+        // idioma del que mira es el de esta petición y no el de cuando se metió
+        // la pieza. Quien añade en castellano y luego cambia a galego ve su
+        // carrito en galego, que es lo que esperaría.
+        name: pick(product.name, locale),
         qty: item.qty,
         unitPriceCents,
         lineTotalCents: unitPriceCents * item.qty,
-        image: product.image,
+        image: product.image && pick(product.image, locale),
       },
     ]
   })

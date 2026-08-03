@@ -4,19 +4,22 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { AccountIcon } from '@/components/layout/NavIcons'
 import { cn } from '@/lib/cn'
+import type { Localized } from '@/lib/i18n/config'
+import { localeOf, path, routeOf } from '@/lib/i18n/routes'
+import { useTranslator } from '@/lib/i18n/useLocale'
 import { PackageIcon, PinIcon, ShieldIcon } from './CuentaIcons'
 
 type Item = {
-  href: string
-  label: string
+  route: string
+  label: Localized
   Icon: (props: { className?: string }) => React.ReactElement
 }
 
 const items: Item[] = [
-  { href: '/cuenta', label: 'Tus datos', Icon: AccountIcon },
-  { href: '/cuenta/pedidos', label: 'Pedidos', Icon: PackageIcon },
-  { href: '/cuenta/direcciones', label: 'Direcciones', Icon: PinIcon },
-  { href: '/cuenta/privacidad', label: 'Privacidad', Icon: ShieldIcon },
+  { route: '/cuenta', label: { es: 'Tus datos', gl: 'Os teus datos' }, Icon: AccountIcon },
+  { route: '/cuenta/pedidos', label: { es: 'Pedidos', gl: 'Pedidos' }, Icon: PackageIcon },
+  { route: '/cuenta/direcciones', label: { es: 'Direcciones', gl: 'Enderezos' }, Icon: PinIcon },
+  { route: '/cuenta/privacidad', label: { es: 'Privacidad', gl: 'Privacidade' }, Icon: ShieldIcon },
 ]
 
 /**
@@ -34,19 +37,25 @@ const items: Item[] = [
  */
 export function CuentaNav() {
   const pathname = usePathname()
+  const locale = localeOf(pathname)
+  const route = routeOf(pathname)
+  const t = useTranslator()
 
   return (
-    <nav aria-label="Secciones de tu cuenta">
+    <nav aria-label={t({ es: 'Secciones de tu cuenta', gl: 'Seccións da túa conta' })}>
       <ul className="flex flex-wrap justify-center gap-x-2 gap-y-1">
-        {items.map(({ href, label, Icon }) => {
+        {items.map((item) => {
+          const { label, Icon } = item
           // Exacto para «Tus datos» y por prefijo para el resto: si no, la raíz
-          // se quedaría encendida en todas las pestañas.
-          const active = href === '/cuenta' ? pathname === href : pathname.startsWith(href)
+          // se quedaría encendida en todas las pestañas. Se compara la ruta sin
+          // idioma: `/gl/cuenta` no empieza por `/cuenta`.
+          const active =
+            item.route === '/cuenta' ? route === item.route : route.startsWith(item.route)
 
           return (
-            <li key={href}>
+            <li key={item.route}>
               <Link
-                href={href}
+                href={path(locale, item.route)}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
                   'flex items-center gap-2 rounded-full px-4 py-2.5 text-small transition-colors duration-500',
@@ -56,7 +65,7 @@ export function CuentaNav() {
                 )}
               >
                 <Icon className="h-4 w-4 shrink-0" />
-                {label}
+                {t(label)}
               </Link>
             </li>
           )

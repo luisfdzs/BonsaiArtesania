@@ -5,8 +5,11 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { NavPending } from '@/components/ui/NavPending'
 import { cn } from '@/lib/cn'
+import { localeOf, path, routeOf } from '@/lib/i18n/routes'
+import { useTranslator } from '@/lib/i18n/useLocale'
 import { navigation } from '@/lib/navigation'
 import { onHome, useActiveSection } from '@/lib/useActiveSection'
+import { LocalePicker } from './LocalePicker'
 import { AccountIcon, CartIcon, CloseIcon, ContactIcon, HomeIcon, MenuIcon } from './NavIcons'
 import { Wordmark } from './Wordmark'
 
@@ -19,6 +22,8 @@ import { Wordmark } from './Wordmark'
  */
 export function Header({ shopOpen }: { shopOpen: boolean }) {
   const pathname = usePathname()
+  const locale = localeOf(pathname)
+  const t = useTranslator()
   const [scrolled, setScrolled] = useState(false)
 
   /**
@@ -67,7 +72,7 @@ export function Header({ shopOpen }: { shopOpen: boolean }) {
           href="#main"
           className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:bg-bark focus:px-3 focus:py-2 focus:text-linen"
         >
-          Saltar al contenido
+          {t({ es: 'Saltar al contenido', gl: 'Ir ao contido' })}
         </a>
 
         {/* En móvil la barra sólo lleva la marca —los iconos viven abajo, en
@@ -76,7 +81,7 @@ export function Header({ shopOpen }: { shopOpen: boolean }) {
             `DesktopNav` y vuelve el reparto a los extremos. */}
         <div className="header-bar page-gutter flex h-20 items-center justify-center gap-6 md:h-24 md:justify-between">
           <Link
-            href="/"
+            href={path(locale, '/')}
             aria-label="Bonsái Artesanía, inicio"
             // Estando ya en la portada, Next no navega y el clic no haría nada:
             // quien esté en el pie se quedaría en el pie. La marca debe llevar
@@ -116,7 +121,7 @@ export function Header({ shopOpen }: { shopOpen: boolean }) {
 // sitio son las que se despliegan en el panel. Se derivan de `navigation` en vez
 // de repetirse, igual que en `MobileNav`: el menú tiene que decir lo mismo en
 // móvil y en escritorio.
-const panelItems = navigation.filter((item) => item.href !== '/#contacto')
+const panelItems = navigation.filter((item) => item.route !== '/#contacto')
 
 /**
  * El mismo repertorio que `MobileNav`, en horizontal: inicio, cuenta, carrito y
@@ -138,17 +143,22 @@ function DesktopNav({
   onToggle: () => void
 }) {
   const section = useActiveSection()
+  const locale = localeOf(pathname)
+  const route = routeOf(pathname)
+  const t = useTranslator()
 
+  // Contra la ruta sin idioma: con el idioma delante, `/gl/tienda` no empieza
+  // por `/tienda`.
   const inPanel =
-    panelItems.some((item) => !item.href.includes('#') && pathname.startsWith(item.href)) ||
+    panelItems.some((item) => !item.route.includes('#') && route.startsWith(item.route)) ||
     section === 'taller'
   const contactoActive = section === 'contacto'
 
   return (
     <nav className="hidden items-center gap-1 md:flex" aria-label="Principal">
       <IconLink
-        href="/"
-        label="Inicio"
+        href={path(locale, '/')}
+        label={t({ es: 'Inicio', gl: 'Inicio' })}
         active={onHome(pathname) && !section && !open}
         onClick={(event) => {
           if (onHome(pathname)) {
@@ -161,7 +171,11 @@ function DesktopNav({
       </IconLink>
 
       {shopOpen && (
-        <IconLink href="/carrito" label="Carrito" active={pathname === '/carrito' && !open}>
+        <IconLink
+          href={path(locale, '/carrito')}
+          label={t({ es: 'Carrito', gl: 'Carro' })}
+          active={route === '/carrito' && !open}
+        >
           <CartIcon className="h-5 w-5" />
         </IconLink>
       )}
@@ -170,17 +184,21 @@ function DesktopNav({
           el paso previo obligado sin sesión, así que sigue el mismo hueco
           encendido en vez de apagarlo de golpe. */}
       <IconLink
-        href="/cuenta"
-        label="Cuenta"
-        active={(pathname.startsWith('/cuenta') || pathname.startsWith('/entrar')) && !open}
+        href={path(locale, '/cuenta')}
+        label={t({ es: 'Cuenta', gl: 'Conta' })}
+        active={(route.startsWith('/cuenta') || route.startsWith('/entrar')) && !open}
       >
         <AccountIcon className="h-5 w-5" />
         {/* Cuenta es el único icono que espera de verdad: los demás llevan a
             páginas ya generadas. Ver `NavPending`. */}
-        <NavPending label="Abriendo tu cuenta" />
+        <NavPending label={t({ es: 'Abriendo tu cuenta', gl: 'Abrindo a túa conta' })} />
       </IconLink>
 
-      <IconLink href="/#contacto" label="Contacto" active={contactoActive && !open}>
+      <IconLink
+        href={path(locale, '/#contacto')}
+        label={t({ es: 'Contacto', gl: 'Contacto' })}
+        active={contactoActive && !open}
+      >
         <ContactIcon className="h-5 w-5" />
       </IconLink>
 
@@ -189,7 +207,11 @@ function DesktopNav({
         onClick={onToggle}
         aria-expanded={open}
         aria-controls="menu-escritorio"
-        aria-label={open ? 'Cerrar el menú' : 'Más secciones'}
+        aria-label={
+          open
+            ? t({ es: 'Cerrar el menú', gl: 'Pechar o menú' })
+            : t({ es: 'Más secciones', gl: 'Máis seccións' })
+        }
         className={cn(iconClass, iconState(open || inPanel))}
       >
         {open ? <CloseIcon className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
@@ -218,6 +240,10 @@ function DesktopMenuPanel({
   pathname: string
   onClose: () => void
 }) {
+  const locale = localeOf(pathname)
+  const route = routeOf(pathname)
+  const t = useTranslator()
+
   return (
     // `hidden` y no un `return` condicional: así el botón conserva
     // `aria-controls` apuntando a un nodo que siempre existe. Y `max-md:hidden`
@@ -233,16 +259,16 @@ function DesktopMenuPanel({
           y el `overflow-y-auto` de arriba las deja alcanzables. */}
       <nav
         className="flex min-h-full flex-col items-center justify-center gap-7 py-12 text-center"
-        aria-label="Secciones"
+        aria-label={t({ es: 'Secciones', gl: 'Seccións' })}
       >
         {panelItems.map((item) => {
           // Las anclas de la portada no se marcan: estando en el inicio se
           // encenderían dos a la vez, y eso es peor que no marcar nada.
-          const active = !item.href.includes('#') && pathname.startsWith(item.href)
+          const active = !item.route.includes('#') && route.startsWith(item.route)
           return (
             <Link
-              key={item.href}
-              href={item.href}
+              key={item.route}
+              href={path(locale, item.route)}
               aria-current={active ? 'page' : undefined}
               onClick={onClose}
               className={cn(
@@ -250,10 +276,14 @@ function DesktopMenuPanel({
                 active ? 'text-sage-deep' : 'text-bark hover:text-sage-deep',
               )}
             >
-              {item.label}
+              {t(item.label)}
             </Link>
           )
         })}
+
+        {/* El idioma, igual que en el menú de móvil: debajo de las tres
+            secciones y detrás de un filete. Ver `LocalePicker`. */}
+        <LocalePicker onNavigate={onClose} />
       </nav>
     </div>
   )
