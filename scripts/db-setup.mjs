@@ -125,7 +125,7 @@ const validators = {
       number: { bsonType: 'string', pattern: '^BA-[0-9]{4}-[0-9]{4}$' },
       userId: { bsonType: 'objectId' },
       status: {
-        enum: ['pendiente_pago', 'pagado', 'preparando', 'enviado', 'entregado', 'cancelado'],
+        enum: ['pendiente_pago', 'preparando', 'enviado', 'en_reparto', 'entregado', 'cancelado'],
       },
       items: {
         bsonType: 'array',
@@ -154,8 +154,9 @@ const validators = {
         bsonType: 'object',
         required: ['provider', 'status'],
         properties: {
-          // 'simulado' = pedido creado mientras el cobro es un placeholder. Ver
-          // el aviso en app/comprar/actions.ts.
+          // Bloque heredado y sin uso: todo se archiva con 'simulado' /
+          // 'pendiente'. Sigue declarado porque los documentos ya guardados lo
+          // tienen; quitarlo es una migración. Ver `lib/schema.ts`.
           provider: { enum: ['stripe', 'transferencia', 'bizum', 'simulado'] },
           status: { enum: ['pendiente', 'pagado', 'fallido', 'reembolsado'] },
           intentId: { bsonType: ['string', 'null'] },

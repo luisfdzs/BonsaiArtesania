@@ -18,8 +18,8 @@ import { clearPending, readPending, setPending, type Pending } from './pending'
  *
  * 1. **La pantalla nunca dice si un correo tiene cuenta o no.** Ni al crearla, ni
  *    al recuperarla, ni al fallar la contraseña. Un formulario que conteste «ese
- *    correo ya existe» es un buscador de clientes de la tienda: se le prueban mil
- *    direcciones y devuelve quiénes compran aquí. Lo que cambia según el caso es
+ *    correo ya existe» es un buscador de cuentas: se le prueban mil direcciones y
+ *    devuelve quiénes están dadas de alta. Lo que cambia según el caso es
  *    **el correo que se envía**, que sólo lee quien tiene ese buzón abierto.
  * 2. **El destino de la redirección se fija en el servidor.** Nunca sale de un
  *    campo del formulario, o cualquiera podría montar un enlace a `/entrar` que

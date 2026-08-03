@@ -16,7 +16,7 @@ type Props = {
   subject: string
   /**
    * Qué se pide desde aquí, en infinitivo: es lo único que queda del texto del
-   * botón, así que va al nombre accesible y al tooltip («Pedir presupuesto por
+   * botón, así que va al nombre accesible y al tooltip («Escribir a Ana por
    * WhatsApp»). Sin él, tres logos seguidos no dicen a qué llevan.
    */
   action: string

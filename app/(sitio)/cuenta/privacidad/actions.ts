@@ -6,15 +6,11 @@ import { getDb } from '@/lib/db'
 import { addresses, carts, orders, users } from '@/lib/schema'
 
 /**
- * Derecho de supresión (art. 17 RGPD).
+ * Borrado de la cuenta.
  *
- * **Los pedidos no se borran: se anonimizan.** La normativa fiscal y contable
- * obliga a conservar las operaciones y sus importes durante años, así que borrarlos
- * sería incumplir una obligación legal —y el propio RGPD (art. 17.3.b) reconoce esa
- * excepción—. Lo que sí desaparece es todo lo que identifica a la persona: se
- * vacían nombre, teléfono y dirección del pedido y se desliga de la cuenta.
- *
- * Queda, por tanto: qué se vendió, cuándo y por cuánto. Sin a quién.
+ * **Los pedidos no se borran: se anonimizan.** Lo que desaparece es todo lo que
+ * identifica a la persona: se vacían nombre, teléfono y dirección del pedido y se
+ * desliga de la cuenta. Queda, por tanto: qué se pidió y cuándo. Sin a quién.
  */
 export async function deleteAccount(): Promise<void> {
   const session = await auth()

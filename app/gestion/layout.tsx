@@ -16,10 +16,10 @@ export const metadata: Metadata = {
  * El panel de gestión: **lo único que tiene la cuenta del taller**.
  *
  * Antes vivía en `/taller` y era una página más de la web: llegaba con la
- * cabecera de la tienda encima —portada, tienda, encargos, carrito— y con el pie
- * legal debajo. Nada de eso le sirve a Ana, que entra a preparar pedidos y no a
- * comprar, y el carrito era además un enlace a una página que su propia cuenta
- * tiene cerrada. Ahora el panel es su propio armazón: cuelga de la raíz y no del
+ * cabecera del sitio encima —portada, tienda, encargos, carrito— y con el pie
+ * debajo. Nada de eso le sirve a Ana, que entra a preparar pedidos y no a pedir, y
+ * el carrito era además un enlace a una página que su propia cuenta tiene
+ * cerrada. Ahora el panel es su propio armazón: cuelga de la raíz y no del
  * grupo `(sitio)`, así que no hereda ninguna de esas dos cosas. Ver
  * `components/layout/SiteChrome.tsx` para el reparto.
  *
@@ -34,7 +34,9 @@ export const metadata: Metadata = {
  *
  * Se maqueta como una sola columna centrada, igual que las páginas de texto del
  * sitio: es el mismo sitio, y no había razón para que la parte de dentro se
- * leyera como un panel de administración distinto.
+ * leyera como un panel de administración distinto. En ordenador, eso sí, esa
+ * columna se abre hasta el ancho de la pantalla —ver el comentario de abajo—;
+ * en móvil se queda como estaba.
  *
  * Lo que sí lleva propio, arriba y abajo, es lo que la cabecera de la web daba
  * gratis: la marca —para saber dónde se está—, las dos secciones que hay, y
@@ -49,7 +51,13 @@ export default async function GestionLayout({ children }: { children: React.Reac
 
   return (
     <main id="main" className="page-gutter flex-1 pt-16 pb-(--spacing-section) md:pt-24">
-      <header className="mx-auto flex max-w-2xl flex-col items-center border-b border-line pb-8 text-center">
+      {/* En pantalla de ordenador el panel ocupa el ancho entero y no la columna
+          de 42rem del resto del sitio. Las páginas de texto se leen mejor
+          estrechas, pero aquí no se lee: se barre una lista de pedidos y se
+          trabaja sobre uno, y cada sección —dirección, cambio de estado,
+          historial— cabe de sobra a lo ancho sin tener que bajar. En móvil no
+          cambia nada, que ahí 42rem ya era más de lo que hay. */}
+      <header className="mx-auto flex max-w-2xl flex-col items-center border-b border-line pb-8 text-center md:max-w-none">
         {/* La marca, sin enlace: aquí no llevaría a ninguna parte —la portada no
             es de esta cuenta— y está sólo para decir de qué web es este panel. */}
         <Wordmark className="h-7 text-bark" />
@@ -63,9 +71,9 @@ export default async function GestionLayout({ children }: { children: React.Reac
         </div>
       </header>
 
-      <div className="mx-auto mt-12 max-w-2xl text-center">{children}</div>
+      <div className="mx-auto mt-12 max-w-2xl text-center md:max-w-none">{children}</div>
 
-      <div className="mx-auto mt-20 flex max-w-2xl flex-col items-center gap-6 border-t border-line pt-10 text-center">
+      <div className="mx-auto mt-20 flex max-w-2xl flex-col items-center gap-6 border-t border-line pt-10 text-center md:max-w-none">
         {email && <p className="text-small text-bark-faint">Dentro como {email}</p>}
 
         <form

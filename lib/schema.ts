@@ -6,15 +6,13 @@ import { getDb } from './db'
  *
  * Dos decisiones que atraviesan todo el modelo:
  *
- * 1. **El dinero se guarda en céntimos, como entero.** Un `float` de euros
- *    acumula error al sumar líneas de pedido (0.1 + 0.2 !== 0.3) y en un importe
- *    a cobrar eso no es aceptable. El catálogo sigue en euros porque lo escribe
- *    una persona a mano; la conversión ocurre al crear el pedido.
+ * 1. **Las cifras se guardan en céntimos, como entero.** Un `float` de euros
+ *    acumula error al sumar líneas (0.1 + 0.2 !== 0.3). El catálogo sigue en euros
+ *    porque lo escribe una persona a mano; la conversión ocurre al archivar la
+ *    petición. Ninguna de estas cifras se publica en ninguna parte.
  *
- * 2. **De la tarjeta no se guarda nada.** Ni número, ni caducidad, ni CVV:
- *    almacenarlo obliga a cumplir PCI-DSS. La captura la hace la pasarela y aquí
- *    sólo queda su identificador de cliente (`stripeCustomerId`) y el del cobro
- *    (`payment.intentId`), que son referencias opacas e inservibles por sí solas.
+ * 2. **De la tarjeta no se guarda nada.** Ni número, ni caducidad, ni CVV: la web
+ *    no los pide en ningún momento y no hay dónde meterlos.
  */
 
 /** Colecciones que gestiona el adaptador de Auth.js; no las tocamos a mano. */
@@ -42,8 +40,6 @@ export type UserDoc = {
   passwordUpdatedAt?: Date | null
   /** Perfil propio. Opcional: al registrarse por correo sólo se conoce el correo. */
   phone?: string | null
-  /** Referencia al cliente en la pasarela. Se rellena en la fase de pago. */
-  stripeCustomerId?: string | null
   createdAt?: Date
   updatedAt?: Date
 }
@@ -73,7 +69,7 @@ export type AddressDoc = {
   updatedAt: Date
 }
 
-/** Línea de carrito. El precio NO se guarda aquí: se lee del catálogo al mostrarlo. */
+/** Línea de carrito. Ninguna cifra se guarda aquí: se leen del catálogo al pintar. */
 export type CartItem = {
   slug: string
   qty: number
@@ -93,9 +89,9 @@ export type CartDoc = {
 }
 
 /**
- * Línea de pedido: copia congelada del catálogo en el momento de comprar.
- * Duplicar nombre y precio es deliberado —si mañana sube el precio o se renombra
- * la pieza, la factura emitida no puede cambiar.
+ * Línea de la petición: copia congelada del catálogo en el momento de pedir.
+ * Duplicar el nombre y la cifra es deliberado —si mañana se renombra la pieza o se
+ * corrige el catálogo, lo ya archivado no puede cambiar.
  */
 export type OrderItem = {
   slug: string
@@ -114,7 +110,7 @@ export type OrderItem = {
  * distintas: «ha salido del taller» y «llega hoy».
  */
 export type OrderStatus =
-  'pendiente_pago' | 'pagado' | 'preparando' | 'enviado' | 'en_reparto' | 'entregado' | 'cancelado'
+  'pendiente_pago' | 'preparando' | 'enviado' | 'en_reparto' | 'entregado' | 'cancelado'
 
 export type OrderDoc = {
   _id: ObjectId
@@ -133,15 +129,15 @@ export type OrderDoc = {
     shippingCents: number
     totalCents: number
   }
+  /**
+   * ⚠️ Bloque heredado, sin uso: todas las peticiones se archivan con `simulado` /
+   * `pendiente` y nada más lo lee ni lo escribe. Sigue aquí sólo porque el
+   * validador de Mongo lo declara obligatorio (`scripts/db-setup.mjs`); quitarlo es
+   * una migración, no una edición.
+   */
   payment: {
-    /**
-     * `simulado` marca los pedidos creados mientras el cobro es un placeholder:
-     * la interfaz dice al cliente que ha pagado, pero no se ha cobrado nada. Es lo
-     * que permite distinguirlos de los reales cuando se conecte Stripe.
-     */
     provider: 'stripe' | 'transferencia' | 'bizum' | 'simulado'
     status: 'pendiente' | 'pagado' | 'fallido' | 'reembolsado'
-    /** Identificador del intento de cobro en la pasarela. Nunca datos de tarjeta. */
     intentId?: string | null
   }
   /** Traza de cambios de estado, para poder responder «¿qué pasó con mi pedido?». */

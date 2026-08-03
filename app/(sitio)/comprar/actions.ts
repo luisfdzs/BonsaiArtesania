@@ -63,20 +63,11 @@ async function devolverCarrito(userId: ObjectId, items: CartItem[]): Promise<voi
 }
 
 /**
- * Registra el pedido.
+ * Registra la petición.
  *
- * ⚠️ NO COBRA NADA. Esto no es una venta cerrada: crea el pedido y avisa a Ana
- * para que sea ella quien se ponga con él y hable con quien lo ha pedido. La
- * interfaz se lo dice al cliente en esos términos —un encargo recibido— y no
- * habla de ningún pago.
- *
- * Para que la base de datos tampoco lo dé por pagado, el pedido se guarda con
- * `payment.provider: 'simulado'`, `payment.status: 'pendiente'` y estado
- * `pendiente_pago`. Así, cuando se conecte Stripe, una consulta distingue sin
- * ambigüedad los pedidos de esta etapa de los cobrados de verdad.
- *
- * No cambiar esos tres valores sin sustituir de verdad el cobro: son lo único que
- * impide que un pedido no pagado parezca pagado.
+ * Lo único que hace es archivarla y avisar a Ana para que sea ella quien se ponga
+ * con ella y hable con quien la ha mandado. La interfaz se lo dice en esos
+ * términos —una petición recibida— y nada más.
  *
  * ## Por qué hay tanta comprobación antes de llegar a crear nada
  *
@@ -169,8 +160,8 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
   })
   if (!address) return { error: 'Elige una dirección de envío.' }
 
-  // El carrito y los precios se releen aquí, en el servidor. Nada de importes
-  // venidos del formulario: es el único punto donde se decide cuánto cuesta.
+  // El carrito se relee aquí, en el servidor. Ninguna cifra viene del formulario:
+  // las del catálogo se leen en este punto y en ningún otro.
   const cart = await readCart()
 
   if (cart.lines.length === 0) {

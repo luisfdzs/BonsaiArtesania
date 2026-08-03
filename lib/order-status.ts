@@ -21,12 +21,10 @@ import type { OrderStatus } from '@/lib/schema'
  * su pieza, y desaprovecharlo con un gerundio administrativo sería una lástima.
  */
 export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
-  // El estado en base se llama `pendiente_pago` y así se queda, porque es lo que
-  // es. Pero en pantalla no se le puede llamar así mientras no haya pasarela: el
-  // cliente no ha dejado ningún pago a medias, sólo ha pedido algo y espera que Ana
-  // le escriba. «Sin confirmar» describe eso sin mentir en ninguno de los dos casos.
+  // El nombre en base es heredado y así se queda —renombrarlo es una migración—,
+  // pero en pantalla no aparece nunca: quien pide sólo ha pedido algo y espera que
+  // Ana le escriba, y «Sin confirmar» describe justo eso.
   pendiente_pago: 'Sin confirmar',
-  pagado: 'Pagado',
   preparando: 'Ana está creando tus joyas bonsái',
   enviado: 'En tránsito',
   en_reparto: 'En reparto',
@@ -57,7 +55,6 @@ export const ORDER_STATUS_ADMIN_LABEL: Record<OrderStatus, string> = {
  */
 export const ORDER_STATUS_FLOW: OrderStatus[] = [
   'pendiente_pago',
-  'pagado',
   'preparando',
   'enviado',
   'en_reparto',
