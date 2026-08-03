@@ -341,17 +341,17 @@
     "height": 1800,
     "blur": "data:image/webp;base64,UklGRm4AAABXRUJQVlA4IGIAAADwAwCdASoQABQAPt1cpkyopSOiMAgBEBuJZACdMoADDOBIalEOUESAAP7EPzpAupO7EXAKM3JYzeqc5M5bU0MAKJz1QdWKs+q4Tbds6H4rL0ecRgsbWLUqujrfCTG0hrYAAA=="
   },
-  "pendientes-helecho-largo": {
-    "src": "/media/pendientes-helecho-largo.webp",
-    "width": 1440,
-    "height": 1801,
-    "blur": "data:image/webp;base64,UklGRpQAAABXRUJQVlA4IIgAAADwAwCdASoQABQAPt1apkyopSOiMAgBEBuJYgC7ABtodjSUjYjKxBwAAP08XZ4f4YtgfOt7zNudcIjBmGAZIGQ0TtZC2szENymet8XvdazvZFNMsoXM00ABQawJKPccoUKP3NRzq3Pedx+RxdJkX//qKpwypI6d2cVqnd3/OHhKOsZAd5FHxAAA"
-  },
   "pendientes-helecho": {
     "src": "/media/pendientes-helecho.webp",
     "width": 1080,
     "height": 1350,
     "blur": "data:image/webp;base64,UklGRoAAAABXRUJQVlA4IHQAAADQAwCdASoQABQAPt1apkyopSOiMAgBEBuJYwC7ACIjwPJ3dWKfVuAA/lWx2hTYdSN7F8W6kO+EqfB8PlY4BjOqNCr0/WPhkHnLWNGM9A032QrnOufSr1taj9AC37iJGBNXW+ye0hLr74vImvv1sLpSYvnAAA=="
+  },
+  "pendientes-helecho-largo": {
+    "src": "/media/pendientes-helecho-largo.webp",
+    "width": 1440,
+    "height": 1801,
+    "blur": "data:image/webp;base64,UklGRpQAAABXRUJQVlA4IIgAAADwAwCdASoQABQAPt1apkyopSOiMAgBEBuJYgC7ABtodjSUjYjKxBwAAP08XZ4f4YtgfOt7zNudcIjBmGAZIGQ0TtZC2szENymet8XvdazvZFNMsoXM00ABQawJKPccoUKP3NRzq3Pedx+RxdJkX//qKpwypI6d2cVqnd3/OHhKOsZAd5FHxAAA"
   },
   "pendientes-hoja-otono": {
     "src": "/media/pendientes-hoja-otono.webp",
@@ -359,17 +359,17 @@
     "height": 1800,
     "blur": "data:image/webp;base64,UklGRrIAAABXRUJQVlA4IKYAAADwAwCdASoQABQAPt1apkyopSOiMAgBEBuJQBOgMXmWCozaTxcBN8QAAP7E/kl6Q1tu2ZjYMQdbzVdk52ZEpIUYn7R7XFZ9HuNK0ZEuYA5ukc7QhiTDRgBrUzbSZHW6BGkqW6sXq1rur1k8mkljPHvcrVDJCNcm/AomD4YMlCFNlq8jU8KFL/7JhFZ5tXzqX4FijBq1lpTpX1FqKgRR6/f2oScDOIAA"
   },
-  "pendientes-hortensia-azul": {
-    "src": "/media/pendientes-hortensia-azul.webp",
-    "width": 1440,
-    "height": 1800,
-    "blur": "data:image/webp;base64,UklGRn4AAABXRUJQVlA4IHIAAAAQBACdASoQABQAPt1apkyopSOiMAgBEBuJbACdMoMh1EkUud3V8qNfgAD3pI/tZH+Cp0kDvNpRZZZ6jmuijNgLMinXv8iCZKa58MZ+CHk8EKjp0beTc02Acvrto2aqkrJImnZ2uLnpwME2zmr1iubnAAA="
-  },
   "pendientes-hortensia": {
     "src": "/media/pendientes-hortensia.webp",
     "width": 1440,
     "height": 1910,
     "blur": "data:image/webp;base64,UklGRqQAAABXRUJQVlA4IJgAAABQBACdASoQABUAPt1apkyopSOiMAgBEBuJbACdMoRwAdCISrs2Mjq3wo6AAPQNScViywtVoegHGTrUsCC2oiYhlX1nJP07oA3mNovh9xfDFEoxZkay99sM/v8jf1J7xcJ5GDwsdEPRzSYyBf5UfrGayWqU6nSu3iLl+MkZdpjNtyOpLXFUXem9t2iTkwoxU7I3j/I9IQoAAA=="
+  },
+  "pendientes-hortensia-azul": {
+    "src": "/media/pendientes-hortensia-azul.webp",
+    "width": 1440,
+    "height": 1800,
+    "blur": "data:image/webp;base64,UklGRn4AAABXRUJQVlA4IHIAAAAQBACdASoQABQAPt1apkyopSOiMAgBEBuJbACdMoMh1EkUud3V8qNfgAD3pI/tZH+Cp0kDvNpRZZZ6jmuijNgLMinXv8iCZKa58MZ+CHk8EKjp0beTc02Acvrto2aqkrJImnZ2uLnpwME2zmr1iubnAAA="
   },
   "pendientes-lavanda-gota": {
     "src": "/media/pendientes-lavanda-gota.webp",
@@ -382,6 +382,12 @@
     "width": 1440,
     "height": 1800,
     "blur": "data:image/webp;base64,UklGRpwAAABXRUJQVlA4IJAAAACQBACdASoQABQAPt1apkyopSOiMAgBEBuJZgCdMoRwAdEAn4wGIY32kH73F5AAygCb3hK938cIJ2kM7BBqRrbbMl6NcFPkJTO/f003sF/Jd6ZfkI/kIwRujT68SRSTC/UQXoftTDbvK+txf5aVrULG8pZm3xLeJFN4xBoKdDKbVeUHhqx1r/fFtXNNh6WieAA="
+  },
+  "pendientes-margarita": {
+    "src": "/media/pendientes-margarita.webp",
+    "width": 1080,
+    "height": 1350,
+    "blur": "data:image/webp;base64,UklGRlAAAABXRUJQVlA4IEQAAAAQBACdASoQABQAPt1apkyopSOiMAgBEBuJZQAAW+m/Fv1m7b9lCkc1AAD+jBkCSs0zLgtt5BL/huyQTWeSnh2DlbPAAA=="
   },
   "pendientes-margarita-amarilla": {
     "src": "/media/pendientes-margarita-amarilla.webp",
@@ -400,12 +406,6 @@
     "width": 1440,
     "height": 1800,
     "blur": "data:image/webp;base64,UklGRpwAAABXRUJQVlA4IJAAAACQBACdASoQABQAPt1apkyopSOiMAgBEBuJZACdMoR3ACxN2tcHKePNZVrNF2AA/mxV0s1P1SvbTUwVpFBB9n6sGPiaqdbPnCAAaFxD4d/xqeyCL0UiNzblWdiHl6OycU4wykDPHvR5iUJYlVPAdsCYmpWW+XZV9guBdNRzbvDB4NbEudLAYDxsSy1SP5pFAAA="
-  },
-  "pendientes-margarita": {
-    "src": "/media/pendientes-margarita.webp",
-    "width": 1080,
-    "height": 1350,
-    "blur": "data:image/webp;base64,UklGRlAAAABXRUJQVlA4IEQAAAAQBACdASoQABQAPt1apkyopSOiMAgBEBuJZQAAW+m/Fv1m7b9lCkc1AAD+jBkCSs0zLgtt5BL/huyQTWeSnh2DlbPAAA=="
   },
   "pendientes-miel": {
     "src": "/media/pendientes-miel.webp",
@@ -508,6 +508,12 @@
     "width": 1440,
     "height": 1800,
     "blur": "data:image/webp;base64,UklGRp4AAABXRUJQVlA4IJIAAABQBACdASoQABQAPt1apkyopSOiMAgBEBuJYgCdL1ABOdFnoMsvIVxu4HYAAPysSqjUc4gFLitS+oyiKuzftR+dAJXm9GhzKhkRUbhBQWVBURAY3mNIgp6tYjPbJemzk162JTHeY5UXp92tlivRnIyos5qmwHg4VrZjxtfTu2jQ7U6WAvIVGWtSrw4OZu4YjQz4AA=="
+  },
+  "reel-prensado": {
+    "src": "/media/reel-prensado.webp",
+    "width": 720,
+    "height": 1280,
+    "blur": "data:image/webp;base64,UklGRvIAAABXRUJQVlA4IOYAAADwBACdASoQABwAPt1cpkyopSOiMAgBEBuJZACdAYsr6PFlzbz/gGZQJ6+3Z9ronwAA/u+GFS6AHWkJkHqAQ9zDccumDTsGDz5Rc6glHcbSlSX+XSpqn37wAMXQ2TMZhkpdH8Q695Bx2mqK+L4TNPMgfwCWV6LnU4+U6RYJ+hxO+Qtz28Wik8Rod413WVR9Zb43GfepeKPxdGoXlTVzJHn8L/9/tMlrq6ut4FPTveIVafunyV6njeek+o6wzN+Qt4Mz5IJVyhRLCDINXCl/YKRSpexEx1mMLumYqBGK19bo8aCJRQAAAA=="
   },
   "taller-buganvilla-libro": {
     "src": "/media/taller-buganvilla-libro.webp",
