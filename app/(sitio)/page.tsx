@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ContactoSection } from '@/components/sections/ContactoSection'
 import { Hero } from '@/components/sections/Hero'
 import { ProductCard } from '@/components/sections/ProductCard'
+import { ReelSection } from '@/components/sections/ReelSection'
 import { TallerSection } from '@/components/sections/TallerSection'
 import { Reveal } from '@/components/ui/Reveal'
 import { featuredProducts } from '@/content/products'
@@ -44,6 +45,10 @@ export default function HomePage() {
           </Link>
         </Reveal>
       </section>
+
+      {/* Antes de «El taller»: el vídeo enseña en quince segundos lo que la
+          sección de abajo cuenta en cuatro pasos, así que la abre. */}
+      <ReelSection />
 
       <TallerSection />
       <ContactoSection />
