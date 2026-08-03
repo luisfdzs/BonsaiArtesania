@@ -5,7 +5,7 @@ import { site } from '@/content/site'
 export default function sitemap(): MetadataRoute.Sitemap {
   // Sólo las páginas públicas. No entra nada tras el login (cuenta, carrito,
   // gestión), que además lleva `robots: noindex` en sus metadatos.
-  const routes = ['', '/tienda', '/encargos']
+  const routes = ['', '/tienda', '/encargos', '/legal/privacidad']
 
   return [
     ...routes.map((route) => ({ url: `${site.url}${route}`, changeFrequency: 'monthly' as const })),

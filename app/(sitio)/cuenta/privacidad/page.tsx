@@ -42,7 +42,8 @@ export default function PrivacidadCuentaPage() {
         </p>
         <p className="mt-4 text-small text-bark-faint">
           Tus pedidos no se borran, se anonimizan: se les quita tu nombre, tu teléfono y tu
-          dirección, y dejan de estar ligados a ti. Queda qué se pidió, sin a quién.
+          dirección, y dejan de estar ligados a ti. Queda qué se pidió, sin a quién. Está explicado
+          en <Link href="/legal/privacidad">privacidad</Link>.
         </p>
 
         <DeleteAccount />

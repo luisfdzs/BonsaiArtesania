@@ -87,9 +87,18 @@ export default async function EntrarPage({ searchParams }: Props) {
           <LoginForm backTo={backTo} />
         )}
 
-        {/* Sólo en el lado de «entrar»: al darse de alta no queda nada que decir
-            aquí debajo, y un párrafo vacío dejaría un hueco sin motivo. */}
-        {!creating && (
+        {/* Al darse de alta, el aviso de privacidad; al entrar, el enlace al alta.
+            El primero va aquí porque éste es el momento en que se recoge el correo,
+            y decirlo donde se pide es justo lo que exige el RGPD (art. 13). */}
+        {creating ? (
+          <p className="mt-8 text-small text-bark-faint">
+            Al crear la cuenta, tus datos se tratan como se explica en{' '}
+            <Link href="/legal/privacidad" className="link-underline">
+              privacidad
+            </Link>
+            .
+          </p>
+        ) : (
           <p className="mt-8 text-small text-bark-faint">
             ¿Todavía no tienes cuenta?{' '}
             {/* Lleva a la misma pestaña de arriba, así que espera igual. */}
