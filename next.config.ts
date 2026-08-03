@@ -15,11 +15,16 @@ const nextConfig: NextConfig = {
    *
    * Temporales y no permanentes: la URL buena sigue siendo la portada, y una
    * 308 se queda cacheada en el navegador para siempre.
+   *
+   * Llevan el idioma dentro porque las secciones también lo llevan: quien
+   * recarga estando en `/gl/contacto` tiene que volver a la portada en galego, no
+   * en castellano. Sin idioma delante no hace falta cubrirlas: de eso se encarga
+   * antes `proxy.ts`, que las manda a `/es/…` y de ahí caen aquí.
    */
   async redirects() {
     return [
-      { source: '/el-taller', destination: '/#taller', permanent: false },
-      { source: '/contacto', destination: '/#contacto', permanent: false },
+      { source: '/:locale(es|gl)/el-taller', destination: '/:locale/#taller', permanent: false },
+      { source: '/:locale(es|gl)/contacto', destination: '/:locale/#contacto', permanent: false },
     ]
   },
   async headers() {

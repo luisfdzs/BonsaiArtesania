@@ -55,8 +55,24 @@ export default function EncargosPage() {
             no se parta en cuatro— y a partir de `md` 6/5 con un hueco en medio,
             que es lo que separa las dos cosas cuando hay sitio de sobra. El aire
             entre columnas también crece, porque a 360px cada píxel de hueco se
-            lo quita al texto. */}
-        <div className="grid grid-cols-12 items-center gap-x-4 md:gap-x-12">
+            lo quita al texto.
+
+            **El tope de ancho de la pareja** es lo que la mantiene cuadrada. La
+            foto no puede pasar de 24rem —es una lámina vertical, estirarla la
+            reventaría—, así que a partir de unos 1000px de contenido su columna
+            crece y ella no: en una pantalla de 1920 la columna medía 672px para
+            una foto de 384, y esos 288px sobrantes la dejaban flotando en medio
+            de la nada, con un cañón de 350px entre el texto y ella y otros 160
+            de margen muerto hasta el borde. Con el tope, la geometría de
+            cualquier pantalla grande es la que ya funcionaba en `md`: la columna
+            de la foto mide casi lo que mide la foto.
+
+            Y `ml-auto` en vez de `mx-auto` para que el borde derecho de la foto
+            sea el borde derecho de la pareja. Debajo de `md` no hace nada —ahí
+            la foto es más estrecha que su columna y el tope no aprieta—, pero
+            arriba es la diferencia entre dos bloques con un canto común y dos
+            bloques centrados cada uno en su hueco. */}
+        <div className="mx-auto grid max-w-6xl grid-cols-12 items-center gap-x-4 md:gap-x-12">
           <div className="col-span-7 text-center md:col-span-6">
             <p className="eyebrow">Encargos</p>
             <h1 className="mt-7 font-serif text-display">Vuestras flores</h1>
@@ -67,18 +83,19 @@ export default function EncargosPage() {
             </p>
           </div>
 
-          <div className="col-span-5 mx-auto w-full max-w-[24rem] md:col-start-8">
+          <div className="col-span-5 ml-auto w-full max-w-[24rem] md:col-start-8">
             <Media
               image={img(
                 'encargos-gotas',
                 'Pendientes largos de resina con flores moradas sobre la tarjeta del taller',
               )}
               ratio="3 / 4"
-              // Un solo valor porque el reparto apenas cambia: cinco doceavos en
-              // móvil y algo más de un tercio en escritorio. Lo que ya no vale es
-              // el `100vw` de antes para móvil, que traía un archivo del doble de
-              // lo que se ve ahora.
-              sizes="40vw"
+              // Cinco doceavos mientras la columna manda, y 24rem en cuanto el
+              // tope de la foto es quien decide —de unos 1000px de ventana
+              // arriba—. Con el `40vw` a secas de antes, una pantalla de 1920
+              // pedía 768px para pintar 384: el doble de archivo del que se ve.
+              // Y el `100vw` que hubo al principio pedía el doble otra vez.
+              sizes="(min-width: 1024px) 24rem, 40vw"
               priority
               className="rounded-t-full border border-line"
             />

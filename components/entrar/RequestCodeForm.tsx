@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
-import { pedirCodigo, type EntrarState } from '@/app/(sitio)/entrar/actions'
+import { pedirCodigo, type EntrarState } from '@/app/[locale]/(sitio)/entrar/actions'
 import { Field } from '@/components/ui/Field'
 import { FormPending } from '@/components/ui/FormPending'
 

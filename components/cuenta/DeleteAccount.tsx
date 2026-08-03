@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { deleteAccount } from '@/app/(sitio)/cuenta/privacidad/actions'
+import { deleteAccount } from '@/app/[locale]/(sitio)/cuenta/privacidad/actions'
 import { TrashIcon } from '@/components/ui/CartIcons'
 import { FormPending } from '@/components/ui/FormPending'
 

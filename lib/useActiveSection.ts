@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { localeOf, path, routeOf } from '@/lib/i18n/routes'
 
 /**
  * Las secciones de la portada que se comportan como una página propia en la
@@ -36,9 +37,13 @@ const HOME = '/'
  * sección. Quien pregunta es la navegación: estando en Contacto seguimos en la
  * portada, así que el icono de la casa tiene que subir al principio en vez de
  * navegar, aunque la barra de direcciones diga otra cosa.
+ *
+ * Compara la ruta **sin el idioma**: lo que llega es `/es` o `/gl/contacto`, y
+ * las rutas de aquí arriba se escriben una sola vez para los dos idiomas.
  */
 export function onHome(pathname: string): boolean {
-  return pathname === HOME || SECTIONS.some((section) => section.path === pathname)
+  const route = routeOf(pathname)
+  return route === HOME || SECTIONS.some((section) => section.path === route)
 }
 
 /**
@@ -63,6 +68,7 @@ export function onHome(pathname: string): boolean {
  */
 export function useActiveSection(): string {
   const pathname = usePathname()
+  const locale = localeOf(pathname)
   const [id, setId] = useState('')
 
   // Ojo con `pathname`: Next sincroniza `replaceState` con su router, así que
@@ -102,7 +108,12 @@ export function useActiveSection(): string {
       // El hash entra en la comparación para limpiarlo si venía puesto —de un
       // enlace `/#contacto` guardado de antes, o del salto al ancla—: si no,
       // quedaría colgando detrás de la ruta nueva.
-      const url = current ? current.path : HOME
+      //
+      // Y la ruta que se escribe lleva el idioma delante: es una dirección de
+      // verdad, la que queda si alguien recarga o copia el enlace, así que
+      // `/contacto` a secas sacaría a un lector en galego de su idioma en cuanto
+      // hiciera scroll.
+      const url = path(locale, current ? current.path : HOME)
       if (window.location.pathname + window.location.hash !== url) {
         history.replaceState(null, '', url)
       }
@@ -127,7 +138,7 @@ export function useActiveSection(): string {
       if (frame) cancelAnimationFrame(frame)
       window.removeEventListener('scroll', onScroll)
     }
-  }, [pathname])
+  }, [pathname, locale])
 
   // Fuera de la portada no hay sección que valga: el id que quedó de la última
   // visita se apaga aquí y no con un `setState` dentro del efecto, que sería

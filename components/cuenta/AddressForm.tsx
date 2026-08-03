@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState, useEffect } from 'react'
-import { createAddress, updateAddress, type ActionState } from '@/app/(sitio)/cuenta/actions'
+import { createAddress, updateAddress, type ActionState } from '@/app/[locale]/(sitio)/cuenta/actions'
 import { CloseIcon } from '@/components/layout/NavIcons'
 import { CheckIcon } from '@/components/ui/CartIcons'
 import { Field } from '@/components/ui/Field'

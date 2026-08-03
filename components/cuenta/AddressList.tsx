@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { deleteAddress } from '@/app/(sitio)/cuenta/actions'
+import { deleteAddress } from '@/app/[locale]/(sitio)/cuenta/actions'
 import { TrashIcon } from '@/components/ui/CartIcons'
 import { FlowerBud } from '@/components/ui/FlowerBud'
 import { AddressForm, type AddressValues } from './AddressForm'

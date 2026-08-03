@@ -1,4 +1,5 @@
 import manifest from '@/content/media-manifest.json'
+import type { Localized } from '@/lib/i18n/config'
 
 export type Image = {
   src: string
@@ -21,4 +22,20 @@ export type ImageKey = keyof typeof manifest
  */
 export function img(key: ImageKey, alt: string): Image {
   return { ...manifest[key], alt }
+}
+
+/**
+ * La misma foto con su texto alternativo en los dos idiomas, para el contenido
+ * que se guarda traducido de una vez —el catálogo— en vez de traducirse al
+ * pintar.
+ *
+ * Devuelve dos fotos enteras y no una foto con el `alt` traducido dentro. Es
+ * repetir el `src`, el tamaño y el placeholder dos veces, y se hace a propósito:
+ * así lo que sale de aquí es un `Localized<Image>` normal, se resuelve con el
+ * mismo `t()` que cualquier otro texto y `Media` sigue recibiendo una `Image` y
+ * no un tipo nuevo. La copia son cuatro campos en memoria; el tipo aparte serían
+ * cuatro sitios donde acordarse de resolverlo.
+ */
+export function imgLocalized(key: ImageKey, alt: Localized): Localized<Image> {
+  return { es: img(key, alt.es), gl: img(key, alt.gl) }
 }

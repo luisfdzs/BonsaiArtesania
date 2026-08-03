@@ -1,7 +1,7 @@
 'use client'
 
 import { type AnimationEvent, type CSSProperties, useState } from 'react'
-import { addToCart } from '@/app/(sitio)/carrito/actions'
+import { addToCart } from '@/app/[locale]/(sitio)/carrito/actions'
 import { CartPing } from '@/components/layout/CartCount'
 
 /**

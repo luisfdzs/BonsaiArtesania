@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
-import { updateProfile, type ActionState } from '@/app/(sitio)/cuenta/actions'
+import { updateProfile, type ActionState } from '@/app/[locale]/(sitio)/cuenta/actions'
 import { MailIcon } from '@/components/cuenta/CuentaIcons'
 import { CheckIcon } from '@/components/ui/CartIcons'
 import { Field } from '@/components/ui/Field'
