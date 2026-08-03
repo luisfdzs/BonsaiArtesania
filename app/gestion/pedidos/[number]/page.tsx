@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { FlowerBud } from '@/components/ui/FlowerBud'
 import { ORDER_STATUS_ADMIN_LABEL, ORDER_STATUS_FLOW } from '@/lib/order-status'
-import { formatCents, orders } from '@/lib/schema'
+import { orders } from '@/lib/schema'
 import { updateOrderStatus } from '../../actions'
 
 type Params = { params: Promise<{ number: string }> }
@@ -42,20 +42,9 @@ export default async function GestionPedidoPage({ params }: Params) {
               {item.name}
               {item.qty > 1 && ` × ${item.qty}`}
             </Link>
-            <span className="text-small text-bark-soft">
-              {formatCents(item.unitPriceCents * item.qty)}
-            </span>
           </li>
         ))}
       </ul>
-
-      <p className="mt-6 text-lead">
-        Total: {formatCents(order.totals.totalCents)}{' '}
-        <span className="text-small text-bark-faint">
-          (envío{' '}
-          {order.totals.shippingCents === 0 ? 'gratis' : formatCents(order.totals.shippingCents)})
-        </span>
-      </p>
 
       <div className="mt-12 border-t border-line pt-8">
         <h3 className="eyebrow">Enviar a</h3>
@@ -80,7 +69,16 @@ export default async function GestionPedidoPage({ params }: Params) {
             <label className="field-label" htmlFor="status">
               Estado
             </label>
-            <select id="status" name="status" defaultValue={order.status} className="field">
+            {/* El texto va centrado, como todo lo demás de esta columna. El
+                `select` es el único campo que no lo estaba: un `input` vacío no
+                tiene nada que centrar, pero este siempre enseña un valor, y
+                alineado a la izquierda se salía del eje de la página. */}
+            <select
+              id="status"
+              name="status"
+              defaultValue={order.status}
+              className="field text-center"
+            >
               {ORDER_STATUS_FLOW.map((status) => (
                 <option key={status} value={status}>
                   {ORDER_STATUS_ADMIN_LABEL[status]}

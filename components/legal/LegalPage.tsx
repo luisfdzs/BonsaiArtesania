@@ -1,11 +1,11 @@
-import { legal, legalComplete } from '@/content/legal'
+import { legal } from '@/content/legal'
 
 /**
- * Envoltorio común de las páginas legales: mismo ancho de lectura, misma
- * tipografía y el mismo aviso cuando faltan los datos del responsable.
+ * Envoltorio del aviso de privacidad: ancho de lectura, la fecha de revisión y la
+ * tipografía de texto corrido (`legal-prose` en globals.css).
  *
- * El aviso es deliberadamente visible. Un texto legal con el titular sin rellenar
- * no cumple, y es mejor que se vea en pantalla que enterarse por una reclamación.
+ * Vive aparte de la página aunque hoy sólo la use ella: si mañana hace falta un
+ * segundo aviso, el encabezado y el ritmo vertical ya están decididos en un sitio.
  */
 export function LegalPage({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -21,36 +21,8 @@ export function LegalPage({ title, children }: { title: string; children: React.
           })}
         </p>
 
-        {!legalComplete && (
-          <p className="mt-10 border border-petal bg-petal-soft p-5 text-small text-bark-soft">
-            <strong className="text-bark">Este texto está incompleto.</strong> Faltan el nombre, el
-            NIF y el domicilio del responsable, que son obligatorios y no se pueden suponer. Se
-            rellenan en <code>content/legal.ts</code> cuando Ana esté dada de alta.
-          </p>
-        )}
-
         <div className="legal-prose mt-12">{children}</div>
       </article>
     </div>
-  )
-}
-
-/** Bloque «responsable», idéntico en privacidad y en el aviso legal. */
-export function Holder() {
-  return (
-    <ul>
-      <li>
-        <strong>Titular:</strong> {legal.holder ?? '— pendiente —'}
-      </li>
-      <li>
-        <strong>NIF:</strong> {legal.taxId ?? '— pendiente —'}
-      </li>
-      <li>
-        <strong>Domicilio:</strong> {legal.address ?? '— pendiente —'}
-      </li>
-      <li>
-        <strong>Correo:</strong> bonsai@bonsaiartesania.com
-      </li>
-    </ul>
   )
 }

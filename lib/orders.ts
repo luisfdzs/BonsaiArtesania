@@ -6,9 +6,9 @@ import { getDb } from '@/lib/db'
  *
  * El contador vive en su propia colección y se incrementa con `findOneAndUpdate`,
  * que en Mongo es atómico sobre un documento. Contar los pedidos existentes y
- * sumarle uno parecería más simple, pero dos compras en el mismo instante leerían
- * el mismo total y generarían el mismo número —y `number` es índice único, así que
- * una de las dos compras fallaría—.
+ * sumarle uno parecería más simple, pero dos peticiones en el mismo instante
+ * leerían el mismo total y generarían el mismo número —y `number` es índice único,
+ * así que una de las dos fallaría—.
  *
  * La serie se reinicia cada año: el año va en el número y el contador es por año.
  */

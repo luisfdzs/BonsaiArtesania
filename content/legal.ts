@@ -1,25 +1,33 @@
+import { site } from '@/content/site'
+
 /**
- * Datos legales del sitio.
+ * Datos para el aviso de privacidad.
  *
- * ⚠️ PENDIENTE (Ana): los tres campos marcados abajo son obligatorios por la LSSI
- * (art. 10) y por el RGPD para identificar al responsable del tratamiento, y **no
- * se pueden inventar**. Hasta que estén rellenos, las páginas legales avisan de
- * que están incompletas en lugar de mostrar datos falsos.
+ * Existe por una razón concreta: la web pide nombre, teléfono y dirección postal
+ * para poder enviar una pieza, y eso es tratamiento de datos personales. El RGPD
+ * (art. 13) obliga a decir quién los trata, para qué y cuánto tiempo, **haya o no
+ * actividad económica detrás**. Es una obligación de quien recoge los datos, no de
+ * quien factura, así que no depende de que Ana esté dada de alta.
  *
- * Tampoco es lo único que hace falta antes de vender de verdad: para cobrar hay
- * que estar dado de alta como autónoma o sociedad, y ese alta es la que da el NIF
- * y el domicilio que van aquí.
+ * Por eso aquí **no hay NIF ni domicilio fiscal**: eso lo exige el art. 10 de la
+ * LSSI a quien presta servicios con ánimo de lucro, y no es lo que esta web hace.
+ * Para identificar al responsable basta un nombre y un medio de contacto.
+ *
+ * PENDIENTE (Ana): `holder` debería llevar su nombre y apellidos. Mientras esté a
+ * `null`, el aviso se identifica con el nombre del taller y el buzón, que es cierto
+ * y sirve para ejercer derechos, pero nombrar a la persona es más limpio.
  */
 export const legal = {
-  /** Nombre y apellidos, o razón social. */
+  /** Nombre y apellidos de quien responde. `null` → se usa el nombre del taller. */
   holder: null as string | null,
-  /** NIF o CIF. */
-  taxId: null as string | null,
-  /** Domicilio a efectos de notificaciones. */
-  address: null as string | null,
 
-  /** Fecha de la última revisión de los textos legales. */
-  updated: '2026-07-29',
+  /** Fecha de la última revisión del texto. */
+  updated: '2026-08-03',
+
+  /** Cómo se identifica al responsable cuando `holder` está sin rellenar. */
+  get responsible(): string {
+    return this.holder ?? `${site.nameFull} (taller artesanal en ${site.location})`
+  },
 
   /**
    * Encargados del tratamiento: terceros que tratan datos por cuenta nuestra.
@@ -29,16 +37,13 @@ export const legal = {
     { name: 'Vercel Inc.', purpose: 'Alojamiento de la web', location: 'EE. UU. (con CCT)' },
     {
       name: 'MongoDB Inc. (Atlas)',
-      purpose: 'Base de datos de cuentas y pedidos',
+      purpose: 'Base de datos de cuentas y peticiones',
       location: 'UE (París)',
     },
     {
       name: 'IONOS SE',
-      purpose: 'Correo electrónico (enlaces de acceso y avisos de pedido) y dominio',
+      purpose: 'Correo electrónico (códigos de acceso y avisos) y dominio',
       location: 'UE (Alemania)',
     },
   ],
 } as const
-
-/** ¿Se pueden publicar los textos legales sin mentir? */
-export const legalComplete = Boolean(legal.holder && legal.taxId && legal.address)

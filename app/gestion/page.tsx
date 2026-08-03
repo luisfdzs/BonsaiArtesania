@@ -1,6 +1,7 @@
 import Link from 'next/link'
+import { cn } from '@/lib/cn'
 import { ORDER_STATUS_ADMIN_LABEL, ORDER_STATUS_FLOW } from '@/lib/order-status'
-import { formatCents, orders, type OrderStatus } from '@/lib/schema'
+import { orders, type OrderStatus } from '@/lib/schema'
 
 type Props = {
   searchParams: Promise<{ estado?: string }>
@@ -13,7 +14,7 @@ const dateFormat = new Intl.DateTimeFormat('es-ES', {
 })
 
 /** Lo que Ana quiere ver primero: lo que hay que preparar. */
-const PENDING: OrderStatus[] = ['pendiente_pago', 'pagado', 'preparando']
+const PENDING: OrderStatus[] = ['pendiente_pago', 'preparando']
 
 export default async function GestionPedidosPage({ searchParams }: Props) {
   const { estado } = await searchParams
@@ -34,25 +35,49 @@ export default async function GestionPedidosPage({ searchParams }: Props) {
 
   const countBy = new Map(counts.map((row) => [row._id, row.total]))
 
+  // «Por preparar» no es un estado, es la vista de entrada —lo que hay encima de
+  // la mesa—, así que va delante y sin contador. El resto son los estados en el
+  // orden en que ocurren, cada uno con cuántos pedidos hay.
+  const tabs = [
+    { key: 'pendientes', href: '/gestion', label: 'Por preparar', active: !estado },
+    ...ORDER_STATUS_FLOW.map((status) => ({
+      key: status,
+      href: `/gestion?estado=${status}`,
+      label: `${ORDER_STATUS_ADMIN_LABEL[status]} (${countBy.get(status) ?? 0})`,
+      active: estado === status,
+    })),
+  ]
+
   return (
     <section>
-      <div className="flex flex-wrap justify-center gap-x-6 gap-y-3">
-        <Link
-          href="/gestion"
-          className={`text-small ${!estado ? 'text-bark' : 'text-bark-faint'} link-underline tap`}
-        >
-          Por preparar
-        </Link>
-        {ORDER_STATUS_FLOW.map((status) => (
-          <Link
-            key={status}
-            href={`/gestion?estado=${status}`}
-            className={`text-small ${estado === status ? 'text-bark' : 'text-bark-faint'} link-underline tap`}
-          >
-            {ORDER_STATUS_ADMIN_LABEL[status]} ({countBy.get(status) ?? 0})
-          </Link>
-        ))}
-      </div>
+      {/* Los estados son un menú de navegación y no una fila de enlaces sueltos:
+          es la barra con la que Ana se mueve por el taller, y ahora se dice como
+          las demás del sitio —píldora salvia en la que está, `aria-current` para
+          quien no ve el color—. Ver `components/gestion/GestionNav.tsx`, que es
+          el mismo lenguaje un nivel más arriba.
+
+          Sigue siendo servidor: lo que está encendido sale de `?estado=`, que ya
+          está aquí, y no hace falta `usePathname` ni bajar nada al navegador. */}
+      <nav aria-label="Estado de los pedidos">
+        <ul className="flex flex-wrap justify-center gap-x-2 gap-y-1">
+          {tabs.map(({ key, href, label, active }) => (
+            <li key={key}>
+              <Link
+                href={href}
+                aria-current={active ? 'page' : undefined}
+                className={cn(
+                  'block rounded-full px-4 py-2.5 text-small transition-colors duration-500',
+                  active
+                    ? 'bg-sage-deep/12 text-sage-deep'
+                    : 'text-bark-soft hover:bg-sage-deep/8 hover:text-bark',
+                )}
+              >
+                {label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
 
       {docs.length === 0 ? (
         <p className="mt-12 text-bark-soft">Nada por aquí.</p>
@@ -63,7 +88,7 @@ export default async function GestionPedidosPage({ searchParams }: Props) {
               {/* El enlace envuelve la fila entera y no sólo el número. Antes
                   había que acertarle a «BA-2026-0004» —nueve caracteres en una
                   fila de cinco líneas—, y todo lo demás, que es lo que de verdad
-                  se está mirando (el nombre, las piezas, el importe), no hacía
+                  se está mirando (el nombre, las piezas, el estado), no hacía
                   nada al pulsarlo. Dentro no hay ningún otro botón ni enlace, así
                   que no hay nada que anidar y el bloque puede ser el enlace.
 
@@ -79,8 +104,9 @@ export default async function GestionPedidosPage({ searchParams }: Props) {
                   el tabulador.
 
                   Antes eran dos columnas, pedido a la izquierda y total a la
-                  derecha. Centrado se apilan: el número primero, y el importe y
-                  el estado debajo. */}
+                  derecha. Centrado se apilan: el número primero y el estado
+                  debajo. El total ya no está —aquí tampoco se enseña ninguna
+                  cifra—, así que abajo queda sólo por dónde va. */}
               <Link
                 href={`/gestion/pedidos/${order.number}`}
                 className="-mx-4 flex flex-col items-center gap-3 px-4 py-5 transition-colors duration-500 hover:bg-sage-deep/8 focus-visible:bg-sage-deep/8"
@@ -98,15 +124,9 @@ export default async function GestionPedidosPage({ searchParams }: Props) {
                   </p>
                 </div>
 
-                <div>
-                  <p>{formatCents(order.totals.totalCents)}</p>
-                  <p className="mt-2 text-small text-bark-soft">
-                    {ORDER_STATUS_ADMIN_LABEL[order.status]}
-                  </p>
-                  {order.payment.provider === 'simulado' && (
-                    <p className="eyebrow mt-2 text-bark-faint">Cobro simulado</p>
-                  )}
-                </div>
+                <p className="text-small text-bark-soft">
+                  {ORDER_STATUS_ADMIN_LABEL[order.status]}
+                </p>
               </Link>
             </li>
           ))}

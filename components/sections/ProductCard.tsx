@@ -22,8 +22,7 @@ export function ProductCard({ product, priority = false }: Props) {
           className="[&_img]:transition-transform [&_img]:duration-[1400ms] [&_img]:ease-(--ease-out-soft) group-hover:[&_img]:scale-[1.03]"
         />
 
-        {/* Sin precio: el catálogo no publica importes. Lo que valga cada pieza se
-            acuerda hablando con Ana al confirmar el encargo. */}
+        {/* Sólo nombre y resumen: el catálogo no publica ninguna cifra. */}
         <h3 className="mt-5 font-serif text-lead leading-tight">{product.name}</h3>
         <p className="mt-1 text-small text-bark-faint">{product.summary}</p>
       </Link>

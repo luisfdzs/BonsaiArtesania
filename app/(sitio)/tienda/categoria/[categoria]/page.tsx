@@ -55,12 +55,11 @@ export default async function CategoriaPage({ params }: Params) {
           {items.length === 1 ? '1 pieza' : `${items.length} piezas`}
         </p>
 
-        {/* El aviso de tienda cerrada sobra en «Del taller»: ahí no hay nada
-            que comprar ni con la tienda abierta. */}
+        {/* El aviso sobra en «Del taller»: ahí no hay nada que pedir ni con el
+            carrito abierto. */}
         {!shopOpen && category.key !== 'taller' && (
           <p className="mt-8 bg-petal-soft p-5 text-small text-bark-soft">
-            Todavía no se puede comprar directamente desde la web: cada pieza se encarga hablando.
-            Escríbeme por WhatsApp o por correo y lo organizamos.
+            Cada pieza se encarga hablando. Escríbeme por WhatsApp o por correo y lo organizamos.
           </p>
         )}
       </header>

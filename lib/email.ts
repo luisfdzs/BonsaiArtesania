@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer'
 import { site } from '@/content/site'
-import { formatCents, type OrderDoc } from '@/lib/schema'
+import { type OrderDoc } from '@/lib/schema'
 import { clientIp, consumeAll, POLICIES } from '@/lib/rate-limit'
 
 /**
@@ -8,10 +8,10 @@ import { clientIp, consumeAll, POLICIES } from '@/lib/rate-limit'
  *
  * Los dos usos tratan el fallo al revés a propósito:
  *
- * - **Avisos de pedido** (`sendOrderEmails`): nunca lanzan. El cliente ya ha
- *   comprado y las unidades están descontadas; que el aviso no salga es molesto
- *   pero recuperable, perder la venta no. Sin SMTP configurado sólo dejan un
- *   aviso en consola, así el proyecto arranca en local sin credenciales.
+ * - **Avisos de pedido** (`sendOrderEmails`): nunca lanzan. La petición ya está
+ *   registrada y las unidades descontadas; que el aviso no salga es molesto pero
+ *   recuperable, perder la petición no. Sin SMTP configurado sólo dejan un aviso
+ *   en consola, así el proyecto arranca en local sin credenciales.
  * - **Códigos de acceso** (`sendCodeEmail`, `sendAlreadyRegisteredEmail`): sí
  *   informan del fallo. Si ese correo no sale, la persona se queda esperando seis
  *   cifras que no existen, y es mejor que vea el error que mirar el buzón en vano.
@@ -208,8 +208,8 @@ ${site.url}`,
  *
  * Existe para no tener que contestarle en pantalla «ese correo ya está registrado».
  * Esa frase, dicha a quien acaba de teclear una dirección cualquiera, convierte el
- * formulario de alta en un buscador de clientes de la tienda: se prueban mil
- * direcciones y se sabe cuáles compran aquí. La pantalla dice siempre lo mismo, y
+ * formulario de alta en un buscador de cuentas: se prueban mil direcciones y se
+ * sabe cuáles están dadas de alta. La pantalla dice siempre lo mismo, y
  * quien de verdad tiene el buzón abierto recibe este correo, que además le resuelve
  * el problema —casi siempre es alguien que no recordaba tener cuenta—.
  */
@@ -294,16 +294,13 @@ ${site.url}`,
 /**
  * Lista de líneas en texto plano, que es lo que leen todos los clientes.
  *
- * Con importes o sin ellos según a quién se escriba: el aviso interno los lleva
- * —Ana necesita saber qué encargo tiene delante— y el correo al cliente no, igual
- * que no los lleva ninguna página de la web.
+ * Sin importes, y en los dos correos por igual: ni el que recibe quien pide ni el
+ * aviso que le llega a Ana llevan cifras, lo mismo que no las lleva ninguna
+ * página de la web ni la pantalla del taller.
  */
-function itemLines(order: OrderDoc, withPrices: boolean): string {
+function itemLines(order: OrderDoc): string {
   return order.items
-    .map((item) => {
-      const line = `  · ${item.name}${item.qty > 1 ? ` × ${item.qty}` : ''}`
-      return withPrices ? `${line} — ${formatCents(item.unitPriceCents * item.qty)}` : line
-    })
+    .map((item) => `  · ${item.name}${item.qty > 1 ? ` × ${item.qty}` : ''}`)
     .join('\n')
 }
 
@@ -318,42 +315,30 @@ function addressBlock(order: OrderDoc): string {
 }
 
 /**
- * El correo que recibe el cliente.
+ * El correo que recibe quien pide.
  *
- * El párrafo del medio es el que sostiene todo el invento y por eso está escrito
- * así, en voz baja y sin jerga: quien acaba de encargar algo por una web necesita
- * saber que al otro lado hay una persona, no un sistema.
- *
- * Aquí no se habla de pagos ni de cobros, y no por omisión: lo que la web recoge
- * son encargos, y el correo tiene que sonar a eso —gracias, ya está en marcha, y
+ * Está escrito en voz baja y sin jerga a propósito: lo que la web recoge son
+ * peticiones, y el correo tiene que sonar a eso —gracias, ya está en marcha, y
  * puedes mirar cómo va cuando quieras—. Sólo se promete lo que se cumple: el aviso
  * de novedades lo da Ana, y el estado sale de `/cuenta/pedidos`.
  *
- * Tampoco lleva importes, por lo mismo que no los lleva la web: ni las piezas ni
- * el envío tienen precio publicado, y ponerlo aquí sería la única cifra que el
- * cliente habría visto en todo el recorrido.
+ * Sin cifras de ninguna clase, igual que la web y la pantalla del taller.
  */
 function customerBody(order: OrderDoc): string {
   return `¡Gracias por tu pedido!
 
 Pedido ${order.number}
 
-${itemLines(order, false)}
+${itemLines(order)}
 
-Ana te escribe con el precio de las piezas y del envío antes de que cierres nada.
+Ana te escribirá en cuanto pueda 🌸
 
 Se enviaría a:
 ${addressBlock(order)}
 
-Muchísimas gracias. Tu pedido ya está en el taller y Ana se pone con él
-enseguida.
-
-Y tranquilo: aunque esto pueda parecer una herramienta de gestión empresarial
-automatizada, al otro lado sólo está ella, que preparará tus piezas con mucha
-paz y alegría.
-
-Cada pieza se hace a mano para ti, así que la preparación lleva entre una y tres
-semanas. Ana te escribe en cuanto haya novedades.
+Muchísimas gracias por tu pedido. Cada pieza se hace a mano para ti, así que la
+preparación lleva entre una y tres semanas, y Ana te escribe en cuanto haya
+novedades.
 
 Puedes consultar cómo va tu pedido cuando quieras en
 ${site.url}/cuenta/pedidos
@@ -396,7 +381,7 @@ function customerHtml(order: OrderDoc): string {
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-top:1px solid #e4dccf;margin:0 0 8px">
         ${rows}
       </table>
-      <p style="border-top:1px solid #e4dccf;padding-top:16px;font-size:14px;line-height:1.6;color:#6e675c;margin:0">Ana te escribe con el precio de las piezas y del envío antes de que cierres nada.</p>
+      <p style="border-top:1px solid #e4dccf;padding-top:16px;font-size:14px;line-height:1.6;color:#6e675c;margin:0">Ana te escribirá en cuanto pueda 🌸</p>
 
       <p style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#a79f91;margin:32px 0 8px">Se enviaría a</p>
       <p style="font-size:15px;line-height:1.7;color:#6e675c;margin:0 0 32px">
@@ -406,10 +391,7 @@ function customerHtml(order: OrderDoc): string {
         ${escapeHtml(address.phone)}
       </p>
 
-      <p style="font-size:15px;line-height:1.7;color:#6e675c;margin:0 0 20px">Muchísimas gracias. Tu pedido ya está en el taller y Ana se pone con él enseguida.</p>
-      <p style="font-size:15px;line-height:1.7;color:#6e675c;margin:0 0 32px">Y tranquilo: aunque esto pueda parecer una herramienta de gestión empresarial automatizada, al otro lado sólo está ella, que preparará tus piezas con mucha paz y alegría.</p>
-
-      <p style="background:#f4e7e7;padding:16px;font-size:14px;line-height:1.6;color:#6e675c;margin:0 0 32px">Cada pieza se hace a mano para ti, así que la preparación lleva entre una y tres semanas. Ana te escribe en cuanto haya novedades.</p>
+      <p style="background:#f4e7e7;padding:16px;font-size:14px;line-height:1.6;color:#6e675c;margin:0 0 32px">Muchísimas gracias por tu pedido. Cada pieza se hace a mano para ti, así que la preparación lleva entre una y tres semanas, y Ana te escribe en cuanto haya novedades.</p>
 
       <p style="font-size:13px;line-height:1.6;color:#a79f91;margin:0 0 32px">Puedes consultar cómo va tu pedido cuando quieras, desde aquí:</p>
 
@@ -426,20 +408,10 @@ function customerHtml(order: OrderDoc): string {
 function shopBody(order: OrderDoc): string {
   return `Nueva petición ${order.number}
 
-${itemLines(order, true)}
-
-Total: ${formatCents(order.totals.totalCents)}
-
-(El cliente no ha visto ningún importe: ni en la web ni en su correo. Estas cifras
-son las del catálogo, para que sepas de qué encargo se trata; el precio se lo dices
-tú al escribirle.)
+${itemLines(order)}
 
 Enviar a:
 ${addressBlock(order)}
-
-⚠️ SIN COBRAR. Esto es un encargo, no una venta cerrada: al cliente se le ha
-dicho que su pedido ya está en el taller y que le escribes tú. Nada de dinero se
-ha movido, así que el pago se acuerda aparte.
 
 Escríbele tú: ese contacto es el único paso que cierra el encargo. En su correo
 se le ha dicho que te pones con ello enseguida, así que no lo dejes dormir.
@@ -470,7 +442,7 @@ export async function sendOrderEmails(order: OrderDoc, customerEmail: string): P
     },
     {
       to: site.contact.email,
-      subject: `Nueva petición ${order.number} · sin cobrar`,
+      subject: `Nueva petición ${order.number}`,
       text: shopBody(order),
       // Responder al correo del aviso escribe al cliente, que es lo que Ana
       // querrá hacer nueve de cada diez veces.

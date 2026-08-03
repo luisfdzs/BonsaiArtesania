@@ -55,8 +55,8 @@ export default async function ComprarPage() {
     <div className="page-gutter pt-16 pb-(--spacing-section) md:pt-24">
       <h1 className="font-serif text-title">Confirmar tu pedido</h1>
 
-      {/* Dicho antes de que rellene nada, no después: aquí no se cierra una compra
-          a un botón, se manda un encargo, y eso hay que saberlo al empezar. */}
+      {/* Dicho antes de que rellene nada, no después: aquí no se cierra nada a un
+          botón, se manda un encargo, y eso hay que saberlo al empezar. */}
       <p className="mt-6 max-w-lg text-bark-soft">
         Esto es un encargo: al enviarlo me llega a mí y me pongo con tus piezas. Te escribo
         enseguida para confirmarte los detalles y contarte cómo va.
@@ -94,11 +94,21 @@ export default async function ComprarPage() {
               ))}
             </ul>
 
-            {/* Sin importes: esto enumera lo que se pide, no lo que se cobra. El
-                precio de las piezas y del envío lo pone Ana al confirmar. */}
+            {/* Sin importes: esto enumera lo que se pide, y nada más. */}
             <p className="mt-8 border-t border-line pt-6 text-small text-bark-faint">
-              Al enviarlo no se te cobra nada. Ana te escribe con el precio de las piezas y del
-              envío antes de que cierres nada.
+              Enviarlo no te compromete a nada: es una petición. Ana te escribirá en cuanto pueda 🌸
+            </p>
+
+            {/* Éste es el único sitio de la web donde se manda una dirección postal
+                y un teléfono, así que es aquí donde hay que decir qué se hace con
+                ellos —no sólo en el pie—. */}
+            <p className="mt-5 text-small text-bark-faint">
+              Tu nombre, tu teléfono y tu dirección se usan para preparar y enviar la pieza, y para
+              nada más. Está explicado en{' '}
+              <Link href="/legal/privacidad" className="link-underline">
+                privacidad
+              </Link>
+              .
             </p>
 
             <Link href="/carrito" className="link-underline tap mt-8 inline-block text-small">

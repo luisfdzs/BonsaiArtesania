@@ -14,12 +14,12 @@ npm run build
 
 ## Dónde se toca cada cosa
 
-| Quiero cambiar…                       | Fichero                      |
-| ------------------------------------- | ---------------------------- |
-| Precios, nombres, textos de las joyas | `content/products.ts`        |
-| Correo, WhatsApp, Instagram, dominio  | `content/site.ts`            |
-| Colores, tipos, ritmo, animaciones    | `app/globals.css` (`@theme`) |
-| Menú                                  | `lib/navigation.ts`          |
+| Quiero cambiar…                      | Fichero                      |
+| ------------------------------------ | ---------------------------- |
+| Nombres y textos de las joyas        | `content/products.ts`        |
+| Correo, WhatsApp, Instagram, dominio | `content/site.ts`            |
+| Colores, tipos, ritmo, animaciones   | `app/globals.css` (`@theme`) |
+| Menú                                 | `lib/navigation.ts`          |
 
 ## Sistema de diseño
 
@@ -54,7 +54,6 @@ Si una pieza aún no tiene foto, `image: null` dibuja un marcador degradado en s
 
 ## Pendiente de esta beta
 
-- Revisar con Ana nombres, precios y textos de las piezas: son una propuesta.
-- No hay carrito ni pasarela: los pedidos se cierran por WhatsApp o correo, con el mensaje ya
-  escrito (`lib/contact.ts`). Si más adelante interesa cobrar en la web, el sitio de donde
-  colgarlo es la ficha de producto.
+- Revisar con Ana los nombres y los textos de las piezas: son una propuesta.
+- Los encargos se organizan por WhatsApp o correo, con el mensaje ya escrito
+  (`lib/contact.ts`). Lo que sale de la web es una petición, y nada más.

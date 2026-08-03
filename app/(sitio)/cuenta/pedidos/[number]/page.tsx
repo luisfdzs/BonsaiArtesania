@@ -53,8 +53,8 @@ export default async function PedidoPage({ params }: Params) {
         <p className="mt-3 text-small text-bark-faint">{dateFormat.format(order.createdAt)}</p>
       </header>
 
-      {/* Sólo las piezas: los importes del pedido están guardados, pero no se
-          enseñan aquí. El precio se acuerda hablando con Ana. */}
+      {/* Sólo las piezas. Las cifras están guardadas en el documento, pero no se
+          enseñan aquí ni en ninguna otra pantalla. */}
       <div className="panel mt-12 text-left">
         <h3 className="eyebrow text-center">Piezas</h3>
 

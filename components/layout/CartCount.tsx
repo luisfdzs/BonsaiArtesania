@@ -10,8 +10,8 @@ import { useFormStatus } from 'react-dom'
  * La cifra se pide al vuelo a `/api/carrito/count` en vez de bajar como prop
  * desde el layout: el carrito vive en la base de datos y leerlo en el servidor
  * volvería dinámicas todas las páginas del sitio (ver el comentario del
- * endpoint). El precio de hacerlo así es que la cifra llega un instante después
- * que la barra; mientras no está, no se pinta nada —nunca un cero de relleno.
+ * endpoint). La contrapartida es que la cifra llega un instante después que la
+ * barra; mientras no está, no se pinta nada —nunca un cero de relleno.
  *
  * Se vuelve a pedir en tres momentos: al cambiar de ruta, al volver a la pestaña
  * y cuando algo la avisa por el evento de abajo. Con eso basta: no hay ningún

@@ -40,7 +40,7 @@ export default async function DireccionesPage() {
   return (
     <section>
       <SectionIntro title="Tus direcciones">
-        Puedes guardar varias —casa, trabajo, la de un regalo— y elegir cuál usar al comprar.
+        Puedes guardar varias —casa, trabajo, la de un regalo— y elegir cuál usar al pedir.
       </SectionIntro>
 
       <div className="mt-12">
