@@ -99,6 +99,18 @@ export default async function ComprarPage() {
               Enviarlo no te compromete a nada: es una petición. Ana te escribirá en cuanto pueda 🌸
             </p>
 
+            {/* Éste es el único sitio de la web donde se manda una dirección postal
+                y un teléfono, así que es aquí donde hay que decir qué se hace con
+                ellos —no sólo en el pie—. */}
+            <p className="mt-5 text-small text-bark-faint">
+              Tu nombre, tu teléfono y tu dirección se usan para preparar y enviar la pieza, y para
+              nada más. Está explicado en{' '}
+              <Link href="/legal/privacidad" className="link-underline">
+                privacidad
+              </Link>
+              .
+            </p>
+
             <Link href="/carrito" className="link-underline tap mt-8 inline-block text-small">
               Volver al carrito
             </Link>

@@ -836,4 +836,72 @@
   font-size: var(--text-small);
   color: var(--color-sage-deep);
 }
+/* Texto corrido de la página de privacidad. Es el único sitio del proyecto con
+   párrafos largos, listas y subtítulos seguidos, así que el ritmo vertical se
+   define aquí y no con utilidades repartidas por cada página. */
+@utility legal-prose {
+  color: var(--color-bark-soft);
 
+  & h2 {
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+    font-family: var(--font-serif);
+    font-size: var(--text-lead);
+    line-height: var(--text-lead--line-height);
+    color: var(--color-bark);
+  }
+
+  & p,
+  & ul,
+  & ol {
+    margin-bottom: 1.25rem;
+  }
+
+  & ul,
+  & ol {
+    padding-left: 1.25rem;
+  }
+
+  & ul {
+    list-style: disc;
+  }
+
+  & ol {
+    list-style: decimal;
+  }
+
+  & li {
+    margin-bottom: 0.4rem;
+  }
+
+  & strong {
+    color: var(--color-bark);
+    font-weight: 400;
+  }
+
+  & a {
+    color: var(--color-sage-deep);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  & table {
+    width: 100%;
+    margin-bottom: 1.25rem;
+    border-collapse: collapse;
+    font-size: var(--text-small);
+  }
+
+  & th,
+  & td {
+    padding: 0.6rem 0.75rem 0.6rem 0;
+    border-bottom: 1px solid var(--color-line);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  & th {
+    color: var(--color-bark);
+    font-weight: 400;
+  }
+}
