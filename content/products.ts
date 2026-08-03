@@ -19,7 +19,14 @@ export type Product = {
   slug: string
   name: string
   category: Category
-  /** `null` = pieza a medida, el precio se acuerda por mensaje. */
+  /**
+   * **No se enseña en ninguna parte de la web**: el catálogo, la ficha y el
+   * carrito van sin importes, y lo que valga cada pieza lo dice Ana al confirmar
+   * el encargo. Sigue aquí porque es lo que se congela en el pedido y lo que ve
+   * ella en el taller y en su aviso por correo.
+   *
+   * `null` = pieza a medida: no pasa por el carrito y se pide escribiendo.
+   */
   price: number | null
   /** Una línea. Es lo que se lee bajo el nombre en la rejilla. */
   summary: string
@@ -226,7 +233,7 @@ export const products: Product[] = [
     summary: 'Finos, para llevar de tres en tres',
     description: [
       'Anillos finos con una gota de resina y flor dentro, pensados para apilarse. Cada uno lleva una flor distinta.',
-      'Precio por unidad. Dime cuáles quieres y te preparo el juego.',
+      'Se venden de uno en uno. Dime cuáles quieres y te preparo el juego.',
     ],
     materials: ['Resina', 'Flor seca', 'Montura dorada ajustable'],
     image: img('anillos-de-campo', 'Tres anillos finos con flores en resina sobre un soporte'),
@@ -448,7 +455,7 @@ export const products: Product[] = [
     summary: 'Resina teñida, sin flor, en tres colores',
     description: [
       'Piedra rectangular de resina teñida sobre montura ajustable de acero inoxidable. Hay amarillo, verde y rojo.',
-      'Precio por unidad. También se hacen en plateado.',
+      'Se venden de uno en uno. También se hacen en plateado.',
     ],
     materials: ['Resina', 'Pigmento', 'Acero inoxidable ajustable'],
     image: img(
@@ -479,7 +486,7 @@ export const products: Product[] = [
     summary: 'Rosa, fresia y caléndula, uno por dedo',
     description: [
       'Piedras ovaladas hechas con pétalos de rosa, fresia y caléndula. Cada anillo sale de una flor distinta, así que no hay dos del mismo tono.',
-      'Todos ajustables. Precio por unidad.',
+      'Todos ajustables, y se venden de uno en uno.',
     ],
     materials: ['Resina', 'Pétalos de rosa, fresia y caléndula', 'Montura ajustable'],
     image: img(
@@ -558,7 +565,7 @@ export const products: Product[] = [
     summary: 'Colgante y pendientes a juego',
     description: [
       'Juego de colgante y pendientes en montura hexagonal dorada, con la misma flor morada en las tres piezas.',
-      'Se venden juntos o por separado, y también en plateado. El precio es del conjunto.',
+      'Se venden juntos o por separado, y también en plateado.',
     ],
     materials: ['Resina', 'Flor morada seca', 'Montura hexagonal dorada'],
     image: img(
@@ -575,7 +582,7 @@ export const products: Product[] = [
     summary: 'Colgante, pendientes y anillo en crema',
     description: [
       'Hecho con pétalos de rosa clara, que al secarse se quedan en un crema muy pálido con vetas. Colgante redondo, pendientes hexagonales y anillo ovalado.',
-      'Disponible en conjunto y por separado. El precio es del conjunto completo.',
+      'Disponible en conjunto y por separado.',
     ],
     materials: ['Resina', 'Pétalos de rosa secos', 'Montura dorada'],
     image: img(
@@ -593,7 +600,7 @@ export const products: Product[] = [
     summary: 'Cadena fina con hexágono de flor',
     description: [
       'La misma montura hexagonal de los colgantes, en cadena de pulsera. Queda plana sobre la muñeca y no gira.',
-      'Precio por unidad. Hay tres rellenos distintos.',
+      'Se venden de una en una. Hay tres rellenos distintos.',
     ],
     materials: ['Resina', 'Flor seca', 'Cadena de acero dorado'],
     image: img(
@@ -749,7 +756,7 @@ export const products: Product[] = [
     summary: 'Tres aros de resina, en tres colores',
     description: [
       'Un aro grueso de resina colgando de un gancho dorado, sin flor: aquí manda el color. Se hacen en crema veteado, verde oliva y rosa pálido.',
-      'Precio por par. Dime el color y te lo preparo.',
+      'Se venden por pares. Dime el color y te lo preparo.',
     ],
     materials: ['Resina', 'Pigmento mineral', 'Gancho de acero dorado'],
     image: img(
@@ -783,7 +790,7 @@ export const products: Product[] = [
     summary: 'Verde oliva y naranja, sin flor',
     description: [
       'Tres modelos de la misma colección: nube con disco, arco con círculo y dos piedras encadenadas. Todos en resina teñida en verde oliva y naranja quemado, los colores del monte en octubre.',
-      'Precio por par. Se venden sueltos, no hace falta llevarse los tres.',
+      'Se venden por pares y sueltos: no hace falta llevarse los tres.',
     ],
     materials: ['Resina', 'Pigmento mineral', 'Acero dorado'],
     image: img(
@@ -851,7 +858,7 @@ export const products: Product[] = [
     summary: 'Pétalos azules partidos, como un terrazo',
     description: [
       'Pétalos de flor azul y lila cortados a trozos y repartidos en resina transparente: de lejos parece terrazo, de cerca sigue siendo flor.',
-      'Tres formas de la misma colección: rectángulo calado, arco pequeño y arco grande. Precio por par.',
+      'Tres formas de la misma colección: rectángulo calado, arco pequeño y arco grande. Se venden por pares.',
     ],
     materials: ['Resina', 'Pétalos secos', 'Acero dorado'],
     image: img(
@@ -953,7 +960,7 @@ export const products: Product[] = [
     summary: 'Gota o aro, con lavanda dentro',
     description: [
       'Lavanda repartida en resina transparente, en dos formas: gota alargada de botón y aro hueco de gancho. El morado queda apagado, como la flor cuando se seca de verdad.',
-      'Precio por par. Dime cuál de las dos formas quieres.',
+      'Se venden por pares. Dime cuál de las dos formas quieres.',
     ],
     materials: ['Resina', 'Lavanda seca', 'Acero dorado'],
     image: img(
@@ -1070,7 +1077,7 @@ export const products: Product[] = [
     summary: 'Rosa, verde esmeralda y oro',
     description: [
       'Rectángulo calado por dentro, con pétalos rosas, hojas verde esmeralda y pan de oro repartidos por el marco. Se hacen también en gota, con la misma mezcla.',
-      'Precio por par. Dime si los quieres en rectángulo o en gota.',
+      'Se venden por pares. Dime si los quieres en rectángulo o en gota.',
     ],
     materials: ['Resina', 'Pétalos y hoja secos', 'Pan de oro', 'Acero dorado'],
     image: img(
@@ -1087,7 +1094,7 @@ export const products: Product[] = [
     summary: 'Flor de tojo en tres formatos',
     description: [
       'Flor de tojo seca, que al perder el agua se queda entre miel y canela, repartida en resina clara. Hay tres formatos: arco, barra larga y escalera de cuatro cuadrados.',
-      'Precio por par. La escalera es la más larga y la que más pesa.',
+      'Se venden por pares. La escalera es la más larga y la que más pesa.',
     ],
     materials: ['Resina', 'Flor de tojo seca', 'Acero dorado'],
     image: img(
@@ -1220,7 +1227,7 @@ export const products: Product[] = [
     summary: 'Todos los colores a la vez',
     description: [
       'Pétalos rojos, morados, amarillos y blancos partidos y mezclados sin ningún criterio. Es la pieza más ruidosa del taller y la que más gusta en verano.',
-      'En dos formas: arco pequeño de botón y aro grande de gancho. Precio por par.',
+      'En dos formas: arco pequeño de botón y aro grande de gancho. Se venden por pares.',
     ],
     materials: ['Resina', 'Pétalos secos', 'Acero dorado'],
     image: img(
@@ -1289,7 +1296,7 @@ export const products: Product[] = [
     summary: 'Colgante y pendientes con la misma flor lila',
     description: [
       'Una flor lila de cinco pétalos, entera, en las tres piezas: los dos pendientes de aro y el colgante. Fondo transparente, sin montura a la vista.',
-      'Se venden juntos o por separado. El precio es del conjunto.',
+      'Se venden juntos o por separado.',
     ],
     materials: ['Resina', 'Flor lila seca', 'Aro y cadena de acero dorado'],
     image: img(
@@ -1339,7 +1346,7 @@ export const products: Product[] = [
     summary: 'Verde musgo, azul noche o ámbar',
     description: [
       'Piedra redonda pequeña en montura dorada, con tres rellenos: musgo verde, pétalo azul y flor ámbar. Es el colgante más discreto que hago.',
-      'Precio por unidad. Dime el color.',
+      'Se venden de uno en uno. Dime el color.',
     ],
     materials: ['Resina', 'Musgo o flor secos', 'Montura redonda dorada'],
     image: img(
@@ -1373,7 +1380,7 @@ export const products: Product[] = [
     summary: 'Pendientes, anillo y colgante en granate',
     description: [
       'Hecho con los pétalos de un clavel granate: pendientes de rectángulo calado, anillo de piedra ovalada y colgante de gota. Los tres del mismo rojo oscuro.',
-      'Se venden juntos o por separado. El precio es del conjunto completo.',
+      'Se venden juntos o por separado, entero o pieza a pieza.',
     ],
     materials: ['Resina', 'Pétalos de clavel secos', 'Acero dorado'],
     image: img(
@@ -1390,7 +1397,7 @@ export const products: Product[] = [
     summary: 'Seis flores, una por colgante',
     description: [
       'El hexágono dorado en su tamaño pequeño, con una sola flor centrada: hoja verde, lavanda, hortensia blanca, viola morada, margarita amarilla o pétalo crema.',
-      'Precio por unidad. Se pueden llevar dos o tres a la vez, con cadenas de distinta largura.',
+      'Se venden de uno en uno. Se pueden llevar dos o tres a la vez, con cadenas de distinta largura.',
     ],
     materials: ['Resina', 'Flor seca', 'Montura hexagonal dorada', 'Cadena fina'],
     image: img(
@@ -1408,7 +1415,7 @@ export const products: Product[] = [
     summary: 'Dos aros muy finos, para apilar',
     description: [
       'Aro fino de acero con una piedra pequeña de resina granate encima. Pensados para llevar dos o tres seguidos en el mismo dedo.',
-      'Precio por unidad. Talla ajustable.',
+      'Se venden de uno en uno. Talla ajustable.',
     ],
     materials: ['Resina', 'Pétalos secos', 'Aro de acero ajustable'],
     image: img(
@@ -1425,7 +1432,7 @@ export const products: Product[] = [
     summary: 'Piedra cuadrada en tres colores',
     description: [
       'Piedra cuadrada de resina sobre aro fino dorado, con flores dentro. Hay ámbar, rosa y amarillo, y se llevan los tres juntos.',
-      'Precio por unidad. El aro es abierto, así que se adapta.',
+      'Se venden de uno en uno. El aro es abierto, así que se adapta.',
     ],
     materials: ['Resina', 'Flor seca', 'Aro de acero dorado ajustable'],
     image: img(
@@ -1629,13 +1636,3 @@ export function getCategoryInfo(key: string): CategoryInfo | undefined {
  * última fila es justo donde va el botón, así que la fila no se rompe.
  */
 export const PREVIEW_SIZE = 11
-
-/** Precio en euros, o la fórmula acordada para las piezas a medida. */
-export function formatPrice(price: number | null): string {
-  if (price === null) return 'A consultar'
-  return new Intl.NumberFormat('es-ES', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 0,
-  }).format(price)
-}

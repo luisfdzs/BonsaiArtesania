@@ -7,7 +7,7 @@ import { Checkout } from '@/components/comprar/Checkout'
 import { isAdminEmail } from '@/lib/admin'
 import { readCart } from '@/lib/cart'
 import { issueFormToken } from '@/lib/form-guard'
-import { addresses, formatCents } from '@/lib/schema'
+import { addresses } from '@/lib/schema'
 import { shopOpen } from '@/lib/shop'
 
 export const metadata: Metadata = {
@@ -90,25 +90,16 @@ export default async function ComprarPage() {
                     {line.name}
                     {line.qty > 1 && ` × ${line.qty}`}
                   </span>
-                  <span className="shrink-0">{formatCents(line.lineTotalCents)}</span>
                 </li>
               ))}
             </ul>
 
-            <dl className="mt-8 flex flex-col gap-3 border-t border-line pt-6">
-              <div className="flex justify-between">
-                <dt className="text-bark-soft">Subtotal</dt>
-                <dd>{formatCents(cart.subtotalCents)}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-bark-soft">Envío</dt>
-                <dd>{cart.shippingCents === 0 ? 'Gratis' : formatCents(cart.shippingCents)}</dd>
-              </div>
-              <div className="mt-3 flex justify-between border-t border-line pt-4 text-lead">
-                <dt>Total</dt>
-                <dd>{formatCents(cart.totalCents)}</dd>
-              </div>
-            </dl>
+            {/* Sin importes: esto enumera lo que se pide, no lo que se cobra. El
+                precio de las piezas y del envío lo pone Ana al confirmar. */}
+            <p className="mt-8 border-t border-line pt-6 text-small text-bark-faint">
+              Al enviarlo no se te cobra nada. Ana te escribe con el precio de las piezas y del
+              envío antes de que cierres nada.
+            </p>
 
             <Link href="/carrito" className="link-underline tap mt-8 inline-block text-small">
               Volver al carrito

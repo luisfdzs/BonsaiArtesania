@@ -6,7 +6,7 @@ import { AddToCart } from '@/components/tienda/AddToCart'
 import { ContactButtons } from '@/components/ui/ContactButtons'
 import { Media } from '@/components/ui/Media'
 import { Reveal } from '@/components/ui/Reveal'
-import { formatPrice, getCategoryInfo, getProduct, products } from '@/content/products'
+import { getCategoryInfo, getProduct, products } from '@/content/products'
 import { orderMessage } from '@/lib/contact'
 import { shopOpen } from '@/lib/shop'
 
@@ -81,7 +81,6 @@ export default async function ProductPage({ params }: Params) {
         <div className="md:col-span-5">
           <p className="eyebrow">{product.summary}</p>
           <h1 className="mt-5 font-serif text-title">{product.name}</h1>
-          <p className="mt-5 text-lead text-bark-soft">{formatPrice(product.price)}</p>
 
           <div className="mt-9 space-y-5 text-bark-soft">
             {product.description.map((paragraph) => (

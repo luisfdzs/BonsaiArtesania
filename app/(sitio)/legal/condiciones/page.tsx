@@ -1,7 +1,5 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { FREE_SHIPPING_FROM_CENTS, SHIPPING_CENTS } from '@/lib/shipping'
-import { formatCents } from '@/lib/schema'
 import { Holder, LegalPage } from '@/components/legal/LegalPage'
 
 export const metadata: Metadata = {
@@ -30,8 +28,10 @@ export default function CondicionesPage() {
 
       <h2>Precios y pago</h2>
       <p>
-        Los precios están en euros e incluyen los impuestos aplicables. El importe final, con los
-        gastos de envío, se muestra antes de confirmar el pedido.
+        <strong>En esta web no se publican precios.</strong> Ni las piezas ni los gastos de envío
+        llevan importe: lo que se manda desde el carrito es una petición sin precio cerrado. Ana te
+        escribe con el presupuesto —piezas y envío, en euros e impuestos incluidos— antes de que
+        confirmes nada, y hasta que lo aceptes no hay compra.
       </p>
       <p>
         <strong>De momento no se paga en la web.</strong> Al enviar tu petición desde el carrito no
@@ -50,8 +50,7 @@ export default function CondicionesPage() {
           <strong>Destino:</strong> España peninsular.
         </li>
         <li>
-          <strong>Coste:</strong> {formatCents(SHIPPING_CENTS)}, y gratis a partir de{' '}
-          {formatCents(FREE_SHIPPING_FROM_CENTS)}.
+          <strong>Coste:</strong> va en el presupuesto que te pasa Ana, junto con el de las piezas.
         </li>
       </ul>
 
