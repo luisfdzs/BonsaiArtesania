@@ -230,8 +230,18 @@ export default async function PrivacidadPage({ params }: Params) {
           {t({ es: 'tus datos y privacidad', gl: 'os teus datos e privacidade' })}
         </Link>
         {t({
-          es: ': desde ahí te descargas todo lo que hay sobre ti y borras tu cuenta sin pedir permiso a nadie ni esperar respuesta.',
-          gl: ': desde aí descargas todo o que hai sobre ti e borras a túa conta sen pedir permiso a ninguén nin esperar resposta.',
+          es: ': desde ahí te descargas en PDF todo lo que hay sobre ti y borras tu cuenta sin pedir permiso a nadie ni esperar respuesta.',
+          gl: ': desde aí descargas en PDF todo o que hai sobre ti e borras a túa conta sen pedir permiso a ninguén nin esperar resposta.',
+        })}
+      </p>
+      {/* El PDF cubre el derecho de acceso —ver qué se guarda— pero no el de
+          portabilidad, que pide un formato de lectura mecánica. Así que la vía para
+          eso tiene que estar dicha, y es el correo de abajo. Antes la descarga era
+          un JSON y cubría los dos; si se vuelve a ése, esta frase sobra. */}
+      <p>
+        {t({
+          es: 'Y si los quieres en un formato que otra web pueda leer, pídemelos por correo y te los mando así.',
+          gl: 'E se os queres nun formato que outra web poida ler, pídemos por correo e mándochos así.',
         })}
       </p>
       <p>

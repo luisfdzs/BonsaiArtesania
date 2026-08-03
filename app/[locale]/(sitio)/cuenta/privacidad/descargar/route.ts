@@ -1,21 +1,25 @@
 import { ObjectId } from 'mongodb'
 import { auth } from '@/auth'
+import { buildDataExportPdf, dataExportFilename, type DataExport } from '@/lib/data-export'
 import { isLocale, pick, type Locale } from '@/lib/i18n/config'
 import { addresses, orders, users } from '@/lib/schema'
 
 /**
- * Derecho de acceso y portabilidad (arts. 15 y 20 RGPD): descarga en JSON de todo
- * lo que la web guarda sobre quien lo pide.
+ * Derecho de acceso (art. 15 RGPD): descarga en PDF de todo lo que la web guarda
+ * sobre quien lo pide.
  *
  * Es una ruta y no una acción de servidor porque el resultado es un fichero, y una
  * acción no puede devolver una descarga. Se genera al vuelo: no queda ninguna copia
  * guardada que después hubiera que proteger o borrar.
  *
- * **Las claves del JSON no se traducen y el aviso sí.** Las claves son nombres de
- * campo: quien abra el fichero con una herramienta espera que `correo` sea siempre
- * `correo`, y traducirlas convertiría el mismo fichero en dos formatos distintos
- * según el idioma en que se descargó. El aviso de arriba, en cambio, es una frase
- * que se lee, y va en la lengua de quien la pidió.
+ * **Era un JSON y ahora es un PDF.** Lo que se gana es que se abre y se lee sin
+ * herramientas, que es lo que hace de verdad quien pulsa el botón. Lo que se pierde
+ * conviene tenerlo escrito: el art. 20, el de portabilidad, pide un formato «de
+ * lectura mecánica», y un PDF no lo es. El derecho de acceso queda cubierto; el de
+ * llevarse los datos a otro sitio, por correo. Ver `lib/data-export.ts`.
+ *
+ * Lo que se enseña es lo mismo que se enseñaba: la cuenta, las direcciones y los
+ * pedidos, y de los pedidos ninguna cifra —igual que en toda la web—.
  */
 export async function GET(_request: Request, { params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params
@@ -39,36 +43,56 @@ export async function GET(_request: Request, { params }: { params: Promise<{ loc
   const addressCollection = await addresses()
   const misDirecciones = await addressCollection
     .find({ userId }, { projection: { userId: 0 } })
+    .sort({ isDefault: -1, createdAt: -1 })
     .toArray()
 
   const orderCollection = await orders()
-  const misPedidos = await orderCollection.find({ userId }, { projection: { userId: 0 } }).toArray()
+  const misPedidos = await orderCollection
+    .find({ userId }, { projection: { userId: 0 } })
+    .sort({ createdAt: -1 })
+    .toArray()
 
-  const payload = {
-    generado: new Date().toISOString(),
-    aviso: pick(
-      {
-        es: 'Estos son todos los datos personales que bonsaiartesania.com guarda sobre ti. No se almacenan datos de tarjeta.',
-        gl: 'Estes son todos os datos persoais que bonsaiartesania.com garda sobre ti. Non se almacenan datos de tarxeta.',
-      },
-      locale,
-    ),
-    cuenta: {
-      nombre: user?.name ?? null,
-      correo: user?.email ?? null,
-      telefono: user?.phone ?? null,
-      alta: user?.createdAt ?? null,
+  const generatedAt = new Date()
+
+  const data: DataExport = {
+    generatedAt,
+    account: {
+      name: user?.name ?? null,
+      email: user?.email ?? null,
+      phone: user?.phone ?? null,
+      createdAt: user?.createdAt ?? null,
     },
-    direcciones: misDirecciones,
-    pedidos: misPedidos,
+    addresses: misDirecciones.map((address) => ({
+      alias: address.alias,
+      recipient: address.recipient,
+      phone: address.phone,
+      line1: address.line1,
+      line2: address.line2 ?? null,
+      postalCode: address.postalCode,
+      city: address.city,
+      province: address.province,
+      isDefault: address.isDefault,
+    })),
+    orders: misPedidos.map((order) => {
+      const a = order.shipping.address
+      return {
+        number: order.number,
+        createdAt: order.createdAt,
+        status: order.status,
+        items: order.items.map((item) => ({ name: item.name, qty: item.qty })),
+        // La dirección a la que se envió, en una línea: es la copia congelada con
+        // el pedido, no la dirección de hoy. Ver `OrderDoc` en `lib/schema.ts`.
+        shippedTo: `${a.recipient}, ${a.line1}${a.line2 ? `, ${a.line2}` : ''}, ${a.postalCode} ${a.city} (${a.province})`,
+      }
+    }),
   }
 
-  const fecha = new Date().toISOString().slice(0, 10)
+  const pdf = await buildDataExportPdf(data, locale)
 
-  return new Response(JSON.stringify(payload, null, 2), {
+  return new Response(pdf as BodyInit, {
     headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Content-Disposition': `attachment; filename="mis-datos-bonsaiartesania-${fecha}.json"`,
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${dataExportFilename(generatedAt, locale)}"`,
       // Datos personales: que no quede cacheado por nada ni por nadie.
       'Cache-Control': 'no-store',
     },

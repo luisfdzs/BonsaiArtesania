@@ -43,15 +43,20 @@ export default async function PrivacidadCuentaPage({ params }: Params) {
         </h3>
         <p className="mt-4 text-bark-soft">
           {t({
-            es: 'Un fichero con tu cuenta, tus direcciones y tus pedidos. Se genera en el momento.',
-            gl: 'Un ficheiro coa túa conta, os teus enderezos e os teus pedidos. Xérase no momento.',
+            es: 'Un PDF con tu cuenta, tus direcciones y tus pedidos. Se genera en el momento.',
+            gl: 'Un PDF coa túa conta, os teus enderezos e os teus pedidos. Xérase no momento.',
           })}
         </p>
         {/* Enlace y no botón: es una descarga, y así funciona con clic derecho,
-            «guardar como» y sin JavaScript. */}
-        <a href={path(locale, '/cuenta/privacidad/descargar')} className="btn mt-8" download>
+            «guardar como» y sin JavaScript.
+
+            Sin el atributo `download`, que no hacía nada: quien decide que esto se
+            guarda en vez de abrirse es la cabecera `Content-Disposition:
+            attachment` de la ruta, y ésa manda sobre el atributo. Dejarlo aquí
+            hacía pensar que el comportamiento se elige en esta línea. */}
+        <a href={path(locale, '/cuenta/privacidad/descargar')} className="btn mt-8">
           <DownloadIcon className="h-4 w-4" />
-          {t({ es: 'Descargar en JSON', gl: 'Descargar en JSON' })}
+          {t({ es: 'Descargar en PDF', gl: 'Descargar en PDF' })}
         </a>
       </div>
 
