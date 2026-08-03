@@ -1280,764 +1280,1223 @@ export const products: Product[] = [
 
   {
     slug: 'pendientes-donut-trio',
-    name: 'Pendientes Donut',
+    name: { es: 'Pendientes Donut', gl: 'Pendentes Donut' },
     category: 'pendientes',
     price: 30,
-    summary: 'Tres aros de resina, en tres colores',
-    description: [
-      'Un aro grueso de resina colgando de un gancho dorado, sin flor: aquí manda el color. Se hacen en crema veteado, verde oliva y rosa pálido.',
-      'Se piden por pares. Dime el color y te lo preparo.',
-    ],
-    materials: ['Resina', 'Pigmento mineral', 'Gancho de acero dorado'],
-    image: img(
-      'pendientes-donut-trio',
-      'Seis pares de pendientes de aro de resina en crema, verde y rosa sobre un expositor',
-    ),
+    summary: {
+      es: 'Tres aros de resina, en tres colores',
+      gl: 'Tres aros de resina, en tres cores',
+    },
+    description: {
+      es: [
+        'Un aro grueso de resina colgando de un gancho dorado, sin flor: aquí manda el color. Se hacen en crema veteado, verde oliva y rosa pálido.',
+        'Se piden por pares. Dime el color y te lo preparo.',
+      ],
+      gl: [
+        'Un aro groso de resina colgando dun gancho dourado, sen flor: aquí manda a cor. Fanse en crema veteado, verde oliva e rosa pálido.',
+        'Pídense por pares. Dime a cor e prepárocho.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Pigmento mineral', 'Gancho de acero dorado'],
+      gl: ['Resina', 'Pigmento mineral', 'Gancho de aceiro dourado'],
+    },
+    image: imgLocalized('pendientes-donut-trio', {
+      es: 'Seis pares de pendientes de aro de resina en crema, verde y rosa sobre un expositor',
+      gl: 'Seis pares de pendentes de aro de resina en crema, verde e rosa sobre un expositor',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-arco-silvestre',
-    name: 'Pendientes Arco Silvestre',
+    name: { es: 'Pendientes Arco Silvestre', gl: 'Pendentes Arco Silvestre' },
     category: 'pendientes',
     price: 32,
-    summary: 'Margarita y flor amarilla bajo el arco',
-    description: [
-      'El arco del taller, esta vez con una margarita blanca abierta, una florecilla amarilla y una brizna verde repartidas dentro de la resina transparente.',
-      'La resina es fina, así que pesan poco para lo grandes que se ven.',
-    ],
-    materials: ['Resina', 'Margarita y flor silvestre secas', 'Gancho de acero dorado'],
-    image: img(
-      'pendientes-arco-silvestre',
-      'Dos pendientes de arco transparente con margaritas, colgados de una maceta con un bonsái',
-    ),
+    summary: {
+      es: 'Margarita y flor amarilla bajo el arco',
+      gl: 'Margarida e flor amarela baixo o arco',
+    },
+    description: {
+      es: [
+        'El arco del taller, esta vez con una margarita blanca abierta, una florecilla amarilla y una brizna verde repartidas dentro de la resina transparente.',
+        'La resina es fina, así que pesan poco para lo grandes que se ven.',
+      ],
+      gl: [
+        'O arco do taller, esta vez cunha margarida branca aberta, unha floriña amarela e unha palla verde repartidas dentro da resina transparente.',
+        'A resina é fina, así que pesan pouco para o grandes que se ven.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Margarita y flor silvestre secas', 'Gancho de acero dorado'],
+      gl: ['Resina', 'Margarida e flor silvestre secas', 'Gancho de aceiro dourado'],
+    },
+    image: imgLocalized('pendientes-arco-silvestre', {
+      es: 'Dos pendientes de arco transparente con margaritas, colgados de una maceta con un bonsái',
+      gl: 'Dous pendentes de arco transparente con margaridas, colgados dunha maceta cun bonsái',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-otono',
-    name: 'Pendientes Otoño',
+    name: { es: 'Pendientes Otoño', gl: 'Pendentes Outono' },
     category: 'pendientes',
     price: 30,
-    summary: 'Verde oliva y naranja, sin flor',
-    description: [
-      'Tres modelos de la misma colección: nube con disco, arco con círculo y dos piedras encadenadas. Todos en resina teñida en verde oliva y naranja quemado, los colores del monte en octubre.',
-      'Se piden por pares y sueltos: no hace falta llevarse los tres.',
-    ],
-    materials: ['Resina', 'Pigmento mineral', 'Acero dorado'],
-    image: img(
-      'pendientes-otono',
-      'Tres pares de pendientes geométricos verdes y naranjas en expositores sobre madera',
-    ),
+    summary: { es: 'Verde oliva y naranja, sin flor', gl: 'Verde oliva e laranxa, sen flor' },
+    description: {
+      es: [
+        'Tres modelos de la misma colección: nube con disco, arco con círculo y dos piedras encadenadas. Todos en resina teñida en verde oliva y naranja quemado, los colores del monte en octubre.',
+        'Se piden por pares y sueltos: no hace falta llevarse los tres.',
+      ],
+      gl: [
+        'Tres modelos da mesma colección: nube con disco, arco con círculo e dúas pedras encadeadas. Todos en resina tinguida en verde oliva e laranxa queimado, as cores do monte en outubro.',
+        'Pídense por pares e soltos: non fai falta levar os tres.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Pigmento mineral', 'Acero dorado'],
+      gl: ['Resina', 'Pigmento mineral', 'Aceiro dourado'],
+    },
+    image: imgLocalized('pendientes-otono', {
+      es: 'Tres pares de pendientes geométricos verdes y naranjas en expositores sobre madera',
+      gl: 'Tres pares de pendentes xeométricos verdes e laranxas en expositores sobre madeira',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-fumaria',
-    name: 'Pendientes Fumaria',
+    name: { es: 'Pendientes Fumaria', gl: 'Pendentes Fumaria' },
     category: 'pendientes',
     price: 34,
-    summary: 'Fumaria y helecho en un óvalo grande',
-    description: [
-      'Fumaria —esa flor rosa de puntas oscuras que sale en las cunetas— con unas hojas de helecho detrás, dentro de un óvalo transparente colgado de un aro fino.',
-      'Es de las piezas más grandes y de las que menos pesan.',
-    ],
-    materials: ['Resina', 'Fumaria y helecho prensados', 'Aro de acero dorado'],
-    image: img(
-      'pendientes-fumaria',
-      'Pendientes ovalados con flores rosas y helecho colgados de un soporte dorado',
-    ),
+    summary: {
+      es: 'Fumaria y helecho en un óvalo grande',
+      gl: 'Fumaria e fento nun óvalo grande',
+    },
+    description: {
+      es: [
+        'Fumaria —esa flor rosa de puntas oscuras que sale en las cunetas— con unas hojas de helecho detrás, dentro de un óvalo transparente colgado de un aro fino.',
+        'Es de las piezas más grandes y de las que menos pesan.',
+      ],
+      gl: [
+        'Fumaria —esa flor rosa de puntas escuras que sae nas gabias— cunhas follas de fento detrás, dentro dun óvalo transparente colgado dun aro fino.',
+        'É das pezas máis grandes e das que menos pesan.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Fumaria y helecho prensados', 'Aro de acero dorado'],
+      gl: ['Resina', 'Fumaria e fento prensados', 'Aro de aceiro dourado'],
+    },
+    image: imgLocalized('pendientes-fumaria', {
+      es: 'Pendientes ovalados con flores rosas y helecho colgados de un soporte dorado',
+      gl: 'Pendentes ovalados con flores rosas e fento colgados dun soporte dourado',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-disco-margarita',
-    name: 'Pendientes Disco Margarita',
+    name: { es: 'Pendientes Disco Margarita', gl: 'Pendentes Disco Margarida' },
     category: 'pendientes',
     price: 32,
-    summary: 'Una margarita abierta, a contraluz',
-    description: [
-      'Una margarita blanca abierta del todo, con el centro amarillo intacto, dentro de un disco redondo de resina casi incolora. Al trasluz se le ven los pétalos uno a uno.',
-      'Cuelgan de un aro grande, así que se mueven al andar.',
-    ],
-    materials: ['Resina', 'Margarita prensada', 'Aro de acero dorado'],
-    image: img(
-      'pendientes-disco-margarita',
-      'Pendientes redondos con una margarita blanca dentro, en un soporte dorado al sol',
-    ),
+    summary: { es: 'Una margarita abierta, a contraluz', gl: 'Unha margarida aberta, a contraluz' },
+    description: {
+      es: [
+        'Una margarita blanca abierta del todo, con el centro amarillo intacto, dentro de un disco redondo de resina casi incolora. Al trasluz se le ven los pétalos uno a uno.',
+        'Cuelgan de un aro grande, así que se mueven al andar.',
+      ],
+      gl: [
+        'Unha margarida branca aberta de todo, co centro amarelo intacto, dentro dun disco redondo de resina case incolora. Ao trasluz vénselle os pétalos un a un.',
+        'Colgan dun aro grande, así que se moven ao andar.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Margarita prensada', 'Aro de acero dorado'],
+      gl: ['Resina', 'Margarida prensada', 'Aro de aceiro dourado'],
+    },
+    image: imgLocalized('pendientes-disco-margarita', {
+      es: 'Pendientes redondos con una margarita blanca dentro, en un soporte dorado al sol',
+      gl: 'Pendentes redondos cunha margarida branca dentro, nun soporte dourado ao sol',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-ovalo-amarillo',
-    name: 'Pendientes Óvalo Amarillo',
+    name: { es: 'Pendientes Óvalo Amarillo', gl: 'Pendentes Óvalo Amarelo' },
     category: 'pendientes',
     price: 28,
-    summary: 'Una flor amarilla dentro de un óvalo hueco',
-    description: [
-      'La montura es un óvalo dorado abierto y la flor queda suspendida en el aire, sujeta por una lámina de resina casi invisible. Parece que flota.',
-      'Pequeños y de diario. Cierre de botón.',
-    ],
-    materials: ['Resina', 'Flor amarilla seca', 'Montura ovalada dorada'],
-    image: img(
-      'pendientes-ovalo-amarillo',
-      'Dos pendientes de óvalo dorado con una flor amarilla dentro, sobre lino',
-    ),
+    summary: {
+      es: 'Una flor amarilla dentro de un óvalo hueco',
+      gl: 'Unha flor amarela dentro dun óvalo baleiro',
+    },
+    description: {
+      es: [
+        'La montura es un óvalo dorado abierto y la flor queda suspendida en el aire, sujeta por una lámina de resina casi invisible. Parece que flota.',
+        'Pequeños y de diario. Cierre de botón.',
+      ],
+      gl: [
+        'A montura é un óvalo dourado aberto e a flor queda suspendida no aire, suxeita por unha lámina de resina case invisible. Parece que flota.',
+        'Pequenos e de diario. Peche de botón.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Flor amarilla seca', 'Montura ovalada dorada'],
+      gl: ['Resina', 'Flor amarela seca', 'Montura ovalada dourada'],
+    },
+    image: imgLocalized('pendientes-ovalo-amarillo', {
+      es: 'Dos pendientes de óvalo dorado con una flor amarilla dentro, sobre lino',
+      gl: 'Dous pendentes de óvalo dourado cunha flor amarela dentro, sobre liño',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-terrazo-azul',
-    name: 'Pendientes Terrazo Azul',
+    name: { es: 'Pendientes Terrazo Azul', gl: 'Pendentes Terrazo Azul' },
     category: 'pendientes',
     price: 32,
-    summary: 'Pétalos azules partidos, como un terrazo',
-    description: [
-      'Pétalos de flor azul y lila cortados a trozos y repartidos en resina transparente: de lejos parece terrazo, de cerca sigue siendo flor.',
-      'Tres formas de la misma colección: rectángulo calado, arco pequeño y arco grande. Se piden por pares.',
-    ],
-    materials: ['Resina', 'Pétalos secos', 'Acero dorado'],
-    image: img(
-      'pendientes-terrazo-azul',
-      'Tres pares de pendientes de resina con trozos de pétalo azul sobre tela clara',
-    ),
+    summary: {
+      es: 'Pétalos azules partidos, como un terrazo',
+      gl: 'Pétalos azuis partidos, coma un terrazo',
+    },
+    description: {
+      es: [
+        'Pétalos de flor azul y lila cortados a trozos y repartidos en resina transparente: de lejos parece terrazo, de cerca sigue siendo flor.',
+        'Tres formas de la misma colección: rectángulo calado, arco pequeño y arco grande. Se piden por pares.',
+      ],
+      gl: [
+        'Pétalos de flor azul e lila cortados a anacos e repartidos en resina transparente: de lonxe parece terrazo, de preto segue sendo flor.',
+        'Tres formas da mesma colección: rectángulo calado, arco pequeno e arco grande. Pídense por pares.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Pétalos secos', 'Acero dorado'],
+      gl: ['Resina', 'Pétalos secos', 'Aceiro dourado'],
+    },
+    image: imgLocalized('pendientes-terrazo-azul', {
+      es: 'Tres pares de pendientes de resina con trozos de pétalo azul sobre tela clara',
+      gl: 'Tres pares de pendentes de resina con anacos de pétalo azul sobre tea clara',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-ovalo-plata',
-    name: 'Pendientes Óvalo Plata',
+    name: { es: 'Pendientes Óvalo Plata', gl: 'Pendentes Óvalo Prata' },
     category: 'pendientes',
     price: 28,
-    summary: 'Flor rosa en montura plateada',
-    description: [
-      'La misma montura ovalada hueca, esta vez en plateado y con una florecilla rosa de tallo largo dentro.',
-      'Para quien no lleva dorado. Se hacen también con la flor que elijas.',
-    ],
-    materials: ['Resina', 'Flor silvestre seca', 'Montura ovalada plateada'],
-    image: img(
-      'pendientes-ovalo-plata',
-      'Dos pendientes ovalados plateados con una flor rosa, sostenidos en una mano',
-    ),
+    summary: { es: 'Flor rosa en montura plateada', gl: 'Flor rosa en montura prateada' },
+    description: {
+      es: [
+        'La misma montura ovalada hueca, esta vez en plateado y con una florecilla rosa de tallo largo dentro.',
+        'Para quien no lleva dorado. Se hacen también con la flor que elijas.',
+      ],
+      gl: [
+        'A mesma montura ovalada baleira, esta vez en prateado e cunha floriña rosa de talo longo dentro.',
+        'Para quen non leva dourado. Fanse tamén coa flor que escollas.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Flor silvestre seca', 'Montura ovalada plateada'],
+      gl: ['Resina', 'Flor silvestre seca', 'Montura ovalada prateada'],
+    },
+    image: imgLocalized('pendientes-ovalo-plata', {
+      es: 'Dos pendientes ovalados plateados con una flor rosa, sostenidos en una mano',
+      gl: 'Dous pendentes ovalados prateados cunha flor rosa, sostidos nunha man',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-aro-petalos',
-    name: 'Pendientes Aro de Pétalos',
+    name: { es: 'Pendientes Aro de Pétalos', gl: 'Pendentes Aro de Pétalos' },
     category: 'pendientes',
     price: 32,
-    summary: 'Un anillo de resina lleno de pétalos morados',
-    description: [
-      'Aro grueso de resina transparente con pétalos morados y ámbar embebidos por todo el contorno. El centro queda hueco, así que la luz pasa a través.',
-      'Es de las piezas que mejor quedan a contraluz.',
-    ],
-    materials: ['Resina', 'Pétalos secos', 'Gancho de acero dorado'],
-    image: img(
-      'pendientes-aro-petalos',
-      'Pendientes de aro con pétalos morados colgados de la rama de un árbol al sol',
-    ),
+    summary: {
+      es: 'Un anillo de resina lleno de pétalos morados',
+      gl: 'Un anel de resina cheo de pétalos morados',
+    },
+    description: {
+      es: [
+        'Aro grueso de resina transparente con pétalos morados y ámbar embebidos por todo el contorno. El centro queda hueco, así que la luz pasa a través.',
+        'Es de las piezas que mejor quedan a contraluz.',
+      ],
+      gl: [
+        'Aro groso de resina transparente con pétalos morados e ámbar embebidos por todo o contorno. O centro queda baleiro, así que a luz pasa a través.',
+        'É das pezas que mellor quedan a contraluz.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Pétalos secos', 'Gancho de acero dorado'],
+      gl: ['Resina', 'Pétalos secos', 'Gancho de aceiro dourado'],
+    },
+    image: imgLocalized('pendientes-aro-petalos', {
+      es: 'Pendientes de aro con pétalos morados colgados de la rama de un árbol al sol',
+      gl: 'Pendentes de aro con pétalos morados colgados da rama dunha árbore ao sol',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-arco-fucsia',
-    name: 'Pendientes Arco Fucsia',
+    name: { es: 'Pendientes Arco Fucsia', gl: 'Pendentes Arco Fucsia' },
     category: 'pendientes',
     price: 32,
-    summary: 'Fucsia, rojo y naranja en el mismo arco',
-    description: [
-      'Pétalos de buganvilla y de rosa cortados y colocados en un arco macizo. Es la combinación más caliente del taller: fucsia, rojo y naranja sin nada frío que los calme.',
-      'Cada par sale distinto: los trozos nunca caen igual.',
-    ],
-    materials: ['Resina', 'Pétalos secos', 'Gancho de acero dorado'],
-    image: img(
-      'pendientes-arco-fucsia',
-      'Dos pendientes de arco con pétalos fucsias y naranjas en la palma de una mano al sol',
-    ),
+    summary: {
+      es: 'Fucsia, rojo y naranja en el mismo arco',
+      gl: 'Fucsia, vermello e laranxa no mesmo arco',
+    },
+    description: {
+      es: [
+        'Pétalos de buganvilla y de rosa cortados y colocados en un arco macizo. Es la combinación más caliente del taller: fucsia, rojo y naranja sin nada frío que los calme.',
+        'Cada par sale distinto: los trozos nunca caen igual.',
+      ],
+      gl: [
+        'Pétalos de buganvilla e de rosa cortados e colocados nun arco macizo. É a combinación máis quente do taller: fucsia, vermello e laranxa sen nada frío que os calme.',
+        'Cada par sae distinto: os anacos nunca caen igual.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Pétalos secos', 'Gancho de acero dorado'],
+      gl: ['Resina', 'Pétalos secos', 'Gancho de aceiro dourado'],
+    },
+    image: imgLocalized('pendientes-arco-fucsia', {
+      es: 'Dos pendientes de arco con pétalos fucsias y naranjas en la palma de una mano al sol',
+      gl: 'Dous pendentes de arco con pétalos fucsias e laranxas na palma dunha man ao sol',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-cascada-azul',
-    name: 'Pendientes Cascada',
+    name: { es: 'Pendientes Cascada', gl: 'Pendentes Fervenza' },
     category: 'pendientes',
     price: 36,
-    summary: 'Tres piezas encadenadas, azul y oro',
-    description: [
-      'Círculo, arco y barra colgando uno del otro, los tres con pétalos azules y virutas doradas dentro. Son los pendientes más largos que hago.',
-      'Pesan poco a pesar del tamaño, pero piden pelo recogido.',
-    ],
-    materials: ['Resina', 'Pétalos secos', 'Pan de oro', 'Acero dorado'],
-    image: img(
-      'pendientes-cascada-azul',
-      'Pendientes largos de tres piezas con pétalos azules, sostenidos frente al mar',
-    ),
+    summary: {
+      es: 'Tres piezas encadenadas, azul y oro',
+      gl: 'Tres pezas encadeadas, azul e ouro',
+    },
+    description: {
+      es: [
+        'Círculo, arco y barra colgando uno del otro, los tres con pétalos azules y virutas doradas dentro. Son los pendientes más largos que hago.',
+        'Pesan poco a pesar del tamaño, pero piden pelo recogido.',
+      ],
+      gl: [
+        'Círculo, arco e barra colgando un do outro, os tres con pétalos azuis e labras douradas dentro. Son os pendentes máis longos que fago.',
+        'Pesan pouco malia o tamaño, pero piden pelo recollido.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Pétalos secos', 'Pan de oro', 'Acero dorado'],
+      gl: ['Resina', 'Pétalos secos', 'Pan de ouro', 'Aceiro dourado'],
+    },
+    image: imgLocalized('pendientes-cascada-azul', {
+      es: 'Pendientes largos de tres piezas con pétalos azules, sostenidos frente al mar',
+      gl: 'Pendentes longos de tres pezas con pétalos azuis, sostidos fronte ao mar',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-hoja-otono',
-    name: 'Pendientes Hoja de Otoño',
+    name: { es: 'Pendientes Hoja de Otoño', gl: 'Pendentes Folla de Outono' },
     category: 'pendientes',
     price: 34,
-    summary: 'Una hoja roja entera, recortada a su forma',
-    description: [
-      'Una hoja de otoño completa, roja con la nervadura ámbar, sellada en resina y recortada siguiendo su propio contorno. No hay montura: la pieza tiene la forma de la hoja.',
-      'Cada par depende de las hojas que haya recogido ese año, así que la forma nunca se repite.',
-    ],
-    materials: ['Resina', 'Hoja natural prensada', 'Aro de acero dorado'],
-    image: img(
-      'pendientes-hoja-otono',
-      'Dos pendientes en forma de hoja roja colgados de las ramas de un bonsái',
-    ),
+    summary: {
+      es: 'Una hoja roja entera, recortada a su forma',
+      gl: 'Unha folla vermella enteira, recortada á súa forma',
+    },
+    description: {
+      es: [
+        'Una hoja de otoño completa, roja con la nervadura ámbar, sellada en resina y recortada siguiendo su propio contorno. No hay montura: la pieza tiene la forma de la hoja.',
+        'Cada par depende de las hojas que haya recogido ese año, así que la forma nunca se repite.',
+      ],
+      gl: [
+        'Unha folla de outono completa, vermella coa nervadura ámbar, selada en resina e recortada seguindo o seu propio contorno. Non hai montura: a peza ten a forma da folla.',
+        'Cada par depende das follas que teña recollido ese ano, así que a forma nunca se repite.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Hoja natural prensada', 'Aro de acero dorado'],
+      gl: ['Resina', 'Folla natural prensada', 'Aro de aceiro dourado'],
+    },
+    image: imgLocalized('pendientes-hoja-otono', {
+      es: 'Dos pendientes en forma de hoja roja colgados de las ramas de un bonsái',
+      gl: 'Dous pendentes en forma de folla vermella colgados das ramas dun bonsái',
+    }),
     featured: true,
   },
   {
     slug: 'pendientes-lavanda-gota',
-    name: 'Pendientes Lavanda',
+    name: { es: 'Pendientes Lavanda', gl: 'Pendentes Lavanda' },
     category: 'pendientes',
     price: 30,
-    summary: 'Gota o aro, con lavanda dentro',
-    description: [
-      'Lavanda repartida en resina transparente, en dos formas: gota alargada de botón y aro hueco de gancho. El morado queda apagado, como la flor cuando se seca de verdad.',
-      'Se piden por pares. Dime cuál de las dos formas quieres.',
-    ],
-    materials: ['Resina', 'Lavanda seca', 'Acero dorado'],
-    image: img(
-      'pendientes-lavanda-gota',
-      'Dos pares de pendientes con lavanda sobre una rodaja de madera entre hojas secas',
-    ),
+    summary: { es: 'Gota o aro, con lavanda dentro', gl: 'Pinga ou aro, con lavanda dentro' },
+    description: {
+      es: [
+        'Lavanda repartida en resina transparente, en dos formas: gota alargada de botón y aro hueco de gancho. El morado queda apagado, como la flor cuando se seca de verdad.',
+        'Se piden por pares. Dime cuál de las dos formas quieres.',
+      ],
+      gl: [
+        'Lavanda repartida en resina transparente, en dúas formas: pinga alongada de botón e aro baleiro de gancho. O morado queda apagado, coma a flor cando seca de verdade.',
+        'Pídense por pares. Dime cal das dúas formas queres.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Lavanda seca', 'Acero dorado'],
+      gl: ['Resina', 'Lavanda seca', 'Aceiro dourado'],
+    },
+    image: imgLocalized('pendientes-lavanda-gota', {
+      es: 'Dos pares de pendientes con lavanda sobre una rodaja de madera entre hojas secas',
+      gl: 'Dous pares de pendentes con lavanda sobre unha rodaxe de madeira entre follas secas',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-arco-lila',
-    name: 'Pendientes Arco Lila',
+    name: { es: 'Pendientes Arco Lila', gl: 'Pendentes Arco Lila' },
     category: 'pendientes',
     price: 34,
-    summary: 'Margaritas amarillas y florecillas lilas',
-    description: [
-      'Arco de resina transparente lleno hasta arriba: margaritas amarillas abiertas, florecillas lilas y hojas finas, sin dejar hueco. De las piezas con más flor por centímetro.',
-      'Se hacen a juego con el colgante hexagonal.',
-    ],
-    materials: ['Resina', 'Margarita y flor silvestre secas', 'Gancho de acero dorado'],
-    image: img(
-      'pendientes-arco-lila',
-      'Dos pendientes de arco con margaritas amarillas y flores lilas sobre lino, entre hojas',
-    ),
+    summary: {
+      es: 'Margaritas amarillas y florecillas lilas',
+      gl: 'Margaridas amarelas e floriñas lilas',
+    },
+    description: {
+      es: [
+        'Arco de resina transparente lleno hasta arriba: margaritas amarillas abiertas, florecillas lilas y hojas finas, sin dejar hueco. De las piezas con más flor por centímetro.',
+        'Se hacen a juego con el colgante hexagonal.',
+      ],
+      gl: [
+        'Arco de resina transparente cheo ata arriba: margaridas amarelas abertas, floriñas lilas e follas finas, sen deixar oco. Das pezas con máis flor por centímetro.',
+        'Fanse a xogo co colgante hexagonal.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Margarita y flor silvestre secas', 'Gancho de acero dorado'],
+      gl: ['Resina', 'Margarida e flor silvestre secas', 'Gancho de aceiro dourado'],
+    },
+    image: imgLocalized('pendientes-arco-lila', {
+      es: 'Dos pendientes de arco con margaritas amarillas y flores lilas sobre lino, entre hojas',
+      gl: 'Dous pendentes de arco con margaridas amarelas e flores lilas sobre liño, entre follas',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-pensamiento',
-    name: 'Pendientes Pensamiento',
+    name: { es: 'Pendientes Pensamiento', gl: 'Pendentes Pensamento' },
     category: 'pendientes',
     price: 34,
-    summary: 'Un pensamiento entero, crema y burdeos',
-    description: [
-      'La flor del pensamiento completa, con sus cinco pétalos, dos color crema arriba y tres burdeos abajo. Se recorta la resina al borde del pétalo para que no se vea montura.',
-      'Es la pieza que más cuesta secar bien: el pétalo es grueso y se pardea si se seca deprisa.',
-    ],
-    materials: ['Resina', 'Pensamiento natural seco', 'Gancho de acero dorado'],
-    image: img(
-      'pendientes-pensamiento',
-      'Dos pendientes con flores de pensamiento crema y burdeos sostenidos en una mano al sol',
-    ),
+    summary: {
+      es: 'Un pensamiento entero, crema y burdeos',
+      gl: 'Un pensamento enteiro, crema e bordeos',
+    },
+    description: {
+      es: [
+        'La flor del pensamiento completa, con sus cinco pétalos, dos color crema arriba y tres burdeos abajo. Se recorta la resina al borde del pétalo para que no se vea montura.',
+        'Es la pieza que más cuesta secar bien: el pétalo es grueso y se pardea si se seca deprisa.',
+      ],
+      gl: [
+        'A flor do pensamento completa, cos seus cinco pétalos, dous de cor crema arriba e tres bordeos abaixo. Recórtase a resina ao bordo do pétalo para que non se vexa montura.',
+        'É a peza que máis custa secar ben: o pétalo é groso e amarelea se seca de présa.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Pensamiento natural seco', 'Gancho de acero dorado'],
+      gl: ['Resina', 'Pensamento natural seco', 'Gancho de aceiro dourado'],
+    },
+    image: imgLocalized('pendientes-pensamiento', {
+      es: 'Dos pendientes con flores de pensamiento crema y burdeos sostenidos en una mano al sol',
+      gl: 'Dous pendentes con flores de pensamento crema e bordeos sostidos nunha man ao sol',
+    }),
     featured: true,
   },
   {
     slug: 'pendientes-cadena-rosa',
-    name: 'Pendientes Cadena Rosa',
+    name: { es: 'Pendientes Cadena Rosa', gl: 'Pendentes Cadea Rosa' },
     category: 'pendientes',
     price: 32,
-    summary: 'Dos discos rosas al final de dos cadenas',
-    description: [
-      'Dos cadenas finas de distinta largura que caen de un mismo gancho, cada una con un disco de resina rosa y pan de oro. Se mueven todo el rato.',
-      'Los más largos y los más discretos a la vez: la pieza es diminuta.',
-    ],
-    materials: ['Resina', 'Pigmento', 'Pan de oro', 'Cadena de acero dorado'],
-    image: img(
-      'pendientes-cadena-rosa',
-      'Pendientes largos de cadena con dos discos rosas, sobre lino junto a eucalipto',
-    ),
+    summary: {
+      es: 'Dos discos rosas al final de dos cadenas',
+      gl: 'Dous discos rosas ao final de dúas cadeas',
+    },
+    description: {
+      es: [
+        'Dos cadenas finas de distinta largura que caen de un mismo gancho, cada una con un disco de resina rosa y pan de oro. Se mueven todo el rato.',
+        'Los más largos y los más discretos a la vez: la pieza es diminuta.',
+      ],
+      gl: [
+        'Dúas cadeas finas de distinta lonxitude que caen dun mesmo gancho, cada unha cun disco de resina rosa e pan de ouro. Móvense todo o tempo.',
+        'Os máis longos e os máis discretos á vez: a peza é diminuta.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Pigmento', 'Pan de oro', 'Cadena de acero dorado'],
+      gl: ['Resina', 'Pigmento', 'Pan de ouro', 'Cadea de aceiro dourado'],
+    },
+    image: imgLocalized('pendientes-cadena-rosa', {
+      es: 'Pendientes largos de cadena con dos discos rosas, sobre lino junto a eucalipto',
+      gl: 'Pendentes longos de cadea con dous discos rosas, sobre liño xunto a eucalipto',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-flor-gota-azul',
-    name: 'Pendientes Flor y Gota',
+    name: { es: 'Pendientes Flor y Gota', gl: 'Pendentes Flor e Pinga' },
     category: 'pendientes',
     price: 34,
-    summary: 'Flor arriba, gota larga debajo',
-    description: [
-      'Dos piezas unidas por una anilla: una flor de cinco pétalos arriba y una gota larga colgando, las dos con flor azul y ámbar dentro.',
-      'Es el modelo que más se pide para bodas.',
-    ],
-    materials: ['Resina', 'Flor seca', 'Acero dorado'],
-    image: img(
-      'pendientes-flor-gota-azul',
-      'Pendientes de flor y gota en su tarjeta, sostenidos frente al mar al atardecer',
-    ),
+    summary: { es: 'Flor arriba, gota larga debajo', gl: 'Flor arriba, pinga longa debaixo' },
+    description: {
+      es: [
+        'Dos piezas unidas por una anilla: una flor de cinco pétalos arriba y una gota larga colgando, las dos con flor azul y ámbar dentro.',
+        'Es el modelo que más se pide para bodas.',
+      ],
+      gl: [
+        'Dúas pezas unidas por unha anela: unha flor de cinco pétalos arriba e unha pinga longa colgando, as dúas con flor azul e ámbar dentro.',
+        'É o modelo que máis se pide para vodas.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Flor seca', 'Acero dorado'],
+      gl: ['Resina', 'Flor seca', 'Aceiro dourado'],
+    },
+    image: imgLocalized('pendientes-flor-gota-azul', {
+      es: 'Pendientes de flor y gota en su tarjeta, sostenidos frente al mar al atardecer',
+      gl: 'Pendentes de flor e pinga na súa tarxeta, sostidos fronte ao mar ao solpor',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-gota-fucsia',
-    name: 'Pendientes Gota Fucsia',
+    name: { es: 'Pendientes Gota Fucsia', gl: 'Pendentes Pinga Fucsia' },
     category: 'pendientes',
     price: 30,
-    summary: 'Gota larga fucsia con pan de oro',
-    description: [
-      'Una sola gota larga por pendiente, con pétalos fucsias y virutas de pan de oro repartidas por dentro. Cierre de botón, así que quedan pegados a la oreja arriba y sueltos abajo.',
-    ],
-    materials: ['Resina', 'Pétalos secos', 'Pan de oro', 'Acero dorado'],
-    image: img(
-      'pendientes-gota-fucsia',
-      'Pendientes de gota larga fucsia en su tarjeta, junto a un sello de campanilla',
-    ),
+    summary: { es: 'Gota larga fucsia con pan de oro', gl: 'Pinga longa fucsia con pan de ouro' },
+    description: {
+      es: [
+        'Una sola gota larga por pendiente, con pétalos fucsias y virutas de pan de oro repartidas por dentro. Cierre de botón, así que quedan pegados a la oreja arriba y sueltos abajo.',
+      ],
+      gl: [
+        'Unha soa pinga longa por pendente, con pétalos fucsias e labras de pan de ouro repartidas por dentro. Peche de botón, así que quedan pegados á orella arriba e soltos abaixo.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Pétalos secos', 'Pan de oro', 'Acero dorado'],
+      gl: ['Resina', 'Pétalos secos', 'Pan de ouro', 'Aceiro dourado'],
+    },
+    image: imgLocalized('pendientes-gota-fucsia', {
+      es: 'Pendientes de gota larga fucsia en su tarjeta, junto a un sello de campanilla',
+      gl: 'Pendentes de pinga longa fucsia na súa tarxeta, xunto a un selo de campaíña',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-flor-cuadrado',
-    name: 'Pendientes Flor y Cuadrado',
+    name: { es: 'Pendientes Flor y Cuadrado', gl: 'Pendentes Flor e Cadrado' },
     category: 'pendientes',
     price: 32,
-    summary: 'Ámbar y verde, en dos piezas',
-    description: [
-      'Flor de cinco pétalos arriba y cuadrado debajo, los dos con pétalos ámbar y hojas verdes dentro. Los colores salen del eucalipto seco con el que se fotografían.',
-    ],
-    materials: ['Resina', 'Pétalos y hoja secos', 'Acero dorado'],
-    image: img(
-      'pendientes-flor-cuadrado',
-      'Pendientes de flor y cuadrado en tonos ámbar sobre lino, junto a hojas de eucalipto',
-    ),
+    summary: { es: 'Ámbar y verde, en dos piezas', gl: 'Ámbar e verde, en dúas pezas' },
+    description: {
+      es: [
+        'Flor de cinco pétalos arriba y cuadrado debajo, los dos con pétalos ámbar y hojas verdes dentro. Los colores salen del eucalipto seco con el que se fotografían.',
+      ],
+      gl: [
+        'Flor de cinco pétalos arriba e cadrado debaixo, os dous con pétalos ámbar e follas verdes dentro. As cores saen do eucalipto seco co que se fotografían.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Pétalos y hoja secos', 'Acero dorado'],
+      gl: ['Resina', 'Pétalos e folla secos', 'Aceiro dourado'],
+    },
+    image: imgLocalized('pendientes-flor-cuadrado', {
+      es: 'Pendientes de flor y cuadrado en tonos ámbar sobre lino, junto a hojas de eucalipto',
+      gl: 'Pendentes de flor e cadrado en tons ámbar sobre liño, xunto a follas de eucalipto',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-rectangulo-esmeralda',
-    name: 'Pendientes Rectángulo Esmeralda',
+    name: { es: 'Pendientes Rectángulo Esmeralda', gl: 'Pendentes Rectángulo Esmeralda' },
     category: 'pendientes',
     price: 34,
-    summary: 'Rosa, verde esmeralda y oro',
-    description: [
-      'Rectángulo calado por dentro, con pétalos rosas, hojas verde esmeralda y pan de oro repartidos por el marco. Se hacen también en gota, con la misma mezcla.',
-      'Se piden por pares. Dime si los quieres en rectángulo o en gota.',
-    ],
-    materials: ['Resina', 'Pétalos y hoja secos', 'Pan de oro', 'Acero dorado'],
-    image: img(
-      'pendientes-rectangulo-esmeralda',
-      'Pendientes rectangulares y de gota con pétalos rosas y verdes sobre una rodaja de madera',
-    ),
+    summary: { es: 'Rosa, verde esmeralda y oro', gl: 'Rosa, verde esmeralda e ouro' },
+    description: {
+      es: [
+        'Rectángulo calado por dentro, con pétalos rosas, hojas verde esmeralda y pan de oro repartidos por el marco. Se hacen también en gota, con la misma mezcla.',
+        'Se piden por pares. Dime si los quieres en rectángulo o en gota.',
+      ],
+      gl: [
+        'Rectángulo calado por dentro, con pétalos rosas, follas verde esmeralda e pan de ouro repartidos polo marco. Fanse tamén en pinga, coa mesma mestura.',
+        'Pídense por pares. Dime se os queres en rectángulo ou en pinga.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Pétalos y hoja secos', 'Pan de oro', 'Acero dorado'],
+      gl: ['Resina', 'Pétalos e folla secos', 'Pan de ouro', 'Aceiro dourado'],
+    },
+    image: imgLocalized('pendientes-rectangulo-esmeralda', {
+      es: 'Pendientes rectangulares y de gota con pétalos rosas y verdes sobre una rodaja de madera',
+      gl: 'Pendentes rectangulares e de pinga con pétalos rosas e verdes sobre unha rodaxe de madeira',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-miel',
-    name: 'Pendientes Miel',
+    name: { es: 'Pendientes Miel', gl: 'Pendentes Mel' },
     category: 'pendientes',
     price: 32,
-    summary: 'Flor de tojo en tres formatos',
-    description: [
-      'Flor de tojo seca, que al perder el agua se queda entre miel y canela, repartida en resina clara. Hay tres formatos: arco, barra larga y escalera de cuatro cuadrados.',
-      'Se piden por pares. La escalera es la más larga y la que más pesa.',
-    ],
-    materials: ['Resina', 'Flor de tojo seca', 'Acero dorado'],
-    image: img(
-      'pendientes-miel',
-      'Tres pares de pendientes color miel con flores secas, sobre tela de lino',
-    ),
+    summary: { es: 'Flor de tojo en tres formatos', gl: 'Flor de toxo en tres formatos' },
+    description: {
+      es: [
+        'Flor de tojo seca, que al perder el agua se queda entre miel y canela, repartida en resina clara. Hay tres formatos: arco, barra larga y escalera de cuatro cuadrados.',
+        'Se piden por pares. La escalera es la más larga y la que más pesa.',
+      ],
+      gl: [
+        'Flor de toxo seca, que ao perder a auga queda entre mel e canela, repartida en resina clara. Hai tres formatos: arco, barra longa e escaleira de catro cadrados.',
+        'Pídense por pares. A escaleira é a máis longa e a que máis pesa.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Flor de tojo seca', 'Acero dorado'],
+      gl: ['Resina', 'Flor de toxo seca', 'Aceiro dourado'],
+    },
+    image: imgLocalized('pendientes-miel', {
+      es: 'Tres pares de pendientes color miel con flores secas, sobre tela de lino',
+      gl: 'Tres pares de pendentes de cor mel con flores secas, sobre tea de liño',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-aro-flor-intercambiable',
-    name: 'Aros con Flor Intercambiable',
+    name: { es: 'Aros con Flor Intercambiable', gl: 'Aros con Flor Intercambiable' },
     category: 'pendientes',
     price: 34,
-    summary: 'Un aro y las flores que quieras',
-    description: [
-      'Un aro de acero, dorado o plateado, y flores de resina que se sacan y se ponen. Cada flor es una pieza distinta: azul veteado, verde esmeralda, morado, ámbar, lila.',
-      'El par de aros va con dos flores a elegir. Las de más se piden sueltas y se van cambiando según el día.',
-    ],
-    materials: ['Resina', 'Pétalos secos', 'Aro de acero dorado o plateado'],
-    image: img(
-      'pendientes-aro-flor-intercambiable',
-      'Siete flores de resina de colores y dos pares de aros en la palma de una mano',
-    ),
+    summary: { es: 'Un aro y las flores que quieras', gl: 'Un aro e as flores que queiras' },
+    description: {
+      es: [
+        'Un aro de acero, dorado o plateado, y flores de resina que se sacan y se ponen. Cada flor es una pieza distinta: azul veteado, verde esmeralda, morado, ámbar, lila.',
+        'El par de aros va con dos flores a elegir. Las de más se piden sueltas y se van cambiando según el día.',
+      ],
+      gl: [
+        'Un aro de aceiro, dourado ou prateado, e flores de resina que se sacan e se poñen. Cada flor é unha peza distinta: azul veteado, verde esmeralda, morado, ámbar, lila.',
+        'O par de aros vai con dúas flores a escoller. As de máis pídense soltas e vanse cambiando segundo o día.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Pétalos secos', 'Aro de acero dorado o plateado'],
+      gl: ['Resina', 'Pétalos secos', 'Aro de aceiro dourado ou prateado'],
+    },
+    image: imgLocalized('pendientes-aro-flor-intercambiable', {
+      es: 'Siete flores de resina de colores y dos pares de aros en la palma de una mano',
+      gl: 'Sete flores de resina de cores e dous pares de aros na palma dunha man',
+    }),
     featured: true,
   },
   {
     slug: 'pendientes-ovalo-nube',
-    name: 'Pendientes Óvalo Nube',
+    name: { es: 'Pendientes Óvalo Nube', gl: 'Pendentes Óvalo Nube' },
     category: 'pendientes',
     price: 32,
-    summary: 'Crema, azul pálido y oro',
-    description: [
-      'Óvalo grueso calado por dentro, con pétalos color crema, azul muy pálido y láminas de oro. Es la pieza más clara del taller y la que mejor va con ropa de verano.',
-    ],
-    materials: ['Resina', 'Pétalos secos', 'Pan de oro', 'Acero plateado'],
-    image: img(
-      'pendientes-ovalo-nube',
-      'Pendientes ovalados en tonos crema y azul pálido en su tarjeta, sobre un arbusto verde',
-    ),
+    summary: { es: 'Crema, azul pálido y oro', gl: 'Crema, azul pálido e ouro' },
+    description: {
+      es: [
+        'Óvalo grueso calado por dentro, con pétalos color crema, azul muy pálido y láminas de oro. Es la pieza más clara del taller y la que mejor va con ropa de verano.',
+      ],
+      gl: [
+        'Óvalo groso calado por dentro, con pétalos de cor crema, azul moi pálido e láminas de ouro. É a peza máis clara do taller e a que mellor vai con roupa de verán.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Pétalos secos', 'Pan de oro', 'Acero plateado'],
+      gl: ['Resina', 'Pétalos secos', 'Pan de ouro', 'Aceiro prateado'],
+    },
+    image: imgLocalized('pendientes-ovalo-nube', {
+      es: 'Pendientes ovalados en tonos crema y azul pálido en su tarjeta, sobre un arbusto verde',
+      gl: 'Pendentes ovalados en tons crema e azul pálido na súa tarxeta, sobre un arbusto verde',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-gota-hortensia',
-    name: 'Pendientes Gota Hortensia',
+    name: { es: 'Pendientes Gota Hortensia', gl: 'Pendentes Pinga Hortensia' },
     category: 'pendientes',
     price: 32,
-    summary: 'Hortensia blanca y una brizna dorada',
-    description: [
-      'Una flor de hortensia blanca con el centro verde y una brizna seca de color miel cruzando la gota. Fondo casi transparente, montura plateada.',
-      'La hortensia blanca amarillea con el sol directo; guárdalos a la sombra y aguantan años.',
-    ],
-    materials: ['Resina', 'Hortensia natural seca', 'Acero plateado'],
-    image: img(
-      'pendientes-gota-hortensia',
-      'Pendientes de gota con hortensia blanca en su tarjeta, sobre la arena de la playa',
-    ),
+    summary: {
+      es: 'Hortensia blanca y una brizna dorada',
+      gl: 'Hortensia branca e unha palla dourada',
+    },
+    description: {
+      es: [
+        'Una flor de hortensia blanca con el centro verde y una brizna seca de color miel cruzando la gota. Fondo casi transparente, montura plateada.',
+        'La hortensia blanca amarillea con el sol directo; guárdalos a la sombra y aguantan años.',
+      ],
+      gl: [
+        'Unha flor de hortensia branca co centro verde e unha palla seca de cor mel cruzando a pinga. Fondo case transparente, montura prateada.',
+        'A hortensia branca amarelea co sol directo; gárdaos á sombra e aguantan anos.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Hortensia natural seca', 'Acero plateado'],
+      gl: ['Resina', 'Hortensia natural seca', 'Aceiro prateado'],
+    },
+    image: imgLocalized('pendientes-gota-hortensia', {
+      es: 'Pendientes de gota con hortensia blanca en su tarjeta, sobre la arena de la playa',
+      gl: 'Pendentes de pinga con hortensia branca na súa tarxeta, sobre a area da praia',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-hortensia-azul',
-    name: 'Pendientes Hortensia Azul',
+    name: { es: 'Pendientes Hortensia Azul', gl: 'Pendentes Hortensia Azul' },
     category: 'pendientes',
     price: 32,
-    summary: 'Hortensia azul en aro plateado',
-    description: [
-      'La flor entera de hortensia azul, recortada a su contorno y colgada de un aro plateado grande. El azul de la hortensia gallega, el que sale cuando la tierra es ácida.',
-    ],
-    materials: ['Resina', 'Hortensia natural seca', 'Aro de acero plateado'],
-    image: img(
-      'pendientes-hortensia-azul',
-      'Pendientes de aro con flores de hortensia azul pálido, sostenidos al atardecer en el campo',
-    ),
+    summary: { es: 'Hortensia azul en aro plateado', gl: 'Hortensia azul en aro prateado' },
+    description: {
+      es: [
+        'La flor entera de hortensia azul, recortada a su contorno y colgada de un aro plateado grande. El azul de la hortensia gallega, el que sale cuando la tierra es ácida.',
+      ],
+      gl: [
+        'A flor enteira de hortensia azul, recortada ao seu contorno e colgada dun aro prateado grande. O azul da hortensia galega, o que sae cando a terra é ácida.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Hortensia natural seca', 'Aro de acero plateado'],
+      gl: ['Resina', 'Hortensia natural seca', 'Aro de aceiro prateado'],
+    },
+    image: imgLocalized('pendientes-hortensia-azul', {
+      es: 'Pendientes de aro con flores de hortensia azul pálido, sostenidos al atardecer en el campo',
+      gl: 'Pendentes de aro con flores de hortensia azul pálido, sostidos ao solpor no campo',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-tres-aros',
-    name: 'Pendientes Tres Aros',
+    name: { es: 'Pendientes Tres Aros', gl: 'Pendentes Tres Aros' },
     category: 'pendientes',
     price: 34,
-    summary: 'Tres donuts crema en cascada',
-    description: [
-      'Tres aros de resina color crema veteado, encadenados de mayor a menor. Sin flor: es la pieza más sobria que hago.',
-      'Largos, pero muy ligeros: la resina hueca no pesa.',
-    ],
-    materials: ['Resina', 'Pigmento mineral', 'Gancho de acero dorado'],
-    image: img(
-      'pendientes-tres-aros',
-      'Pendientes de tres aros color crema apoyados en una roca, con la playa al fondo',
-    ),
+    summary: { es: 'Tres donuts crema en cascada', gl: 'Tres donuts crema en fervenza' },
+    description: {
+      es: [
+        'Tres aros de resina color crema veteado, encadenados de mayor a menor. Sin flor: es la pieza más sobria que hago.',
+        'Largos, pero muy ligeros: la resina hueca no pesa.',
+      ],
+      gl: [
+        'Tres aros de resina de cor crema veteado, encadeados de maior a menor. Sen flor: é a peza máis sobria que fago.',
+        'Longos, pero moi lixeiros: a resina baleira non pesa.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Pigmento mineral', 'Gancho de acero dorado'],
+      gl: ['Resina', 'Pigmento mineral', 'Gancho de aceiro dourado'],
+    },
+    image: imgLocalized('pendientes-tres-aros', {
+      es: 'Pendientes de tres aros color crema apoyados en una roca, con la playa al fondo',
+      gl: 'Pendentes de tres aros de cor crema apoiados nunha rocha, coa praia ao fondo',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-esfera-amarilla',
-    name: 'Pendientes Esfera',
+    name: { es: 'Pendientes Esfera', gl: 'Pendentes Esfera' },
     category: 'pendientes',
     price: 30,
-    summary: 'Una flor amarilla dentro de una bola',
-    description: [
-      'Una esfera de resina del tamaño de un guisante con una flor amarilla suspendida en el centro. No es una placa: la flor está metida en el volumen y se ve desde cualquier ángulo.',
-      'Cuelgan de un aro pequeño, pegados al lóbulo.',
-    ],
-    materials: ['Resina', 'Flor amarilla seca', 'Aro de acero dorado'],
-    image: img(
-      'pendientes-esfera-amarilla',
-      'Dos pendientes de esfera con una flor amarilla dentro, colgados de una rama de cedro',
-    ),
+    summary: {
+      es: 'Una flor amarilla dentro de una bola',
+      gl: 'Unha flor amarela dentro dunha bóla',
+    },
+    description: {
+      es: [
+        'Una esfera de resina del tamaño de un guisante con una flor amarilla suspendida en el centro. No es una placa: la flor está metida en el volumen y se ve desde cualquier ángulo.',
+        'Cuelgan de un aro pequeño, pegados al lóbulo.',
+      ],
+      gl: [
+        'Unha esfera de resina do tamaño dun chícharo cunha flor amarela suspendida no centro. Non é unha placa: a flor está metida no volume e vese desde calquera ángulo.',
+        'Colgan dun aro pequeno, pegados ao lóbulo.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Flor amarilla seca', 'Aro de acero dorado'],
+      gl: ['Resina', 'Flor amarela seca', 'Aro de aceiro dourado'],
+    },
+    image: imgLocalized('pendientes-esfera-amarilla', {
+      es: 'Dos pendientes de esfera con una flor amarilla dentro, colgados de una rama de cedro',
+      gl: 'Dous pendentes de esfera cunha flor amarela dentro, colgados dunha rama de cedro',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-arco-mostaza',
-    name: 'Pendientes Arco Mostaza',
+    name: { es: 'Pendientes Arco Mostaza', gl: 'Pendentes Arco Mostaza' },
     category: 'pendientes',
     price: 30,
-    summary: 'Arco pequeño color mostaza',
-    description: [
-      'Botón redondo y arco debajo, los dos en resina mostaza con flor seca dentro. De los más pequeños de la familia de arcos: se llevan a diario sin pensar en ellos.',
-    ],
-    materials: ['Resina', 'Flor seca', 'Acero dorado'],
-    image: img(
-      'pendientes-arco-mostaza',
-      'Pendiente de arco color mostaza puesto en la oreja, con el pelo al viento',
-    ),
+    summary: { es: 'Arco pequeño color mostaza', gl: 'Arco pequeno de cor mostaza' },
+    description: {
+      es: [
+        'Botón redondo y arco debajo, los dos en resina mostaza con flor seca dentro. De los más pequeños de la familia de arcos: se llevan a diario sin pensar en ellos.',
+      ],
+      gl: [
+        'Botón redondo e arco debaixo, os dous en resina mostaza con flor seca dentro. Dos máis pequenos da familia de arcos: lévanse a diario sen pensar neles.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Flor seca', 'Acero dorado'],
+      gl: ['Resina', 'Flor seca', 'Aceiro dourado'],
+    },
+    image: imgLocalized('pendientes-arco-mostaza', {
+      es: 'Pendiente de arco color mostaza puesto en la oreja, con el pelo al viento',
+      gl: 'Pendente de arco de cor mostaza posto na orella, co pelo ao vento',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-verbena',
-    name: 'Pendientes Verbena',
+    name: { es: 'Pendientes Verbena', gl: 'Pendentes Verbena' },
     category: 'pendientes',
     price: 32,
-    summary: 'Todos los colores a la vez',
-    description: [
-      'Pétalos rojos, morados, amarillos y blancos partidos y mezclados sin ningún criterio. Es la pieza más ruidosa del taller y la que más gusta en verano.',
-      'En dos formas: arco pequeño de botón y aro grande de gancho. Se piden por pares.',
-    ],
-    materials: ['Resina', 'Pétalos secos', 'Acero dorado'],
-    image: img(
-      'pendientes-verbena',
-      'Dos pares de pendientes con pétalos de muchos colores sobre una rodaja de madera',
-    ),
+    summary: { es: 'Todos los colores a la vez', gl: 'Todas as cores á vez' },
+    description: {
+      es: [
+        'Pétalos rojos, morados, amarillos y blancos partidos y mezclados sin ningún criterio. Es la pieza más ruidosa del taller y la que más gusta en verano.',
+        'En dos formas: arco pequeño de botón y aro grande de gancho. Se piden por pares.',
+      ],
+      gl: [
+        'Pétalos vermellos, morados, amarelos e brancos partidos e mesturados sen ningún criterio. É a peza máis ruidosa do taller e a que máis gusta no verán.',
+        'En dúas formas: arco pequeno de botón e aro grande de gancho. Pídense por pares.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Pétalos secos', 'Acero dorado'],
+      gl: ['Resina', 'Pétalos secos', 'Aceiro dourado'],
+    },
+    image: imgLocalized('pendientes-verbena', {
+      es: 'Dos pares de pendientes con pétalos de muchos colores sobre una rodaja de madera',
+      gl: 'Dous pares de pendentes con pétalos de moitas cores sobre unha rodaxe de madeira',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-margarita-gota',
-    name: 'Pendientes Margarita y Gota',
+    name: { es: 'Pendientes Margarita y Gota', gl: 'Pendentes Margarida e Pinga' },
     category: 'pendientes',
     price: 34,
-    summary: 'Margarita en resina, gota en latón',
-    description: [
-      'Una margarita blanca en disco de resina y, colgando, una gota de latón martilleado. Es la única pieza donde el metal pesa tanto como la flor.',
-      'El martilleado se hace a mano, así que no hay dos gotas con la misma marca.',
-    ],
-    materials: ['Resina', 'Margarita prensada', 'Latón martilleado'],
-    image: img(
-      'pendientes-margarita-gota',
-      'Pendiente con margarita y gota de latón puesto, de perfil, con chaqueta de cuero',
-    ),
+    summary: {
+      es: 'Margarita en resina, gota en latón',
+      gl: 'Margarida en resina, pinga en latón',
+    },
+    description: {
+      es: [
+        'Una margarita blanca en disco de resina y, colgando, una gota de latón martilleado. Es la única pieza donde el metal pesa tanto como la flor.',
+        'El martilleado se hace a mano, así que no hay dos gotas con la misma marca.',
+      ],
+      gl: [
+        'Unha margarida branca en disco de resina e, colgando, unha pinga de latón martelado. É a única peza onde o metal pesa tanto coma a flor.',
+        'O martelado faise a man, así que non hai dúas pingas coa mesma marca.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Margarita prensada', 'Latón martilleado'],
+      gl: ['Resina', 'Margarida prensada', 'Latón martelado'],
+    },
+    image: imgLocalized('pendientes-margarita-gota', {
+      es: 'Pendiente con margarita y gota de latón puesto, de perfil, con chaqueta de cuero',
+      gl: 'Pendente con margarida e pinga de latón posto, de perfil, con chaqueta de coiro',
+    }),
     featured: false,
   },
   {
     slug: 'pendientes-margarita-grande',
-    name: 'Pendientes Margarita Grande',
+    name: { es: 'Pendientes Margarita Grande', gl: 'Pendentes Margarida Grande' },
     category: 'pendientes',
     price: 34,
-    summary: 'Una margarita entera, del tamaño real',
-    description: [
-      'La margarita a su tamaño de campo, sin recortar, dentro de un disco de borde libre con un filo dorado que se pintó a mano. Ocupa entero el lóbulo.',
-      'Es la versión grande de los pendientes de disco.',
-    ],
-    materials: ['Resina', 'Margarita prensada', 'Filo dorado', 'Acero dorado'],
-    image: img(
-      'pendientes-margarita-grande',
-      'Pendiente grande con una margarita blanca y borde dorado puesto en la oreja',
-    ),
+    summary: {
+      es: 'Una margarita entera, del tamaño real',
+      gl: 'Unha margarida enteira, do tamaño real',
+    },
+    description: {
+      es: [
+        'La margarita a su tamaño de campo, sin recortar, dentro de un disco de borde libre con un filo dorado que se pintó a mano. Ocupa entero el lóbulo.',
+        'Es la versión grande de los pendientes de disco.',
+      ],
+      gl: [
+        'A margarida ao seu tamaño de campo, sen recortar, dentro dun disco de bordo libre cun fío dourado que se pintou a man. Ocupa enteiro o lóbulo.',
+        'É a versión grande dos pendentes de disco.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Margarita prensada', 'Filo dorado', 'Acero dorado'],
+      gl: ['Resina', 'Margarida prensada', 'Fío dourado', 'Aceiro dourado'],
+    },
+    image: imgLocalized('pendientes-margarita-grande', {
+      es: 'Pendiente grande con una margarita blanca y borde dorado puesto en la oreja',
+      gl: 'Pendente grande cunha margarida branca e bordo dourado posto na orella',
+    }),
     featured: false,
   },
 
   {
     slug: 'colgante-ovalo-amarillo',
-    name: 'Colgante Óvalo Amarillo',
+    name: { es: 'Colgante Óvalo Amarillo', gl: 'Colgante Óvalo Amarelo' },
     category: 'colgantes',
     price: 30,
-    summary: 'Dos flores amarillas suspendidas en el aire',
-    description: [
-      'Óvalo dorado hueco con dos flores amarillas de tallo largo sujetas por una lámina de resina finísima. Puesto a contraluz sólo se ven las flores.',
-      'Cadena de 45 cm.',
-    ],
-    materials: ['Resina', 'Flor amarilla seca', 'Montura ovalada dorada', 'Cadena fina'],
-    image: img(
-      'colgante-ovalo-amarillo',
-      'Colgante de óvalo dorado con flores amarillas colgando frente a una pared clara',
-    ),
+    summary: {
+      es: 'Dos flores amarillas suspendidas en el aire',
+      gl: 'Dúas flores amarelas suspendidas no aire',
+    },
+    description: {
+      es: [
+        'Óvalo dorado hueco con dos flores amarillas de tallo largo sujetas por una lámina de resina finísima. Puesto a contraluz sólo se ven las flores.',
+        'Cadena de 45 cm.',
+      ],
+      gl: [
+        'Óvalo dourado baleiro con dúas flores amarelas de talo longo suxeitas por unha lámina de resina finísima. Posto a contraluz só se ven as flores.',
+        'Cadea de 45 cm.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Flor amarilla seca', 'Montura ovalada dorada', 'Cadena fina'],
+      gl: ['Resina', 'Flor amarela seca', 'Montura ovalada dourada', 'Cadea fina'],
+    },
+    image: imgLocalized('colgante-ovalo-amarillo', {
+      es: 'Colgante de óvalo dorado con flores amarillas colgando frente a una pared clara',
+      gl: 'Colgante de óvalo dourado con flores amarelas colgando fronte a unha parede clara',
+    }),
     featured: false,
   },
   {
     slug: 'conjunto-violeta',
-    name: 'Conjunto Violeta',
+    name: { es: 'Conjunto Violeta', gl: 'Conxunto Violeta' },
     category: 'colgantes',
     price: 54,
-    summary: 'Colgante y pendientes con la misma flor lila',
-    description: [
-      'Una flor lila de cinco pétalos, entera, en las tres piezas: los dos pendientes de aro y el colgante. Fondo transparente, sin montura a la vista.',
-      'Se piden juntos o por separado.',
-    ],
-    materials: ['Resina', 'Flor lila seca', 'Aro y cadena de acero dorado'],
-    image: img(
-      'conjunto-violeta',
-      'Pendientes de aro y colgante con flores lilas sobre una rodaja de madera, en la hierba',
-    ),
+    summary: {
+      es: 'Colgante y pendientes con la misma flor lila',
+      gl: 'Colgante e pendentes coa mesma flor lila',
+    },
+    description: {
+      es: [
+        'Una flor lila de cinco pétalos, entera, en las tres piezas: los dos pendientes de aro y el colgante. Fondo transparente, sin montura a la vista.',
+        'Se piden juntos o por separado.',
+      ],
+      gl: [
+        'Unha flor lila de cinco pétalos, enteira, nas tres pezas: os dous pendentes de aro e o colgante. Fondo transparente, sen montura á vista.',
+        'Pídense xuntos ou por separado.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Flor lila seca', 'Aro y cadena de acero dorado'],
+      gl: ['Resina', 'Flor lila seca', 'Aro e cadea de aceiro dourado'],
+    },
+    image: imgLocalized('conjunto-violeta', {
+      es: 'Pendientes de aro y colgante con flores lilas sobre una rodaja de madera, en la hierba',
+      gl: 'Pendentes de aro e colgante con flores lilas sobre unha rodaxe de madeira, na herba',
+    }),
     featured: false,
   },
   {
     slug: 'colgante-ovalo-naranja',
-    name: 'Colgante Óvalo Naranja',
+    name: { es: 'Colgante Óvalo Naranja', gl: 'Colgante Óvalo Laranxa' },
     category: 'colgantes',
     price: 30,
-    summary: 'Dos florecillas naranjas, muy pequeño',
-    description: [
-      'La montura ovalada hueca con dos flores naranjas dentro, del tamaño de una moneda pequeña. Queda justo en el hueco del cuello.',
-      'Se entrega con cadena dorada de 45 cm.',
-    ],
-    materials: ['Resina', 'Flor naranja seca', 'Montura ovalada dorada', 'Cadena fina'],
-    image: img(
-      'colgante-ovalo-naranja',
-      'Colgante ovalado con flores naranjas puesto al cuello, con camisa blanca',
-    ),
+    summary: {
+      es: 'Dos florecillas naranjas, muy pequeño',
+      gl: 'Dúas floriñas laranxas, moi pequeno',
+    },
+    description: {
+      es: [
+        'La montura ovalada hueca con dos flores naranjas dentro, del tamaño de una moneda pequeña. Queda justo en el hueco del cuello.',
+        'Se entrega con cadena dorada de 45 cm.',
+      ],
+      gl: [
+        'A montura ovalada baleira con dúas flores laranxas dentro, do tamaño dunha moeda pequena. Queda xusto no oco do pescozo.',
+        'Entrégase con cadea dourada de 45 cm.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Flor naranja seca', 'Montura ovalada dorada', 'Cadena fina'],
+      gl: ['Resina', 'Flor laranxa seca', 'Montura ovalada dourada', 'Cadea fina'],
+    },
+    image: imgLocalized('colgante-ovalo-naranja', {
+      es: 'Colgante ovalado con flores naranjas puesto al cuello, con camisa blanca',
+      gl: 'Colgante ovalado con flores laranxas posto ao pescozo, con camisa branca',
+    }),
     featured: false,
   },
   {
     slug: 'colgante-ovalo-plata',
-    name: 'Colgante Óvalo Plata',
+    name: { es: 'Colgante Óvalo Plata', gl: 'Colgante Óvalo Prata' },
     category: 'colgantes',
     price: 30,
-    summary: 'Pétalo morado en montura plateada',
-    description: [
-      'Un pétalo morado y una hojita verde dentro de un óvalo plateado macizo, con fondo casi transparente. La versión en plata del camafeo.',
-    ],
-    materials: ['Resina', 'Pétalo y hoja secos', 'Montura ovalada plateada'],
-    image: img(
-      'colgante-ovalo-plata',
-      'Colgante ovalado plateado con una flor morada puesto al cuello, con jersey claro',
-    ),
+    summary: { es: 'Pétalo morado en montura plateada', gl: 'Pétalo morado en montura prateada' },
+    description: {
+      es: [
+        'Un pétalo morado y una hojita verde dentro de un óvalo plateado macizo, con fondo casi transparente. La versión en plata del camafeo.',
+      ],
+      gl: [
+        'Un pétalo morado e unha folliña verde dentro dun óvalo prateado macizo, con fondo case transparente. A versión en prata do camafeo.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Pétalo y hoja secos', 'Montura ovalada plateada'],
+      gl: ['Resina', 'Pétalo e folla secos', 'Montura ovalada prateada'],
+    },
+    image: imgLocalized('colgante-ovalo-plata', {
+      es: 'Colgante ovalado plateado con una flor morada puesto al cuello, con jersey claro',
+      gl: 'Colgante ovalado prateado cunha flor morada posto ao pescozo, con xersei claro',
+    }),
     featured: false,
   },
   {
     slug: 'colgantes-piedra-redonda',
-    name: 'Colgantes Piedra Redonda',
+    name: { es: 'Colgantes Piedra Redonda', gl: 'Colgantes Pedra Redonda' },
     category: 'colgantes',
     price: 28,
-    summary: 'Verde musgo, azul noche o ámbar',
-    description: [
-      'Piedra redonda pequeña en montura dorada, con tres rellenos: musgo verde, pétalo azul y flor ámbar. Es el colgante más discreto que hago.',
-      'Se piden de uno en uno. Dime el color.',
-    ],
-    materials: ['Resina', 'Musgo o flor secos', 'Montura redonda dorada'],
-    image: img(
-      'colgantes-piedra-redonda',
-      'Tres colgantes redondos verde, azul y ámbar sobre una rodaja de madera con flores secas',
-    ),
+    summary: { es: 'Verde musgo, azul noche o ámbar', gl: 'Verde musgo, azul noite ou ámbar' },
+    description: {
+      es: [
+        'Piedra redonda pequeña en montura dorada, con tres rellenos: musgo verde, pétalo azul y flor ámbar. Es el colgante más discreto que hago.',
+        'Se piden de uno en uno. Dime el color.',
+      ],
+      gl: [
+        'Pedra redonda pequena en montura dourada, con tres recheos: musgo verde, pétalo azul e flor ámbar. É o colgante máis discreto que fago.',
+        'Pídense dun en un. Dime a cor.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Musgo o flor secos', 'Montura redonda dorada'],
+      gl: ['Resina', 'Musgo ou flor secos', 'Montura redonda dourada'],
+    },
+    image: imgLocalized('colgantes-piedra-redonda', {
+      es: 'Tres colgantes redondos verde, azul y ámbar sobre una rodaja de madera con flores secas',
+      gl: 'Tres colgantes redondos verde, azul e ámbar sobre unha rodaxe de madeira con flores secas',
+    }),
     featured: false,
   },
   {
     slug: 'colgante-hexagono-hojas',
-    name: 'Colgante Hexágono Hojas',
+    name: { es: 'Colgante Hexágono Hojas', gl: 'Colgante Hexágono Follas' },
     category: 'colgantes',
     price: 30,
-    summary: 'Una ramita verde, nada más',
-    description: [
-      'Una ramita de cinco hojas verdes, colocada recta, dentro de un hexágono dorado con fondo blanco roto. Sin flor y sin color: sólo la hoja.',
-      'De las piezas que más se regalan.',
-    ],
-    materials: ['Resina', 'Hoja natural prensada', 'Montura hexagonal dorada'],
-    image: img(
-      'colgante-hexagono-hojas',
-      'Colgante hexagonal dorado con hojas verdes colgando frente a una pared blanca',
-    ),
+    summary: { es: 'Una ramita verde, nada más', gl: 'Unha ramiña verde, nada máis' },
+    description: {
+      es: [
+        'Una ramita de cinco hojas verdes, colocada recta, dentro de un hexágono dorado con fondo blanco roto. Sin flor y sin color: sólo la hoja.',
+        'De las piezas que más se regalan.',
+      ],
+      gl: [
+        'Unha ramiña de cinco follas verdes, colocada recta, dentro dun hexágono dourado con fondo branco roto. Sen flor e sen cor: só a folla.',
+        'Das pezas que máis se regalan.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Hoja natural prensada', 'Montura hexagonal dorada'],
+      gl: ['Resina', 'Folla natural prensada', 'Montura hexagonal dourada'],
+    },
+    image: imgLocalized('colgante-hexagono-hojas', {
+      es: 'Colgante hexagonal dorado con hojas verdes colgando frente a una pared blanca',
+      gl: 'Colgante hexagonal dourado con follas verdes colgando fronte a unha parede branca',
+    }),
     featured: false,
   },
   {
     slug: 'conjunto-clavel',
-    name: 'Conjunto Clavel',
+    name: { es: 'Conjunto Clavel', gl: 'Conxunto Caravel' },
     category: 'colgantes',
     price: 66,
-    summary: 'Pendientes, anillo y colgante en granate',
-    description: [
-      'Hecho con los pétalos de un clavel granate: pendientes de rectángulo calado, anillo de piedra ovalada y colgante de gota. Los tres del mismo rojo oscuro.',
-      'Se piden juntos o por separado, entero o pieza a pieza.',
-    ],
-    materials: ['Resina', 'Pétalos de clavel secos', 'Acero dorado'],
-    image: img(
-      'conjunto-clavel',
-      'Pendientes, anillo y colgante granates sobre una rodaja de madera, junto a un clavel',
-    ),
+    summary: {
+      es: 'Pendientes, anillo y colgante en granate',
+      gl: 'Pendentes, anel e colgante en granate',
+    },
+    description: {
+      es: [
+        'Hecho con los pétalos de un clavel granate: pendientes de rectángulo calado, anillo de piedra ovalada y colgante de gota. Los tres del mismo rojo oscuro.',
+        'Se piden juntos o por separado, entero o pieza a pieza.',
+      ],
+      gl: [
+        'Feito cos pétalos dun caravel granate: pendentes de rectángulo calado, anel de pedra ovalada e colgante de pinga. Os tres do mesmo vermello escuro.',
+        'Pídense xuntos ou por separado, enteiro ou peza a peza.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Pétalos de clavel secos', 'Acero dorado'],
+      gl: ['Resina', 'Pétalos de caravel secos', 'Aceiro dourado'],
+    },
+    image: imgLocalized('conjunto-clavel', {
+      es: 'Pendientes, anillo y colgante granates sobre una rodaja de madera, junto a un clavel',
+      gl: 'Pendentes, anel e colgante granates sobre unha rodaxe de madeira, xunto a un caravel',
+    }),
     featured: true,
   },
   {
     slug: 'colgantes-hexagono-mini',
-    name: 'Colgantes Hexágono Mini',
+    name: { es: 'Colgantes Hexágono Mini', gl: 'Colgantes Hexágono Mini' },
     category: 'colgantes',
     price: 28,
-    summary: 'Seis flores, una por colgante',
-    description: [
-      'El hexágono dorado en su tamaño pequeño, con una sola flor centrada: hoja verde, lavanda, hortensia blanca, viola morada, margarita amarilla o pétalo crema.',
-      'Se piden de uno en uno. Se pueden llevar dos o tres a la vez, con cadenas de distinta largura.',
-    ],
-    materials: ['Resina', 'Flor seca', 'Montura hexagonal dorada', 'Cadena fina'],
-    image: img(
-      'colgantes-hexagono-mini',
-      'Seis colgantes hexagonales dorados con flores distintas sobre una rodaja de madera',
-    ),
+    summary: { es: 'Seis flores, una por colgante', gl: 'Seis flores, unha por colgante' },
+    description: {
+      es: [
+        'El hexágono dorado en su tamaño pequeño, con una sola flor centrada: hoja verde, lavanda, hortensia blanca, viola morada, margarita amarilla o pétalo crema.',
+        'Se piden de uno en uno. Se pueden llevar dos o tres a la vez, con cadenas de distinta largura.',
+      ],
+      gl: [
+        'O hexágono dourado no seu tamaño pequeno, cunha soa flor centrada: folla verde, lavanda, hortensia branca, viola morada, margarida amarela ou pétalo crema.',
+        'Pídense dun en un. Pódense levar dous ou tres á vez, con cadeas de distinta lonxitude.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Flor seca', 'Montura hexagonal dorada', 'Cadena fina'],
+      gl: ['Resina', 'Flor seca', 'Montura hexagonal dourada', 'Cadea fina'],
+    },
+    image: imgLocalized('colgantes-hexagono-mini', {
+      es: 'Seis colgantes hexagonales dorados con flores distintas sobre una rodaja de madera',
+      gl: 'Seis colgantes hexagonais dourados con flores distintas sobre unha rodaxe de madeira',
+    }),
     featured: false,
   },
 
   {
     slug: 'anillos-finos-granate',
-    name: 'Anillos Finos Granate',
+    name: { es: 'Anillos Finos Granate', gl: 'Aneis Finos Granate' },
     category: 'anillos',
     price: 24,
-    summary: 'Dos aros muy finos, para apilar',
-    description: [
-      'Aro fino de acero con una piedra pequeña de resina granate encima. Pensados para llevar dos o tres seguidos en el mismo dedo.',
-      'Se piden de uno en uno. Talla ajustable.',
-    ],
-    materials: ['Resina', 'Pétalos secos', 'Aro de acero ajustable'],
-    image: img(
-      'anillos-finos-granate',
-      'Dos anillos finos con piedras granates en una mano que sostiene flores amarillas',
-    ),
+    summary: { es: 'Dos aros muy finos, para apilar', gl: 'Dous aros moi finos, para apilar' },
+    description: {
+      es: [
+        'Aro fino de acero con una piedra pequeña de resina granate encima. Pensados para llevar dos o tres seguidos en el mismo dedo.',
+        'Se piden de uno en uno. Talla ajustable.',
+      ],
+      gl: [
+        'Aro fino de aceiro cunha pedra pequena de resina granate enriba. Pensados para levar dous ou tres seguidos no mesmo dedo.',
+        'Pídense dun en un. Talla axustable.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Pétalos secos', 'Aro de acero ajustable'],
+      gl: ['Resina', 'Pétalos secos', 'Aro de aceiro axustable'],
+    },
+    image: imgLocalized('anillos-finos-granate', {
+      es: 'Dos anillos finos con piedras granates en una mano que sostiene flores amarillas',
+      gl: 'Dous aneis finos con pedras granates nunha man que sostén flores amarelas',
+    }),
     featured: false,
   },
   {
     slug: 'anillos-cuadrados',
-    name: 'Anillos Cuadrados',
+    name: { es: 'Anillos Cuadrados', gl: 'Aneis Cadrados' },
     category: 'anillos',
     price: 28,
-    summary: 'Piedra cuadrada en tres colores',
-    description: [
-      'Piedra cuadrada de resina sobre aro fino dorado, con flores dentro. Hay ámbar, rosa y amarillo, y se llevan los tres juntos.',
-      'Se piden de uno en uno. El aro es abierto, así que se adapta.',
-    ],
-    materials: ['Resina', 'Flor seca', 'Aro de acero dorado ajustable'],
-    image: img(
-      'anillos-cuadrados',
-      'Tres anillos de piedra cuadrada ámbar, rosa y amarilla en una mano apoyada en el bolsillo',
-    ),
+    summary: { es: 'Piedra cuadrada en tres colores', gl: 'Pedra cadrada en tres cores' },
+    description: {
+      es: [
+        'Piedra cuadrada de resina sobre aro fino dorado, con flores dentro. Hay ámbar, rosa y amarillo, y se llevan los tres juntos.',
+        'Se piden de uno en uno. El aro es abierto, así que se adapta.',
+      ],
+      gl: [
+        'Pedra cadrada de resina sobre aro fino dourado, con flores dentro. Hai ámbar, rosa e amarelo, e lévanse os tres xuntos.',
+        'Pídense dun en un. O aro é aberto, así que se adapta.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Flor seca', 'Aro de acero dorado ajustable'],
+      gl: ['Resina', 'Flor seca', 'Aro de aceiro dourado axustable'],
+    },
+    image: imgLocalized('anillos-cuadrados', {
+      es: 'Tres anillos de piedra cuadrada ámbar, rosa y amarilla en una mano apoyada en el bolsillo',
+      gl: 'Tres aneis de pedra cadrada ámbar, rosa e amarela nunha man apoiada no peto',
+    }),
     featured: false,
   },
   {
     slug: 'anillo-ovalo-petalos',
-    name: 'Anillo Óvalo de Pétalos',
+    name: { es: 'Anillo Óvalo de Pétalos', gl: 'Anel Óvalo de Pétalos' },
     category: 'anillos',
     price: 34,
-    summary: 'Óvalo grande, morado y naranja',
-    description: [
-      'La piedra más grande que hago: un óvalo ancho lleno de trozos de pétalo morado, naranja y blanco. Ocupa medio dedo.',
-      'Montura ajustable. Es el anillo que se ve desde lejos.',
-    ],
-    materials: ['Resina', 'Pétalos secos', 'Montura ovalada ajustable'],
-    image: img(
-      'anillo-ovalo-petalos',
-      'Anillo ovalado con pétalos morados y naranjas en una mano recogiéndose el pelo',
-    ),
+    summary: { es: 'Óvalo grande, morado y naranja', gl: 'Óvalo grande, morado e laranxa' },
+    description: {
+      es: [
+        'La piedra más grande que hago: un óvalo ancho lleno de trozos de pétalo morado, naranja y blanco. Ocupa medio dedo.',
+        'Montura ajustable. Es el anillo que se ve desde lejos.',
+      ],
+      gl: [
+        'A pedra máis grande que fago: un óvalo ancho cheo de anacos de pétalo morado, laranxa e branco. Ocupa medio dedo.',
+        'Montura axustable. É o anel que se ve desde lonxe.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Pétalos secos', 'Montura ovalada ajustable'],
+      gl: ['Resina', 'Pétalos secos', 'Montura ovalada axustable'],
+    },
+    image: imgLocalized('anillo-ovalo-petalos', {
+      es: 'Anillo ovalado con pétalos morados y naranjas en una mano recogiéndose el pelo',
+      gl: 'Anel ovalado con pétalos morados e laranxas nunha man recollendo o pelo',
+    }),
     featured: false,
   },
   {
     slug: 'anillo-fino-ambar',
-    name: 'Anillo Fino Ámbar',
+    name: { es: 'Anillo Fino Ámbar', gl: 'Anel Fino Ámbar' },
     category: 'anillos',
     price: 26,
-    summary: 'Una piedra de miel y otra morada',
-    description: [
-      'Aro fino dorado con dos piedras pequeñas seguidas, una ámbar y otra morada. Se lleva solo o con otro aro liso al lado.',
-      'Talla ajustable.',
-    ],
-    materials: ['Resina', 'Flor seca', 'Aro de acero dorado ajustable'],
-    image: img(
-      'anillo-fino-ambar',
-      'Anillo fino con piedras ámbar y morada en la mano de una mujer, de perfil, en el bosque',
-    ),
+    summary: { es: 'Una piedra de miel y otra morada', gl: 'Unha pedra de mel e outra morada' },
+    description: {
+      es: [
+        'Aro fino dorado con dos piedras pequeñas seguidas, una ámbar y otra morada. Se lleva solo o con otro aro liso al lado.',
+        'Talla ajustable.',
+      ],
+      gl: [
+        'Aro fino dourado con dúas pedras pequenas seguidas, unha ámbar e outra morada. Lévase só ou con outro aro liso ao lado.',
+        'Talla axustable.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Flor seca', 'Aro de acero dorado ajustable'],
+      gl: ['Resina', 'Flor seca', 'Aro de aceiro dourado axustable'],
+    },
+    image: imgLocalized('anillo-fino-ambar', {
+      es: 'Anillo fino con piedras ámbar y morada en la mano de una mujer, de perfil, en el bosque',
+      gl: 'Anel fino con pedras ámbar e morada na man dunha muller, de perfil, no bosque',
+    }),
     featured: false,
   },
 
   {
     slug: 'bordado-abrazo',
-    name: 'Bordado Abrazo',
+    name: { es: 'Bordado Abrazo', gl: 'Bordado Abrazo' },
     category: 'bordados',
     price: 52,
-    summary: 'Una madre y su hija, de una línea',
-    description: [
-      'Dos figuras abrazadas bordadas a línea continua, con flores sueltas de colores repartidas por la ropa y el pelo, y una luna arriba. La pieza más pedida para regalar en un nacimiento.',
-      'Bastidor de 20 cm. Se puede bordar a partir de una foto vuestra.',
-    ],
-    materials: ['Lino', 'Hilo de algodón', 'Bastidor de madera de 20 cm'],
-    image: img(
-      'bordado-abrazo',
-      'Bastidor con dos figuras abrazadas bordadas a línea, con florecillas de colores',
-    ),
+    summary: { es: 'Una madre y su hija, de una línea', gl: 'Unha nai e a súa filla, dunha liña' },
+    description: {
+      es: [
+        'Dos figuras abrazadas bordadas a línea continua, con flores sueltas de colores repartidas por la ropa y el pelo, y una luna arriba. La pieza más pedida para regalar en un nacimiento.',
+        'Bastidor de 20 cm. Se puede bordar a partir de una foto vuestra.',
+      ],
+      gl: [
+        'Dúas figuras abrazadas bordadas a liña continua, con flores soltas de cores repartidas pola roupa e o pelo, e unha lúa arriba. A peza máis pedida para regalar nun nacemento.',
+        'Bastidor de 20 cm. Pódese bordar a partir dunha foto vosa.',
+      ],
+    },
+    materials: {
+      es: ['Lino', 'Hilo de algodón', 'Bastidor de madera de 20 cm'],
+      gl: ['Liño', 'Fío de algodón', 'Bastidor de madeira de 20 cm'],
+    },
+    image: imgLocalized('bordado-abrazo', {
+      es: 'Bastidor con dos figuras abrazadas bordadas a línea, con florecillas de colores',
+      gl: 'Bastidor con dúas figuras abrazadas bordadas a liña, con floriñas de cores',
+    }),
     featured: false,
   },
   {
     slug: 'bordado-con-un-par',
-    name: 'Bordado Con un Par',
+    name: { es: 'Bordado Con un Par', gl: 'Bordado Con un Par' },
     category: 'bordados',
     price: 46,
-    summary: 'Un útero en rojo y dos ramas',
-    description: [
-      'Un útero bordado a línea en rojo, con dos ramitas de hoja verde y flores azules debajo, y la frase «con un par» encima.',
-      'Bastidor de 20 cm. Admite otra frase, si prefieres.',
-    ],
-    materials: ['Lino', 'Hilo de algodón', 'Bastidor de madera de 20 cm'],
-    image: img(
-      'bordado-con-un-par',
-      'Bastidor colgado en la pared con un útero bordado en rojo y la frase «con un par»',
-    ),
+    summary: { es: 'Un útero en rojo y dos ramas', gl: 'Un útero en vermello e dúas ramas' },
+    description: {
+      es: [
+        'Un útero bordado a línea en rojo, con dos ramitas de hoja verde y flores azules debajo, y la frase «con un par» encima.',
+        'Bastidor de 20 cm. Admite otra frase, si prefieres.',
+      ],
+      gl: [
+        'Un útero bordado a liña en vermello, con dúas ramiñas de folla verde e flores azuis debaixo, e a frase «con un par» enriba.',
+        'Bastidor de 20 cm. Admite outra frase, se o prefires.',
+      ],
+    },
+    materials: {
+      es: ['Lino', 'Hilo de algodón', 'Bastidor de madera de 20 cm'],
+      gl: ['Liño', 'Fío de algodón', 'Bastidor de madeira de 20 cm'],
+    },
+    image: imgLocalized('bordado-con-un-par', {
+      es: 'Bastidor colgado en la pared con un útero bordado en rojo y la frase «con un par»',
+      gl: 'Bastidor colgado na parede cun útero bordado en vermello e a frase «con un par»',
+    }),
     featured: false,
   },
 
@@ -2046,100 +2505,156 @@ export const products: Product[] = [
 
   {
     slug: 'taller-flores-prensadas',
-    name: 'Flores Prensadas',
+    name: { es: 'Flores Prensadas', gl: 'Flores Prensadas' },
     category: 'taller',
     price: null,
-    summary: 'El material, antes de la resina',
-    description: [
-      'Margaritas y caléndulas después de dos semanas de prensa. Al secarse pierden el color vivo y se quedan en marrones y ocres: esa gama es la que acaba dentro de las piezas de otoño.',
-      'Si quieres que seque flores tuyas, escríbeme antes de que se pasen: cuanto más frescas lleguen a la prensa, mejor aguanta el color.',
-    ],
-    materials: ['Margarita', 'Caléndula', 'Prensa de madera'],
-    image: img(
-      'taller-flores-prensadas',
-      'Margaritas y caléndulas secas prensadas, repartidas sobre papel blanco',
-    ),
+    summary: { es: 'El material, antes de la resina', gl: 'O material, antes da resina' },
+    description: {
+      es: [
+        'Margaritas y caléndulas después de dos semanas de prensa. Al secarse pierden el color vivo y se quedan en marrones y ocres: esa gama es la que acaba dentro de las piezas de otoño.',
+        'Si quieres que seque flores tuyas, escríbeme antes de que se pasen: cuanto más frescas lleguen a la prensa, mejor aguanta el color.',
+      ],
+      gl: [
+        'Margaridas e caléndulas despois de dúas semanas de prensa. Ao secarse perden a cor viva e quedan en marróns e ocres: esa gama é a que acaba dentro das pezas de outono.',
+        'Se queres que seque flores túas, escríbeme antes de que se pasen: canto máis frescas cheguen á prensa, mellor aguanta a cor.',
+      ],
+    },
+    materials: {
+      es: ['Margarita', 'Caléndula', 'Prensa de madera'],
+      gl: ['Margarida', 'Caléndula', 'Prensa de madeira'],
+    },
+    image: imgLocalized('taller-flores-prensadas', {
+      es: 'Margaritas y caléndulas secas prensadas, repartidas sobre papel blanco',
+      gl: 'Margaridas e caléndulas secas prensadas, repartidas sobre papel branco',
+    }),
     featured: false,
   },
   {
     slug: 'taller-buganvilla-libro',
-    name: 'Buganvillas en un Libro',
+    name: { es: 'Buganvillas en un Libro', gl: 'Buganvillas nun Libro' },
     category: 'taller',
     price: null,
-    summary: 'Prensadas entre páginas, sin prisa',
-    description: [
-      'Brácteas de buganvilla secándose entre las hojas de un libro. Es el método de siempre y sigue siendo el mejor para las flores finas: el papel absorbe la humedad sin aplastar el color.',
-      'Tres semanas, y el naranja se queda casi como estaba.',
-    ],
-    materials: ['Buganvilla', 'Un libro cualquiera', 'Paciencia'],
-    image: img(
-      'taller-buganvilla-libro',
-      'Brácteas de buganvilla naranja secándose entre las páginas abiertas de un libro',
-    ),
+    summary: { es: 'Prensadas entre páginas, sin prisa', gl: 'Prensadas entre páxinas, sen presa' },
+    description: {
+      es: [
+        'Brácteas de buganvilla secándose entre las hojas de un libro. Es el método de siempre y sigue siendo el mejor para las flores finas: el papel absorbe la humedad sin aplastar el color.',
+        'Tres semanas, y el naranja se queda casi como estaba.',
+      ],
+      gl: [
+        'Brácteas de buganvilla secándose entre as follas dun libro. É o método de sempre e segue sendo o mellor para as flores finas: o papel absorbe a humidade sen esmagar a cor.',
+        'Tres semanas, e o laranxa queda case como estaba.',
+      ],
+    },
+    materials: {
+      es: ['Buganvilla', 'Un libro cualquiera', 'Paciencia'],
+      gl: ['Buganvilla', 'Un libro calquera', 'Paciencia'],
+    },
+    image: imgLocalized('taller-buganvilla-libro', {
+      es: 'Brácteas de buganvilla naranja secándose entre las páginas abiertas de un libro',
+      gl: 'Brácteas de buganvilla laranxa secándose entre as páxinas abertas dun libro',
+    }),
     featured: false,
   },
   {
     slug: 'taller-montaje',
-    name: 'El Montaje',
+    name: { es: 'El Montaje', gl: 'A Montaxe' },
     category: 'taller',
     price: null,
-    summary: 'Cada pieza, a su tarjeta',
-    description: [
-      'Las tarjetas se cortan e imprimen aquí, y cada pieza se monta a mano en la suya antes de guardarla. Es el último paso y el que más se nota al abrir el paquete.',
-    ],
-    materials: ['Cartulina', 'Tinta', 'Un rato'],
-    image: img('taller-montaje', 'Dos manos montando unos pendientes en una tarjeta con el logo'),
+    summary: { es: 'Cada pieza, a su tarjeta', gl: 'Cada peza, á súa tarxeta' },
+    description: {
+      es: [
+        'Las tarjetas se cortan e imprimen aquí, y cada pieza se monta a mano en la suya antes de guardarla. Es el último paso y el que más se nota al abrir el paquete.',
+      ],
+      gl: [
+        'As tarxetas córtanse e imprímense aquí, e cada peza móntase a man na súa antes de gardala. É o último paso e o que máis se nota ao abrir o paquete.',
+      ],
+    },
+    materials: { es: ['Cartulina', 'Tinta', 'Un rato'], gl: ['Cartolina', 'Tinta', 'Un rato'] },
+    image: imgLocalized('taller-montaje', {
+      es: 'Dos manos montando unos pendientes en una tarjeta con el logo',
+      gl: 'Dúas mans montando uns pendentes nunha tarxeta co logo',
+    }),
     featured: false,
   },
   {
     slug: 'taller-tarjetas',
-    name: 'Listo para Regalar',
+    name: { es: 'Listo para Regalar', gl: 'Listo para Regalar' },
     category: 'taller',
     price: null,
-    summary: 'Cuatro piezas en su tarjeta',
-    description: [
-      'Así sale cada pieza del taller: en su tarjeta, con el nombre y el cuidado detrás. Puesto así ya se puede regalar sin envolver nada más.',
-      'Si es un regalo, dímelo al encargar y le añado una nota escrita a mano.',
-    ],
-    materials: ['Resina', 'Flor seca', 'Tarjeta impresa'],
-    image: img(
-      'taller-tarjetas',
-      'Cuatro tarjetas con pendientes y colgantes de resina sobre un plato de madera',
-    ),
+    summary: { es: 'Cuatro piezas en su tarjeta', gl: 'Catro pezas na súa tarxeta' },
+    description: {
+      es: [
+        'Así sale cada pieza del taller: en su tarjeta, con el nombre y el cuidado detrás. Puesto así ya se puede regalar sin envolver nada más.',
+        'Si es un regalo, dímelo al encargar y le añado una nota escrita a mano.',
+      ],
+      gl: [
+        'Así sae cada peza do taller: na súa tarxeta, co nome e o coidado detrás. Posto así xa se pode regalar sen envolver nada máis.',
+        'Se é un agasallo, dimo ao encargar e engádolle unha nota escrita a man.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Flor seca', 'Tarjeta impresa'],
+      gl: ['Resina', 'Flor seca', 'Tarxeta impresa'],
+    },
+    image: imgLocalized('taller-tarjetas', {
+      es: 'Cuatro tarjetas con pendientes y colgantes de resina sobre un plato de madera',
+      gl: 'Catro tarxetas con pendentes e colgantes de resina sobre un prato de madeira',
+    }),
     featured: false,
   },
   {
     slug: 'taller-caja-regalo',
-    name: 'La Caja',
+    name: { es: 'La Caja', gl: 'A Caixa' },
     category: 'taller',
     price: null,
-    summary: 'Cómo llega el pedido a casa',
-    description: [
-      'Caja de cartón sin plástico, virutas de papel, una ramita seca y una lámina botánica dentro. Los pedidos de más de una pieza van todos así.',
-      'El envoltorio va incluido. No hay que pedirlo aparte.',
-    ],
-    materials: ['Cartón', 'Papel', 'Lámina botánica'],
-    image: img(
-      'taller-caja-regalo',
-      'Caja de envío abierta con un colgante, un anillo y una lámina botánica dentro',
-    ),
+    summary: { es: 'Cómo llega el pedido a casa', gl: 'Como chega o pedido á casa' },
+    description: {
+      es: [
+        'Caja de cartón sin plástico, virutas de papel, una ramita seca y una lámina botánica dentro. Los pedidos de más de una pieza van todos así.',
+        'El envoltorio va incluido. No hay que pedirlo aparte.',
+      ],
+      gl: [
+        'Caixa de cartón sen plástico, labras de papel, unha ramiña seca e unha lámina botánica dentro. Os pedidos de máis dunha peza van todos así.',
+        'O envoltorio vai incluído. Non hai que pedilo aparte.',
+      ],
+    },
+    materials: {
+      es: ['Cartón', 'Papel', 'Lámina botánica'],
+      gl: ['Cartón', 'Papel', 'Lámina botánica'],
+    },
+    image: imgLocalized('taller-caja-regalo', {
+      es: 'Caja de envío abierta con un colgante, un anillo y una lámina botánica dentro',
+      gl: 'Caixa de envío aberta cun colgante, un anel e unha lámina botánica dentro',
+    }),
     featured: false,
   },
   {
     slug: 'taller-envio-ambar',
-    name: 'Un Pedido de Ámbar',
+    name: { es: 'Un Pedido de Ámbar', gl: 'Un Pedido de Ámbar' },
     category: 'taller',
     price: null,
-    summary: 'Pendientes y colgante, listos para salir',
-    description: [
-      'Un pedido a medio cerrar: pendientes y colgante a juego en tonos ámbar, cada uno en su tarjeta, con un sello antiguo de regalo.',
-      'Los sellos los voy guardando y meto uno distinto en cada caja.',
-    ],
-    materials: ['Resina', 'Flor seca', 'Cartón y papel'],
-    image: img(
-      'taller-envio-ambar',
-      'Caja de envío con pendientes y un colgante ámbar en sus tarjetas, junto a un sello antiguo',
-    ),
+    summary: {
+      es: 'Pendientes y colgante, listos para salir',
+      gl: 'Pendentes e colgante, listos para saír',
+    },
+    description: {
+      es: [
+        'Un pedido a medio cerrar: pendientes y colgante a juego en tonos ámbar, cada uno en su tarjeta, con un sello antiguo de regalo.',
+        'Los sellos los voy guardando y meto uno distinto en cada caja.',
+      ],
+      gl: [
+        'Un pedido a medio pechar: pendentes e colgante a xogo en tons ámbar, cada un na súa tarxeta, cun selo antigo de agasallo.',
+        'Os selos vounos gardando e meto un distinto en cada caixa.',
+      ],
+    },
+    materials: {
+      es: ['Resina', 'Flor seca', 'Cartón y papel'],
+      gl: ['Resina', 'Flor seca', 'Cartón e papel'],
+    },
+    image: imgLocalized('taller-envio-ambar', {
+      es: 'Caja de envío con pendientes y un colgante ámbar en sus tarjetas, junto a un sello antiguo',
+      gl: 'Caixa de envío con pendentes e un colgante ámbar nas súas tarxetas, xunto a un selo antigo',
+    }),
     featured: false,
   },
 ]
