@@ -171,14 +171,14 @@ export default async function CarritoPage() {
 
             {/* Ni subtotal, ni envío, ni total: la web no publica importes. Lo que
                 queda del resumen es lo único que aquí se puede afirmar —cuántas
-                piezas se piden— y el aviso de que el precio lo pone Ana. */}
+                piezas se piden— y el aviso de que Ana escribirá. */}
             <p className="mt-8 font-serif text-lead">
               {cart.count} {cart.count === 1 ? 'pieza' : 'piezas'}
             </p>
 
             <p className="mt-6 bg-petal-soft p-4 text-small text-bark-soft">
               Enviar el pedido no cuesta nada ni te compromete a nada: es una petición. Ana te
-              escribe con el precio de las piezas y del envío antes de que decidas.
+              escribirá en cuanto pueda 🌸
             </p>
 
             <Link href="/comprar" className="btn mt-8 w-full">
