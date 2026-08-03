@@ -4,6 +4,7 @@ import { ObjectId } from 'mongodb'
 import { revalidatePath } from 'next/cache'
 import { auth } from '@/auth'
 import { hashPassword, verifyPassword } from '@/lib/password'
+import { defaultLocale } from '@/lib/i18n/config'
 import { consumeAll, describeWait, POLICIES } from '@/lib/rate-limit'
 import { endSessions } from '@/lib/session'
 import { addresses, users } from '@/lib/schema'
@@ -102,7 +103,7 @@ export async function changePassword(_prev: ActionState, formData: FormData): Pr
   if (!verdict.ok) {
     return {
       errors: {
-        current: `Demasiados intentos. Prueba dentro de ${describeWait(verdict.retryAfterMs)}.`,
+        current: `Demasiados intentos. Prueba dentro de ${describeWait(verdict.retryAfterMs, defaultLocale)}.`,
       },
     }
   }

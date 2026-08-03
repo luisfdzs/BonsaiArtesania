@@ -1,41 +1,72 @@
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import { ContactButtons } from '@/components/ui/ContactButtons'
 import { Media } from '@/components/ui/Media'
 import { Reveal } from '@/components/ui/Reveal'
 import { customOrderMessage } from '@/lib/contact'
+import { isLocale, pick, translator, type Localized } from '@/lib/i18n/config'
+import { alternates } from '@/lib/i18n/metadata'
 import { img } from '@/lib/media'
 
-export const metadata: Metadata = {
-  title: 'Encargos',
-  description:
-    'Convierte el ramo de tu boda o las flores de alguien especial en una joya de resina hecha a mano.',
+type Params = { params: Promise<{ locale: string }> }
+
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const { locale } = await params
+  if (!isLocale(locale)) return {}
+
+  return {
+    title: pick({ es: 'Encargos', gl: 'Encargas' }, locale),
+    description: pick(
+      {
+        es: 'Convierte el ramo de tu boda o las flores de alguien especial en una joya de resina hecha a mano.',
+        gl: 'Converte o ramo da túa voda ou as flores de alguén especial nunha xoia de resina feita a man.',
+      },
+      locale,
+    ),
+    alternates: alternates(locale, '/encargos'),
+  }
 }
 
-const pasos = [
+const pasos: { n: string; titulo: Localized; texto: Localized }[] = [
   {
     n: '01',
-    titulo: 'Me escribes',
-    texto: 'Me cuentas qué flores son y qué te gustaría llevar puesto. Sin compromiso.',
+    titulo: { es: 'Me escribes', gl: 'Escríbesme' },
+    texto: {
+      es: 'Me cuentas qué flores son y qué te gustaría llevar puesto. Sin compromiso.',
+      gl: 'Cóntasme que flores son e que che gustaría levar posto. Sen compromiso.',
+    },
   },
   {
     n: '02',
-    titulo: 'Me las envías',
-    texto: 'Cuanto más frescas lleguen, mejor conservan el color. Te explico cómo empaquetarlas.',
+    titulo: { es: 'Me las envías', gl: 'Mándasmas' },
+    texto: {
+      es: 'Cuanto más frescas lleguen, mejor conservan el color. Te explico cómo empaquetarlas.',
+      gl: 'Canto máis frescas cheguen, mellor conservan a cor. Explícoche como empaquetalas.',
+    },
   },
   {
     n: '03',
-    titulo: 'Secado',
-    texto:
-      'De dos a cuatro semanas de prensa. Es lo que decide el resultado, y no se puede correr.',
+    titulo: { es: 'Secado', gl: 'Secado' },
+    texto: {
+      es: 'De dos a cuatro semanas de prensa. Es lo que decide el resultado, y no se puede correr.',
+      gl: 'De dúas a catro semanas de prensa. É o que decide o resultado, e non se pode correr.',
+    },
   },
   {
     n: '04',
-    titulo: 'Te la envío',
-    texto: 'Antes de cerrar nada te enseño fotos. La pieza sale en su caja, lista para regalar.',
+    titulo: { es: 'Te la envío', gl: 'Mándocha' },
+    texto: {
+      es: 'Antes de cerrar nada te enseño fotos. La pieza sale en su caja, lista para regalar.',
+      gl: 'Antes de pechar nada ensínoche fotos. A peza sae na súa caixa, lista para regalar.',
+    },
   },
 ]
 
-export default function EncargosPage() {
+export default async function EncargosPage({ params }: Params) {
+  const { locale } = await params
+  if (!isLocale(locale)) notFound()
+  const t = translator(locale)
+
   return (
     <div className="page-gutter pt-16 md:pt-24">
       <header>
@@ -74,12 +105,15 @@ export default function EncargosPage() {
             bloques centrados cada uno en su hueco. */}
         <div className="mx-auto grid max-w-6xl grid-cols-12 items-center gap-x-4 md:gap-x-12">
           <div className="col-span-7 text-center md:col-span-6">
-            <p className="eyebrow">Encargos</p>
-            <h1 className="mt-7 font-serif text-display">Vuestras flores</h1>
+            <p className="eyebrow">{t({ es: 'Encargos', gl: 'Encargas' })}</p>
+            <h1 className="mt-7 font-serif text-display">
+              {t({ es: 'Vuestras flores', gl: 'As vosas flores' })}
+            </h1>
             <p className="mx-auto mt-8 max-w-md text-bark-soft">
-              El ramo de una boda, las flores de un aniversario, la planta de alguien que ya no
-              está. Todas se secan. Lo que hago es pararlas justo antes y convertirlas en algo que
-              puedas llevar contigo.
+              {t({
+                es: 'El ramo de una boda, las flores de un aniversario, la planta de alguien que ya no está. Todas se secan. Lo que hago es pararlas justo antes y convertirlas en algo que puedas llevar contigo.',
+                gl: 'O ramo dunha voda, as flores dun aniversario, a planta de alguén que xa non está. Todas se secan. O que fago é paralas xusto antes e convertelas en algo que poidas levar contigo.',
+              })}
             </p>
           </div>
 
@@ -87,7 +121,10 @@ export default function EncargosPage() {
             <Media
               image={img(
                 'encargos-gotas',
-                'Pendientes largos de resina con flores moradas sobre la tarjeta del taller',
+                t({
+                  es: 'Pendientes largos de resina con flores moradas sobre la tarjeta del taller',
+                  gl: 'Pendentes longos de resina con flores moradas sobre a tarxeta do taller',
+                }),
               )}
               ratio="3 / 4"
               // Cinco doceavos mientras la columna manda, y 24rem en cuanto el
@@ -108,22 +145,24 @@ export default function EncargosPage() {
             círculo con el logo dentro y ninguno manda sobre los otros: se elige
             por dónde resulte cómodo escribir, no por cuál está más grande. */}
         <ContactButtons
-          message={customOrderMessage}
-          subject="Encargo especial"
-          action="Contarme mi caso"
+          message={t(customOrderMessage)}
+          subject={t({ es: 'Encargo especial', gl: 'Encarga especial' })}
+          action={t({ es: 'Contarme mi caso', gl: 'Contarme o meu caso' })}
           withSocial
           className="mt-14 justify-center"
         />
       </header>
 
       <section className="mt-(--spacing-section)">
-        <h2 className="eyebrow border-b border-line pb-4 text-center">Cómo funciona</h2>
+        <h2 className="eyebrow border-b border-line pb-4 text-center">
+          {t({ es: 'Cómo funciona', gl: 'Como funciona' })}
+        </h2>
         <ol className="mt-12 grid items-center gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
           {pasos.map((paso, index) => (
             <Reveal as="li" key={paso.n} step={index} className="text-center">
               <p className="eyebrow text-sage-deep">{paso.n}</p>
-              <h3 className="mt-3 font-serif text-lead">{paso.titulo}</h3>
-              <p className="mt-2 text-small text-bark-soft">{paso.texto}</p>
+              <h3 className="mt-3 font-serif text-lead">{t(paso.titulo)}</h3>
+              <p className="mt-2 text-small text-bark-soft">{t(paso.texto)}</p>
             </Reveal>
           ))}
         </ol>
@@ -131,8 +170,10 @@ export default function EncargosPage() {
 
       <Reveal className="mt-(--spacing-section) border-t border-line pt-12 text-center">
         <p className="mx-auto max-w-2xl font-serif text-title">
-          «No hay dos ramos iguales, así que no hay dos piezas iguales. Cuéntame el tuyo y lo vemos
-          con calma.»
+          {t({
+            es: '«No hay dos ramos iguales, así que no hay dos piezas iguales. Cuéntame el tuyo y lo vemos con calma.»',
+            gl: '«Non hai dous ramos iguais, así que non hai dúas pezas iguais. Cóntame o teu e vémolo con calma.»',
+          })}
         </p>
         <p className="mt-6 text-small text-bark-faint">Ana</p>
       </Reveal>

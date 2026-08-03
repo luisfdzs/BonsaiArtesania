@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { checkCode, dropCode, issueCode } from '@/lib/codes'
 import { sendAlreadyRegisteredEmail, sendCodeEmail, sendNoAccountEmail } from '@/lib/email'
 import { fakeVerify, hashPassword, verifyPassword } from '@/lib/password'
+import { defaultLocale } from '@/lib/i18n/config'
 import { clientIp, consume, consumeAll, describeWait, POLICIES } from '@/lib/rate-limit'
 import { users } from '@/lib/schema'
 import { endSessions, startSession } from '@/lib/session'
@@ -61,7 +62,7 @@ function sendError(
 ): Record<string, string> {
   if (result.reason === 'limite') {
     return {
-      form: `Se han pedido ya varios códigos para ese correo. Busca en tu buzón el último que te llegó —incluida la carpeta de spam— o espera ${describeWait(result.retryAfterMs)} antes de pedir otro.`,
+      form: `Se han pedido ya varios códigos para ese correo. Busca en tu buzón el último que te llegó —incluida la carpeta de spam— o espera ${describeWait(result.retryAfterMs, defaultLocale)} antes de pedir otro.`,
     }
   }
   return { form: 'No se ha podido enviar el correo. Inténtalo otra vez en un momento.' }
@@ -199,7 +200,7 @@ async function spendCode(pending: Pending, raw: unknown): Promise<{ error: strin
   const verdict = await consume('codigo:check:ip', ip, POLICIES.codeCheckIp)
   if (!verdict.ok) {
     return {
-      error: `Demasiados intentos desde aquí. Prueba dentro de ${describeWait(verdict.retryAfterMs)}.`,
+      error: `Demasiados intentos desde aquí. Prueba dentro de ${describeWait(verdict.retryAfterMs, defaultLocale)}.`,
     }
   }
 
@@ -384,7 +385,7 @@ export async function iniciarSesion(_prev: EntrarState, formData: FormData): Pro
   if (!verdict.ok) {
     return {
       errors: {
-        form: `Demasiados intentos. Prueba dentro de ${describeWait(verdict.retryAfterMs)}, o pon una contraseña nueva desde el enlace de abajo.`,
+        form: `Demasiados intentos. Prueba dentro de ${describeWait(verdict.retryAfterMs, defaultLocale)}, o pon una contraseña nueva desde el enlace de abajo.`,
       },
       email: typed,
     }

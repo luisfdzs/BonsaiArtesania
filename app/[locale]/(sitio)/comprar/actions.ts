@@ -8,6 +8,8 @@ import { isAdminEmail } from '@/lib/admin'
 import { readCart } from '@/lib/cart'
 import { sendOrderEmails } from '@/lib/email'
 import { checkFormGuard } from '@/lib/form-guard'
+import { defaultLocale, isLocale, translator, type Locale } from '@/lib/i18n/config'
+import { path } from '@/lib/i18n/routes'
 import { notifyNewOrder } from '@/lib/notify'
 import { nextOrderNumber } from '@/lib/orders'
 import { clientIp, consumeAll, describeWait, POLICIES } from '@/lib/rate-limit'
@@ -89,22 +91,47 @@ async function devolverCarrito(userId: ObjectId, items: CartItem[]): Promise<voi
  * El orden importa: lo barato, y lo que no consume cuota de nadie, va primero.
  */
 export async function placeOrder(_prev: CheckoutState, formData: FormData): Promise<CheckoutState> {
+  // El idioma viaja en el formulario: una acción de servidor no tiene `params`, y
+  // sin él los mensajes de error volverían en castellano a una página en galego y
+  // las redirecciones sacarían del idioma. Se valida como todo lo que llega de
+  // fuera; si viene manipulado, se cae al de por defecto en vez de romper.
+  const raw = String(formData.get('idioma') ?? '')
+  const locale: Locale = isLocale(raw) ? raw : defaultLocale
+  const t = translator(locale)
+
   // Primera comprobación de todas: con la tienda cerrada no se registra ningún
   // pedido. Va en la acción y no sólo en la página porque una acción de servidor
   // es un endpoint público: ocultar el formulario no la cierra.
   if (!shopOpen) {
-    return { error: 'La tienda no está abierta todavía. Escríbeme y lo vemos por mensaje.' }
+    return {
+      error: t({
+        es: 'La tienda no está abierta todavía. Escríbeme y lo vemos por mensaje.',
+        gl: 'A tenda non está aberta aínda. Escríbeme e vémolo por mensaxe.',
+      }),
+    }
   }
 
   const session = await auth()
-  if (!session?.user?.id) return { error: 'Tienes que entrar para poder enviar el pedido.' }
+  if (!session?.user?.id) {
+    return {
+      error: t({
+        es: 'Tienes que entrar para poder enviar el pedido.',
+        gl: 'Tes que entrar para poder enviar o pedido.',
+      }),
+    }
+  }
 
   // La cuenta del taller gestiona pedidos, no los hace (ver `lib/admin.ts`). No
   // debería poder llegar hasta aquí —ni tiene carrito ni ve la pantalla—, pero
   // esto es lo que lo cierra de verdad: crear un pedido reserva unidades de piezas
   // únicas y dispara dos correos y un aviso a Telegram.
   if (isAdminEmail(session.user.email)) {
-    return { error: 'Esta es la cuenta del taller: gestiona los pedidos, no hace ninguno.' }
+    return {
+      error: t({
+        es: 'Esta es la cuenta del taller: gestiona los pedidos, no hace ninguno.',
+        gl: 'Esta é a conta do taller: xestiona os pedidos, non fai ningún.',
+      }),
+    }
   }
 
   const userId = new ObjectId(session.user.id)
@@ -131,7 +158,12 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
     // Al bot se le contesta lo mismo que a la pestaña caducada, y a propósito: un
     // mensaje que dijera «has caído en el campo trampa» sería un manual para
     // esquivarla. Recargar arregla el caso legítimo y no ayuda nada al otro.
-    return { error: 'Este formulario ha caducado. Recarga la página y vuelve a enviarlo.' }
+    return {
+      error: t({
+        es: 'Este formulario ha caducado. Recarga la página y vuelve a enviarlo.',
+        gl: 'Este formulario caducou. Recarga a páxina e volve envialo.',
+      }),
+    }
   }
 
   const ip = await clientIp()
@@ -142,13 +174,21 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
   ])
   if (!intento.ok) {
     return {
-      error: `Has enviado el formulario muchas veces seguidas. Prueba dentro de ${describeWait(intento.retryAfterMs)}.`,
+      error: t({
+        es: `Has enviado el formulario muchas veces seguidas. Prueba dentro de ${describeWait(intento.retryAfterMs, 'es')}.`,
+        gl: `Enviaches o formulario moitas veces seguidas. Proba dentro de ${describeWait(intento.retryAfterMs, 'gl')}.`,
+      }),
     }
   }
 
+  const elegirDireccion = t({
+    es: 'Elige una dirección de envío.',
+    gl: 'Escolle un enderezo de envío.',
+  })
+
   const rawAddressId = String(formData.get('addressId') ?? '')
   if (!ObjectId.isValid(rawAddressId)) {
-    return { error: 'Elige una dirección de envío.' }
+    return { error: elegirDireccion }
   }
 
   // La dirección se busca con el userId en el filtro: nadie puede enviar un pedido
@@ -158,18 +198,21 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
     _id: new ObjectId(rawAddressId),
     userId,
   })
-  if (!address) return { error: 'Elige una dirección de envío.' }
+  if (!address) return { error: elegirDireccion }
+
+  const enviado = (numero: string) => `${path(locale, '/comprar/enviado')}?pedido=${numero}`
+  const carritoVacio = t({ es: 'Tu carrito está vacío.', gl: 'O teu carro está baleiro.' })
 
   // El carrito se relee aquí, en el servidor. Ninguna cifra viene del formulario:
   // las del catálogo se leen en este punto y en ningún otro.
-  const cart = await readCart()
+  const cart = await readCart(locale)
 
   if (cart.lines.length === 0) {
     // Un carrito vacío justo después de pedir es casi siempre un «atrás» o un
     // recargar, no un error: se le lleva a la confirmación de lo que ya envió.
     const reciente = await pedidoReciente(userId)
-    if (reciente) redirect(`/comprar/enviado?pedido=${reciente}`)
-    return { error: 'Tu carrito está vacío.' }
+    if (reciente) redirect(enviado(reciente))
+    return { error: carritoVacio }
   }
 
   // Aquí se cierra el cerrojo: a partir de este punto el carrito está vacío y estas
@@ -177,8 +220,8 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
   const tomadas = await tomarCarrito(userId)
   if (!tomadas) {
     const reciente = await pedidoReciente(userId)
-    if (reciente) redirect(`/comprar/enviado?pedido=${reciente}`)
-    return { error: 'Tu carrito está vacío.' }
+    if (reciente) redirect(enviado(reciente))
+    return { error: carritoVacio }
   }
 
   const items = cart.lines.map((line) => ({
@@ -199,7 +242,12 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
   )
   if (!mismasLineas) {
     await devolverCarrito(userId, tomadas)
-    return { error: 'Tu carrito ha cambiado mientras enviabas. Revísalo y vuelve a intentarlo.' }
+    return {
+      error: t({
+        es: 'Tu carrito ha cambiado mientras enviabas. Revísalo y vuelve a intentarlo.',
+        gl: 'O teu carro cambiou mentres enviabas. Revísao e volve intentalo.',
+      }),
+    }
   }
 
   // El cubo estrecho: se gasta ya, con el carrito tomado y a un paso de crear el
@@ -213,7 +261,10 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
   if (!creado.ok) {
     await devolverCarrito(userId, tomadas)
     return {
-      error: `Has hecho varios pedidos muy seguidos. Tu carrito sigue guardado: inténtalo dentro de ${describeWait(creado.retryAfterMs)}, o escríbele directamente a Ana.`,
+      error: t({
+        es: `Has hecho varios pedidos muy seguidos. Tu carrito sigue guardado: inténtalo dentro de ${describeWait(creado.retryAfterMs, 'es')}, o escríbele directamente a Ana.`,
+        gl: `Fixeches varios pedidos moi seguidos. O teu carro segue gardado: inténtao dentro de ${describeWait(creado.retryAfterMs, 'gl')}, ou escríbelle directamente a Ana.`,
+      }),
     }
   }
 
@@ -225,6 +276,10 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
     _id: new ObjectId(),
     number,
     userId,
+    // El idioma en el que se hizo el pedido se guarda con él. No es un adorno: los
+    // correos de cambio de estado los manda Ana desde el taller semanas después, y
+    // sin esto saldrían en el idioma del panel y no en el de quien va a leerlos.
+    locale,
     status: 'pendiente_pago',
     items,
     shipping: {
@@ -269,12 +324,15 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
     notifyNewOrder(order),
   ])
 
-  revalidatePath('/carrito')
-  revalidatePath('/cuenta/pedidos')
-  revalidatePath('/gestion')
+  // Con idioma delante, porque son rutas de verdad. El taller se refresca en los
+  // dos: Ana puede tenerlo abierto en cualquiera de ellos.
+  revalidatePath(path(locale, '/carrito'))
+  revalidatePath(path(locale, '/cuenta/pedidos'))
+  revalidatePath(path('es', '/gestion'))
+  revalidatePath(path('gl', '/gestion'))
 
   // Redirección, y no un estado devuelto: la confirmación es una página propia, así
   // que sobrevive a recargar y se puede volver a ella. Ojo, `redirect` funciona
   // lanzando, así que tiene que ser lo último y quedar fuera de cualquier `try`.
-  redirect(`/comprar/enviado?pedido=${number}`)
+  redirect(enviado(number))
 }

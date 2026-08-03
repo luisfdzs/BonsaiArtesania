@@ -1,40 +1,57 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { CartPing } from '@/components/layout/CartCount'
 import { CheckIcon, TrashIcon } from '@/components/ui/CartIcons'
 import { FlowerBud } from '@/components/ui/FlowerBud'
 import { Media } from '@/components/ui/Media'
 import { isAdmin } from '@/lib/admin'
 import { readCart } from '@/lib/cart'
+import { isLocale, pick, translator } from '@/lib/i18n/config'
+import { path } from '@/lib/i18n/routes'
 import { shopOpen } from '@/lib/shop'
 import { removeFromCart, setQty } from './actions'
 
-export const metadata: Metadata = {
-  title: 'Carrito',
-  robots: { index: false, follow: false },
+type Params = { params: Promise<{ locale: string }> }
+
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const { locale } = await params
+  return {
+    title: isLocale(locale) ? pick({ es: 'Carrito', gl: 'Carro' }, locale) : 'Carrito',
+    robots: { index: false, follow: false },
+  }
 }
 
-export default async function CarritoPage() {
+export default async function CarritoPage({ params }: Params) {
+  const { locale } = await params
+  if (!isLocale(locale)) notFound()
+  const t = translator(locale)
+
+  // «pieza» y «piezas» salen tres veces en esta página.
+  const pieza = t({ es: 'pieza', gl: 'peza' })
+  const piezas = t({ es: 'piezas', gl: 'pezas' })
+
   // La cuenta del taller no tiene carrito, así que aquí no hay nada que enseñarle:
   // se la manda a su sitio. Ver `lib/admin.ts`.
-  if (await isAdmin()) redirect('/gestion')
+  if (await isAdmin()) redirect(path(locale, '/gestion'))
 
   // Sin carrito abierto no hay nada que enseñar. Se explica en lugar de dar un
   // 404: quien llegue aquí desde un enlace guardado merece saber qué ha pasado.
   if (!shopOpen) {
     return (
       <div className="page-gutter pt-16 md:pt-24">
-        <h1 className="font-serif text-title">Muy pronto</h1>
+        <h1 className="font-serif text-title">{t({ es: 'Muy pronto', gl: 'Moi pronto' })}</h1>
         <p className="mt-6 max-w-md text-bark-soft">
-          Cada pieza se sigue encargando hablando, que es como Ana trabaja hoy: escríbele y lo
-          organizáis.
+          {t({
+            es: 'Cada pieza se sigue encargando hablando, que es como Ana trabaja hoy: escríbele y lo organizáis.',
+            gl: 'Cada peza séguese encargando falando, que é como Ana traballa hoxe: escríbelle e organizádelo.',
+          })}
         </p>
         <div className="mt-10 flex flex-col gap-2 sm:flex-row">
-          <Link href="/tienda" className="btn">
-            Ver las piezas
+          <Link href={path(locale, '/tienda')} className="btn">
+            {t({ es: 'Ver las piezas', gl: 'Ver as pezas' })}
           </Link>
-          <Link href="/#contacto" className="btn btn-quiet">
+          <Link href={path(locale, '/#contacto')} className="btn btn-quiet">
             Escribir a Ana
           </Link>
         </div>
@@ -42,7 +59,7 @@ export default async function CarritoPage() {
     )
   }
 
-  const cart = await readCart()
+  const cart = await readCart(locale)
 
   if (cart.lines.length === 0) {
     return (
@@ -52,10 +69,15 @@ export default async function CarritoPage() {
       // igual arriba y abajo. El relleno es simétrico para no descentrarlo.
       <div data-fill className="page-gutter grid place-items-center py-16 text-center">
         <div>
-          <h1 className="font-serif text-title">Tu carrito</h1>
-          <p className="mt-6 text-bark-soft">Todavía no has añadido ninguna pieza.</p>
-          <Link href="/tienda" className="btn mt-10">
-            Tienda
+          <h1 className="font-serif text-title">{t({ es: 'Tu carrito', gl: 'O teu carro' })}</h1>
+          <p className="mt-6 text-bark-soft">
+            {t({
+              es: 'Todavía no has añadido ninguna pieza.',
+              gl: 'Aínda non engadiches ningunha peza.',
+            })}
+          </p>
+          <Link href={path(locale, '/tienda')} className="btn mt-10">
+            {t({ es: 'Tienda', gl: 'Tenda' })}
           </Link>
         </div>
       </div>
@@ -64,14 +86,14 @@ export default async function CarritoPage() {
 
   return (
     <div className="page-gutter pt-10 pb-(--spacing-section) md:pt-16">
-      <Link href="/tienda" className="link-underline tap eyebrow">
-        ← Seguir viendo la tienda
+      <Link href={path(locale, '/tienda')} className="link-underline tap eyebrow">
+        ← {t({ es: 'Seguir viendo la tienda', gl: 'Seguir vendo a tenda' })}
       </Link>
 
       <div className="mt-5 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-        <h1 className="font-serif text-title">Tu carrito</h1>
+        <h1 className="font-serif text-title">{t({ es: 'Tu carrito', gl: 'O teu carro' })}</h1>
         <p className="text-small text-bark-faint">
-          {cart.count} {cart.count === 1 ? 'pieza' : 'piezas'}
+          {cart.count} {cart.count === 1 ? pieza : piezas}
         </p>
       </div>
 
@@ -82,7 +104,7 @@ export default async function CarritoPage() {
               key={line.slug}
               className="flex gap-5 border-b border-line py-8 first:border-t sm:gap-7"
             >
-              <Link href={`/tienda/${line.slug}`} className="w-20 shrink-0 sm:w-28">
+              <Link href={path(locale, `/tienda/${line.slug}`)} className="w-20 shrink-0 sm:w-28">
                 <Media
                   image={line.image}
                   ratio="1 / 1"
@@ -94,7 +116,7 @@ export default async function CarritoPage() {
               <div className="flex flex-1 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
                   <Link
-                    href={`/tienda/${line.slug}`}
+                    href={path(locale, `/tienda/${line.slug}`)}
                     className="link-underline tap font-serif text-lead"
                   >
                     {line.name}
@@ -112,7 +134,7 @@ export default async function CarritoPage() {
                           móvil, y este aviso es lo que se lo dice. Ver `CartCount`. */}
                       <CartPing />
                       <label className="sr-only" htmlFor={`qty-${line.slug}`}>
-                        Cantidad de {line.name}
+                        {t({ es: 'Cantidad de', gl: 'Cantidade de' })} {line.name}
                       </label>
                       <input
                         id={`qty-${line.slug}`}
@@ -125,8 +147,8 @@ export default async function CarritoPage() {
                       />
                       <button
                         type="submit"
-                        aria-label="Actualizar cantidad"
-                        title="Actualizar cantidad"
+                        aria-label={t({ es: 'Actualizar cantidad', gl: 'Actualizar cantidade' })}
+                        title={t({ es: 'Actualizar cantidad', gl: 'Actualizar cantidade' })}
                         className="tap flex h-9 w-9 shrink-0 items-center justify-center border-l border-line text-bark-faint transition-colors duration-500 hover:text-sage-deep"
                       >
                         {/* Guardar la cantidad va a la base y vuelve a pintar el
@@ -135,7 +157,12 @@ export default async function CarritoPage() {
                             todo lo demás es el viejo: parece que el visto no ha
                             hecho nada. La flor ocupa el sitio del visto y lo
                             desmiente sin mover nada de sitio. */}
-                        <FlowerBud label="Actualizando la cantidad">
+                        <FlowerBud
+                          label={t({
+                            es: 'Actualizando la cantidad',
+                            gl: 'Actualizando a cantidade',
+                          })}
+                        >
                           <CheckIcon className="h-4 w-4" />
                         </FlowerBud>
                       </button>
@@ -146,14 +173,14 @@ export default async function CarritoPage() {
                       <CartPing />
                       <button
                         type="submit"
-                        aria-label={`Quitar ${line.name}`}
-                        title="Quitar"
+                        aria-label={`${t({ es: 'Quitar', gl: 'Quitar' })} ${line.name}`}
+                        title={t({ es: 'Quitar', gl: 'Quitar' })}
                         className="tap flex h-9 w-9 items-center justify-center text-bark-faint transition-colors duration-500 hover:text-sage-deep"
                       >
                         {/* Igual que el visto de al lado: quitar una pieza tarda
                             lo que tarde la base y hasta que vuelve la línea sigue
                             ahí, entera. */}
-                        <FlowerBud label={`Quitando ${line.name}`}>
+                        <FlowerBud label={`${t({ es: 'Quitando', gl: 'Quitando' })} ${line.name}`}>
                           <TrashIcon className="h-4 w-4" />
                         </FlowerBud>
                       </button>
@@ -167,27 +194,31 @@ export default async function CarritoPage() {
 
         <aside className="lg:col-span-5 lg:sticky lg:top-32 lg:self-start">
           <div className="border border-line bg-linen-deep/50 p-8 sm:p-10">
-            <h2 className="eyebrow">Resumen</h2>
+            <h2 className="eyebrow">{t({ es: 'Resumen', gl: 'Resumo' })}</h2>
 
             {/* Ni subtotal, ni envío, ni total: la web no publica ninguna cifra.
                 Lo que queda del resumen es lo único que aquí se puede afirmar
                 —cuántas piezas se piden— y el aviso de que Ana escribirá. */}
             <p className="mt-8 font-serif text-lead">
-              {cart.count} {cart.count === 1 ? 'pieza' : 'piezas'}
+              {cart.count} {cart.count === 1 ? pieza : piezas}
             </p>
 
             <p className="mt-6 bg-petal-soft p-4 text-small text-bark-soft">
-              Enviar el pedido no cuesta nada ni te compromete a nada: es una petición. Ana te
-              escribirá en cuanto pueda 🌸
+              {t({
+                es: 'Enviar el pedido no cuesta nada ni te compromete a nada: es una petición. Ana te escribirá en cuanto pueda 🌸',
+                gl: 'Enviar o pedido non custa nada nin te compromete a nada: é unha petición. Ana escribirache en canto poida 🌸',
+              })}
             </p>
 
-            <Link href="/comprar" className="btn mt-8 w-full">
-              Continuar
+            <Link href={path(locale, '/comprar')} className="btn mt-8 w-full">
+              {t({ es: 'Continuar', gl: 'Continuar' })}
             </Link>
 
             <p className="mt-6 text-small text-bark-faint">
-              Cada pieza se hace a mano para ti: entre 1 y 3 semanas. Envío a toda España. Al enviar
-              el pedido le llega a Ana, que se pone con él y te escribe.
+              {t({
+                es: 'Cada pieza se hace a mano para ti: entre 1 y 3 semanas. Envío a toda España. Al enviar el pedido le llega a Ana, que se pone con él y te escribe.',
+                gl: 'Cada peza faise a man para ti: entre 1 e 3 semanas. Envío a toda España. Ao enviar o pedido chégalle a Ana, que se pon con el e escríbeche.',
+              })}
             </p>
           </div>
         </aside>

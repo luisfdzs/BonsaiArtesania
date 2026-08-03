@@ -124,6 +124,9 @@ const validators = {
     properties: {
       number: { bsonType: 'string', pattern: '^BA-[0-9]{4}-[0-9]{4}$' },
       userId: { bsonType: 'objectId' },
+      // Fuera de `required` a propósito: los pedidos anteriores al galego no lo
+      // llevan y quien los lee cae al castellano. Ver `OrderDoc` en lib/schema.ts.
+      locale: { enum: ['es', 'gl'] },
       status: {
         enum: ['pendiente_pago', 'preparando', 'enviado', 'en_reparto', 'entregado', 'cancelado'],
       },
