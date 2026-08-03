@@ -11,7 +11,13 @@ export default function HomePage() {
     <>
       <Hero />
 
-      <section className="page-gutter">
+      {/* El `pt` no es decoración: sin él la sección arrancaba pegada al borde del hero.
+          Mientras la portada era aire y titular se disimulaba, pero contra un vídeo a
+          sangre el filete de «Piezas destacadas» parece parte del hero en vez del
+          principio de lo siguiente. `--spacing-section` es el mismo aire con el que
+          entran `TallerSection` y `ContactoSection`, así que la página respira igual en
+          los tres saltos. */}
+      <section className="page-gutter pt-(--spacing-section)">
         <div className="border-b border-line pb-4">
           <h2 className="eyebrow">Piezas destacadas</h2>
         </div>

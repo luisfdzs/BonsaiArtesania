@@ -16,6 +16,13 @@ import { imgSrc } from '@/lib/media'
  * `100svh` y no `100vh`: en móvil, `vh` cuenta la barra del navegador como si no
  * existiera y la primera pantalla queda cortada por abajo, justo donde está el texto.
  *
+ * **En escritorio se ven los dos vídeos a la vez, uno al lado del otro.** Un clip
+ * vertical de 720 px de ancho estirado a una pantalla de portátil hay que ampliarlo casi
+ * tres veces y recortarle arriba y abajo: se veía blando y descuadrado, mientras que en
+ * móvil —donde el hueco es casi el 9:16 del clip— se veía bien. Dos huecos verticales
+ * llenan una pantalla ancha sin pedirle a ninguno lo que no tiene. El reparto vive en
+ * `ReelBackdrop`, que es también quien explica por qué en móvil sigue habiendo uno solo.
+ *
  * **El texto va abajo y no en el centro.** Arriba está la cabecera flotando, y el
  * centro es donde el vídeo tiene lo que hay que ver —las manos, la prensa—. Pegado al
  * borde inferior, el titular no tapa nada y el degradado que le da contraste cae donde

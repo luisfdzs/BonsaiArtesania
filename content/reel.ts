@@ -3,14 +3,21 @@ import type { ImageKey } from '@/lib/media'
 /**
  * Los vídeos del fondo de la portada, en el orden en que se ven.
  *
- * **Dos, y encadenados en bucle:** cuando termina el primero entra el segundo, y al
- * acabar el segundo vuelve el primero. Ocupan la primera pantalla entera y el texto
- * va encima; ver `components/sections/Hero.tsx`.
+ * **Dos, y se ven de dos maneras según la pantalla.** En móvil van encadenados en
+ * bucle: cuando termina el primero entra el segundo, y al acabar el segundo vuelve el
+ * primero. En escritorio se ven **los dos a la vez**, uno al lado del otro, cada uno en
+ * bucle por su cuenta: son verticales de 720 px y a lo ancho de un portátil ninguno
+ * llena solo la pantalla sin quedarse blando. Ocupan la primera pantalla entera y el
+ * texto va encima; ver `components/ui/ReelBackdrop.tsx`, que es donde está el detalle.
  *
  * El orden cuenta algo. El primero es la prensa: las flores secas saliendo de la
  * carpeta y entrando en el molde. El segundo es el final del camino: la pieza ya
  * hecha, montada en su tarjeta. Puestos así, los veintisiete segundos del primero y
- * los veintiséis del segundo son el principio y el fin de lo mismo.
+ * los veintiséis del segundo son el principio y el fin de lo mismo —en móvil por turnos,
+ * y en escritorio a la vez, con la prensa a la izquierda y la pieza acabada a la
+ * derecha—. **Si algún día hay un tercer clip, el díptico deja de cuadrar**: la fila los
+ * reparte a partes iguales y tres columnas verticales en una pantalla de portátil son
+ * tres tiras estrechas.
  *
  * **Los ficheros se sirven desde `public/reel/`, no se incrustan desde Instagram.**
  * Un `<iframe>` de Instagram trae su propio JavaScript, sus cookies de terceros y su
@@ -33,8 +40,11 @@ export type Reel = {
   file: string
   /**
    * Fotograma de portada: una clave del manifiesto de fotos, como cualquier otra
-   * imagen de la web. Sólo hace falta el del primero —es el único que se ve antes de
-   * que arranque el vídeo—, así que en los demás puede ir a `null`.
+   * imagen de la web. Basta con el del primero, y en los demás puede ir a `null`: es el
+   * que se ve mientras llega el vídeo y el que se queda solo, a sangre, si el navegador
+   * decide no reproducir nada. La mitad del segundo se queda en tinta hasta que su clip
+   * está, que dura poco y cae debajo del velo; ponerle aquí su propia clave es lo único
+   * que hay que hacer si algún día se quiere tapar también ese instante.
    */
   poster: ImageKey | null
   /**
