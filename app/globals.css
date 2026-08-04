@@ -66,6 +66,8 @@
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
   --animate-bloom: bloom 1.6s var(--ease-out-soft) both;
+  /* El vaivén de la flecha de volver arriba. Ver `nudge-up`. */
+  --animate-nudge-up: nudge-up 2.8s var(--ease-in-out-soft) infinite;
 }
 
 @keyframes reveal {
@@ -76,6 +78,23 @@
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* La flecha de volver arriba se asoma tres píxeles y vuelve, con una pausa larga
+   en el sitio. Tres y no diez, y 2,8s y no medio segundo: aquí nada rebota —ver
+   `--ease-out-soft`—, así que lo que tiene que hacer es que el ojo la encuentre
+   al pararse a mirar, no saltar en la esquina mientras se lee. Con
+   `prefers-reduced-motion` la regla de base la deja en un fotograma y la flecha
+   se queda quieta, que es lo suyo. */
+@keyframes nudge-up {
+  0%,
+  55%,
+  100% {
+    transform: none;
+  }
+  30% {
+    transform: translateY(-3px);
   }
 }
 

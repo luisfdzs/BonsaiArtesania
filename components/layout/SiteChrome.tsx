@@ -1,6 +1,7 @@
 import { Footer } from '@/components/layout/Footer'
 import { Header } from '@/components/layout/Header'
 import { MobileNav } from '@/components/layout/MobileNav'
+import { ScrollTop } from '@/components/ui/ScrollTop'
 import { shopOpen } from '@/lib/shop'
 
 /**
@@ -42,6 +43,10 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
           cabecera: es una barra fija abajo, y en orden de lectura le toca
           después del contenido. Sólo se ve por debajo de `md`. */}
       <MobileNav shopOpen={shopOpen} />
+      {/* Y encima de la barra, la flecha de volver arriba: la última del
+          documento porque es lo último que se necesita de una página, y sólo
+          cuando ya se ha bajado. Ver `ScrollTop`. */}
+      <ScrollTop />
     </>
   )
 }
