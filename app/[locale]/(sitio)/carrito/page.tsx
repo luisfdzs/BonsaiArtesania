@@ -5,6 +5,7 @@ import { CartPing } from '@/components/layout/CartCount'
 import { CheckIcon, TrashIcon } from '@/components/ui/CartIcons'
 import { FlowerBud } from '@/components/ui/FlowerBud'
 import { Media } from '@/components/ui/Media'
+import { SendIcon } from '@/components/ui/SocialIcons'
 import { isAdmin } from '@/lib/admin'
 import { readCart } from '@/lib/cart'
 import { isLocale, pick, translator } from '@/lib/i18n/config'
@@ -193,9 +194,22 @@ export default async function CarritoPage({ params }: Params) {
             que se podía afirmar ahí —cuántas piezas se piden— ya está en la
             cabecera de la página. Del resumen sólo queda el paso siguiente,
             justo debajo de la última línea. */}
-        <Link href={path(locale, '/comprar')} className="btn mt-10">
-          {t({ es: 'Continuar', gl: 'Continuar' })}
-        </Link>
+        {/* Va centrado y sin rótulo dentro, con el mismo avioncito y el mismo
+            tamaño que el de enviar el pedido: son los dos pasos de lo mismo, y
+            que se parezcan es lo que hace que el segundo no sorprenda. El texto
+            se va a `aria-label` y `title` —lo que oye quien usa lector de
+            pantalla y lo que sale al pasar el ratón—, que es lo único que un
+            avioncito solo no dice. */}
+        <div className="mt-10 flex justify-center">
+          <Link
+            href={path(locale, '/comprar')}
+            aria-label={t({ es: 'Continuar', gl: 'Continuar' })}
+            title={t({ es: 'Continuar', gl: 'Continuar' })}
+            className="btn btn-icon btn-icon-lg"
+          >
+            <SendIcon className="h-5 w-5" />
+          </Link>
+        </div>
       </div>
     </div>
   )
