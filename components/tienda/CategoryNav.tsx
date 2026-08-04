@@ -37,11 +37,7 @@ type Props = {
  */
 export function CategoryNav({ current, outside = false, locale, className }: Props) {
   const t = translator(locale)
-  const visible = categories
-    .map((category) => ({ ...category, count: productsByCategory(category.key).length }))
-    .filter((category) => category.count > 0)
-
-  const total = visible.reduce((sum, category) => sum + category.count, 0)
+  const visible = categories.filter((category) => productsByCategory(category.key).length > 0)
 
   return (
     <nav
@@ -54,7 +50,6 @@ export function CategoryNav({ current, outside = false, locale, className }: Pro
         <Tab
           href={path(locale, '/tienda')}
           label={t({ es: 'Todo', gl: 'Todo' })}
-          count={total}
           active={!current && !outside}
         />
 
@@ -63,7 +58,6 @@ export function CategoryNav({ current, outside = false, locale, className }: Pro
             key={category.key}
             href={path(locale, `/tienda/categoria/${category.key}`)}
             label={t(category.label)}
-            count={category.count}
             active={category.key === current}
           />
         ))}
@@ -73,26 +67,16 @@ export function CategoryNav({ current, outside = false, locale, className }: Pro
 }
 
 /**
- * Cada entrada lleva su número de piezas. Es el mismo dato que ya daba el botón
- * «Ver más …» del final de cada familia, pero antes de entrar: con la tienda
- * repartida en subsecciones conviene saber si detrás de un rótulo hay veinte
- * piezas o dos.
+ * Cada entrada es sólo su rótulo. Llevó un tiempo el número de piezas al lado,
+ * para saber antes de entrar si detrás de un rótulo había veinte o dos, pero en
+ * una barra de ocho eran ocho cifras que no se leen y que había que saltarse para
+ * llegar a los nombres. Y ponerle un número a cada familia acercaba el taller a un
+ * inventario. Cuántas hay se ve bajando, que es lo que se hace en la tienda.
  */
-function Tab({
-  href,
-  label,
-  count,
-  active,
-}: {
-  href: string
-  label: string
-  count: number
-  active: boolean
-}) {
+function Tab({ href, label, active }: { href: string; label: string; active: boolean }) {
   return (
     <Link href={href} aria-current={active ? 'page' : undefined} className="shop-tab">
       {label}
-      <span className="shop-tab-count">{count}</span>
     </Link>
   )
 }

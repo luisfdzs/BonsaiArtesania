@@ -15,8 +15,6 @@ export type EscaparateFamilia = {
   label: string
   /** La línea de la derecha, bajo la barra. «Todo» no tiene. */
   note?: string
-  /** Piezas de la familia, para el número de la barra. */
-  count: number
   /** A dónde lleva el rótulo y el botón del final: la tienda o la subsección. */
   href: string
   /** El «Ver más» del final dice sólo eso; el lector de pantalla oye la frase. */
@@ -125,7 +123,6 @@ export function Escaparate({
               className="shop-tab tap"
             >
               {f.label}
-              <span className="shop-tab-count">{f.count}</span>
             </button>
           ))}
         </ShopRail>
