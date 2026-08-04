@@ -61,12 +61,12 @@ export default async function CategoriaPage({ params }: Params) {
 
       <header className="mt-10 max-w-xl">
         <h1 className="font-serif text-display">{t(category.label)}</h1>
+        {/* Sin el recuento de piezas que iba aquí debajo, ni el número que llevaba
+            cada familia en la barra: la cifra no cambiaba nada de lo que se hace en
+            esta página —bajar y mirar—, y ponerle un número a un taller de piezas
+            únicas lo acercaba más a un inventario que a un escaparate. Lo que hay
+            se ve. */}
         <p className="mt-7 text-bark-soft">{t(category.intro)}</p>
-        <p className="mt-5 text-small text-bark-faint">
-          {items.length === 1
-            ? t({ es: '1 pieza', gl: '1 peza' })
-            : `${items.length} ${t({ es: 'piezas', gl: 'pezas' })}`}
-        </p>
 
         {/* El aviso sobra en «Del taller»: ahí no hay nada que pedir ni con el
             carrito abierto. */}

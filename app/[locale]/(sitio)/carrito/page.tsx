@@ -5,6 +5,7 @@ import { CartPing } from '@/components/layout/CartCount'
 import { CheckIcon, TrashIcon } from '@/components/ui/CartIcons'
 import { FlowerBud } from '@/components/ui/FlowerBud'
 import { Media } from '@/components/ui/Media'
+import { SendIcon } from '@/components/ui/SocialIcons'
 import { isAdmin } from '@/lib/admin'
 import { readCart } from '@/lib/cart'
 import { isLocale, pick, translator } from '@/lib/i18n/config'
@@ -26,10 +27,6 @@ export default async function CarritoPage({ params }: Params) {
   const { locale } = await params
   if (!isLocale(locale)) notFound()
   const t = translator(locale)
-
-  // «pieza» y «piezas» salen tres veces en esta página.
-  const pieza = t({ es: 'pieza', gl: 'peza' })
-  const piezas = t({ es: 'piezas', gl: 'pezas' })
 
   // La cuenta del taller no tiene carrito, así que aquí no hay nada que enseñarle:
   // se la manda a su sitio. Ver `lib/admin.ts`.
@@ -93,12 +90,13 @@ export default async function CarritoPage({ params }: Params) {
       <div className="mt-5 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
         <h1 className="font-serif text-title">{t({ es: 'Tu carrito', gl: 'O teu carro' })}</h1>
         <p className="text-small text-bark-faint">
-          {cart.count} {cart.count === 1 ? pieza : piezas}
+          {cart.count}{' '}
+          {t(cart.count === 1 ? { es: 'pieza', gl: 'peza' } : { es: 'piezas', gl: 'pezas' })}
         </p>
       </div>
 
-      <div className="mt-12 grid gap-14 lg:grid-cols-12 lg:items-start">
-        <ul className="lg:col-span-7">
+      <div className="mt-12">
+        <ul>
           {cart.lines.map((line) => (
             <li
               key={line.slug}
@@ -192,36 +190,26 @@ export default async function CarritoPage({ params }: Params) {
           ))}
         </ul>
 
-        <aside className="lg:col-span-5 lg:sticky lg:top-32 lg:self-start">
-          <div className="border border-line bg-linen-deep/50 p-8 sm:p-10">
-            <h2 className="eyebrow">{t({ es: 'Resumen', gl: 'Resumo' })}</h2>
-
-            {/* Ni subtotal, ni envío, ni total: la web no publica ninguna cifra.
-                Lo que queda del resumen es lo único que aquí se puede afirmar
-                —cuántas piezas se piden— y el aviso de que Ana escribirá. */}
-            <p className="mt-8 font-serif text-lead">
-              {cart.count} {cart.count === 1 ? pieza : piezas}
-            </p>
-
-            <p className="mt-6 bg-petal-soft p-4 text-small text-bark-soft">
-              {t({
-                es: 'Enviar el pedido no cuesta nada ni te compromete a nada: es una petición. Ana te escribirá en cuanto pueda 🌸',
-                gl: 'Enviar o pedido non custa nada nin te compromete a nada: é unha petición. Ana escribirache en canto poida 🌸',
-              })}
-            </p>
-
-            <Link href={path(locale, '/comprar')} className="btn mt-8 w-full">
-              {t({ es: 'Continuar', gl: 'Continuar' })}
-            </Link>
-
-            <p className="mt-6 text-small text-bark-faint">
-              {t({
-                es: 'Cada pieza se hace a mano para ti: entre 1 y 3 semanas. Envío a toda España. Al enviar el pedido le llega a Ana, que se pone con él y te escribe.',
-                gl: 'Cada peza faise a man para ti: entre 1 e 3 semanas. Envío a toda España. Ao enviar o pedido chégalle a Ana, que se pon con el e escríbeche.',
-              })}
-            </p>
-          </div>
-        </aside>
+        {/* Sin tarjeta de resumen: la web no publica ninguna cifra, y lo único
+            que se podía afirmar ahí —cuántas piezas se piden— ya está en la
+            cabecera de la página. Del resumen sólo queda el paso siguiente,
+            justo debajo de la última línea. */}
+        {/* Va centrado y sin rótulo dentro, con el mismo avioncito y el mismo
+            tamaño que el de enviar el pedido: son los dos pasos de lo mismo, y
+            que se parezcan es lo que hace que el segundo no sorprenda. El texto
+            se va a `aria-label` y `title` —lo que oye quien usa lector de
+            pantalla y lo que sale al pasar el ratón—, que es lo único que un
+            avioncito solo no dice. */}
+        <div className="mt-10 flex justify-center">
+          <Link
+            href={path(locale, '/comprar')}
+            aria-label={t({ es: 'Continuar', gl: 'Continuar' })}
+            title={t({ es: 'Continuar', gl: 'Continuar' })}
+            className="btn btn-icon btn-icon-lg"
+          >
+            <SendIcon className="h-5 w-5" />
+          </Link>
+        </div>
       </div>
     </div>
   )

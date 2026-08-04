@@ -5,6 +5,7 @@ import { LogoutIcon } from '@/components/cuenta/CuentaIcons'
 import { GestionNav } from '@/components/gestion/GestionNav'
 import { Wordmark } from '@/components/layout/Wordmark'
 import { FormPending } from '@/components/ui/FormPending'
+import { ScrollTop } from '@/components/ui/ScrollTop'
 import { adminSession } from '@/lib/admin'
 import { isLocale, pick, translator } from '@/lib/i18n/config'
 import { path } from '@/lib/i18n/routes'
@@ -118,6 +119,10 @@ export default async function GestionLayout({
           </button>
         </form>
       </div>
+
+      {/* La flecha de volver arriba también aquí: el panel no hereda el armazón
+          del sitio, y la lista de pedidos es lo más largo que tiene esta web. */}
+      <ScrollTop />
     </main>
   )
 }
