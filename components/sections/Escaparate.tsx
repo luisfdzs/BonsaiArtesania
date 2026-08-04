@@ -5,6 +5,7 @@ import { useRef, useState } from 'react'
 import { ShopRail } from '@/components/tienda/ShopRail'
 import { ProductGrid } from '@/components/tienda/ProductGrid'
 import { Reveal } from '@/components/ui/Reveal'
+import { cn } from '@/lib/cn'
 import type { ProductCardData } from '@/content/products'
 import type { Locale } from '@/lib/i18n/config'
 
@@ -79,6 +80,18 @@ export function Escaparate({
 
   if (!familia) return null
 
+  // Columnas que dejan libres las piezas en la última fila de la rejilla de
+  // escritorio, que es de tres. Ahí van los botones; ver `Botones`.
+  const hueco = (3 - (familia.items.length % 3)) % 3
+
+  const botones = {
+    href: familia.href,
+    verMas,
+    verMasLabel: familia.verMasLabel,
+    personalizar,
+    personalizarHref,
+  }
+
   return (
     <>
       <div role="tablist" aria-label={navLabel} className="shop-nav mt-10">
@@ -143,30 +156,76 @@ export function Escaparate({
           items={familia.items}
           locale={locale}
           priority={familia.key === familias[0]?.key}
+          trailing={
+            hueco > 0 && (
+              <Reveal
+                className={cn(
+                  'hidden self-center lg:flex lg:flex-col lg:items-center lg:gap-3',
+                  hueco === 2 && 'lg:col-span-2',
+                )}
+              >
+                <Botones {...botones} />
+              </Reveal>
+            )
+          }
         />
       </div>
 
-      {/* Seguir a la tienda es lo que toca después de mirar la muestra, no antes:
-          arriba, junto al encabezado, el enlace invitaba a saltarse justo lo que
-          la sección venía a enseñar. Lo que ocupa el ancho es la fila, no el
-          botón: centrado bajo la rejilla se ve desde cualquier columna, y
-          estirarlo hasta el borde le habría dado un tamaño que no tiene ningún
-          otro botón de la web. */}
-      {/* «Ver más» a secas basta debajo de la rejilla, donde el destino se
-          entiende por el sitio en el que está el botón. Fuera de contexto no, así
-          que el `aria-label` conserva la frase completa: un lector de pantalla
-          que recorra los enlaces de la página oiría «ver más» sin saber más de
-          qué. */}
-      <Reveal className="mt-16 flex flex-wrap justify-center gap-x-2 gap-y-3">
-        <Link href={familia.href} className="btn" aria-label={familia.verMasLabel}>
-          {verMas}
-        </Link>
-        {/* Los encargos ya no son una página aparte: viven en la sección de
-            debajo, así que esto es un ancla de la propia portada. */}
-        <Link href={personalizarHref} className="btn btn-quiet">
-          {personalizar}
-        </Link>
+      {/* Y en pantallas estrechas, debajo: ahí la rejilla es de una o dos
+          columnas y no hay hueco que aprovechar. Cuando sí lo hay, esta fila
+          desaparece en `lg` —los mismos botones no pueden estar dos veces— y los
+          que se ven son los de dentro de la rejilla. */}
+      <Reveal
+        className={cn(
+          'mt-16 flex flex-wrap justify-center gap-x-2 gap-y-3',
+          hueco > 0 && 'lg:hidden',
+        )}
+      >
+        <Botones {...botones} />
       </Reveal>
+    </>
+  )
+}
+
+/**
+ * Los dos botones del escaparate.
+ *
+ * Seguir a la tienda es lo que toca después de mirar la muestra, no antes: arriba,
+ * junto al encabezado, el enlace invitaba a saltarse justo lo que la sección venía
+ * a enseñar. En escritorio van en el hueco que dejan las piezas en la última fila
+ * de la rejilla, uno debajo del otro y centrados en él: la muestra nunca llena la
+ * fila entera —cinco piezas en tres columnas dejan una libre, cuatro dejan dos—, y
+ * ese hueco es sitio de sobra para la salida. Antes eran una fila centrada debajo,
+ * que añadía a la portada un tramo de página entero para dos botones.
+ *
+ * «Ver más» a secas basta ahí, donde el destino se entiende por el sitio en el que
+ * está el botón. Fuera de contexto no, así que el `aria-label` conserva la frase
+ * completa: un lector de pantalla que recorra los enlaces de la página oiría «ver
+ * más» sin saber más de qué.
+ */
+function Botones({
+  href,
+  verMas,
+  verMasLabel,
+  personalizar,
+  personalizarHref,
+}: {
+  href: string
+  verMas: string
+  verMasLabel: string
+  personalizar: string
+  personalizarHref: string
+}) {
+  return (
+    <>
+      <Link href={href} className="btn" aria-label={verMasLabel}>
+        {verMas}
+      </Link>
+      {/* Los encargos ya no son una página aparte: viven en la sección de debajo,
+          así que esto es un ancla de la propia portada. */}
+      <Link href={personalizarHref} className="btn btn-quiet">
+        {personalizar}
+      </Link>
     </>
   )
 }

@@ -81,13 +81,18 @@ export function TallerSection({ locale }: { locale: Locale }) {
             </p>
             <p className="mx-auto mt-7 max-w-prose text-bark-soft">
               {t({
-                es: 'Soy Ana. Recojo las flores, las seco, las coloco de una en una y las guardo en resina. No hay moldes en serie ni dos piezas iguales: la flor decide cómo va a quedar y yo la acompaño.',
-                gl: 'Son Ana. Recollo as flores, sécoas, colócoas dunha en unha e gárdoas en resina. Non hai moldes en serie nin dúas pezas iguais: a flor decide como vai quedar e eu acompáñoa.',
+                es: 'Recojo las flores, las seco, las coloco de una en una y las guardo en resina. No hay moldes en serie ni dos piezas iguales: la flor decide cómo va a quedar y yo la acompaño.',
+                gl: 'Recollo as flores, sécoas, colócoas dunha en unha e gárdoas en resina. Non hai moldes en serie nin dúas pezas iguais: a flor decide como vai quedar e eu acompáñoa.',
               })}
             </p>
           </Reveal>
 
-          <ol className="mt-14 grid items-center gap-x-10 gap-y-9 sm:grid-cols-2">
+          {/* Dos filas de dos a cualquier ancho. En móvil eran cuatro apilados: la
+              columna de texto ya es estrecha ahí, así que cada paso se llevaba
+              una pantalla y los cuatro juntos dejaban de leerse como los cuatro
+              pasos de una cosa. Los rótulos son de una palabra —recoger, secar,
+              resina, pulir—, así que entran de dos en dos hasta a 360px. */}
+          <ol className="mt-14 grid grid-cols-2 items-start gap-x-6 gap-y-9 sm:gap-x-10">
             {pasos.map((paso, index) => (
               <Reveal as="li" key={paso.n} step={index} className="text-center">
                 <p className="eyebrow text-sage-deep">{paso.n}</p>
