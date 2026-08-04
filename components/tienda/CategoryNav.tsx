@@ -8,6 +8,13 @@ import { ShopRail } from './ShopRail'
 type Props = {
   /** Familia que se está viendo; en `/tienda` no hay ninguna activa. */
   current?: string
+  /**
+   * La barra vive fuera de la tienda —en la portada—, así que no hay familia
+   * abierta y «Todo» tampoco lo está: es un índice para entrar, no para decir
+   * dónde se está. Sin esto, sin `current`, «Todo» se marcaría con
+   * `aria-current="page"` en una página que no es `/tienda`.
+   */
+  outside?: boolean
   locale: Locale
   className?: string
 }
@@ -28,7 +35,7 @@ type Props = {
  * Las familias vacías no se listan: un enlace a una página sin piezas es una vía
  * muerta. Y la que se está viendo se queda como texto, no como enlace a sí misma.
  */
-export function CategoryNav({ current, locale, className }: Props) {
+export function CategoryNav({ current, outside = false, locale, className }: Props) {
   const t = translator(locale)
   const visible = categories
     .map((category) => ({ ...category, count: productsByCategory(category.key).length }))
@@ -48,7 +55,7 @@ export function CategoryNav({ current, locale, className }: Props) {
           href={path(locale, '/tienda')}
           label={t({ es: 'Todo', gl: 'Todo' })}
           count={total}
-          active={!current}
+          active={!current && !outside}
         />
 
         {visible.map((category) => (

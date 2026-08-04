@@ -38,11 +38,22 @@ const pasos: { n: string; titulo: Localized; texto: Localized }[] = [
   },
 ]
 
+/**
+ * Cómo se hace una pieza. Ya no es una sección de primer nivel de la portada:
+ * vive dentro de «Encargos» (ver `EncargosSection`), debajo del encargo, porque
+ * las dos cosas contaban lo mismo —el secado, las semanas, que lo hace una
+ * persona— en dos sitios distintos de la misma página.
+ *
+ * De ahí que no lleve `page-gutter`: el margen lateral lo pone ya la sección que
+ * la contiene, y repetirlo aquí doblaría el hueco contra los bordes. Conserva en
+ * cambio su `id`, que es a donde apuntan «El taller» del menú y la redirección de
+ * `/el-taller`.
+ */
 export function TallerSection({ locale }: { locale: Locale }) {
   const t = translator(locale)
 
   return (
-    <section id="taller" className="page-gutter pt-(--spacing-section)">
+    <section id="taller" className="pt-(--spacing-section)">
       <div className="grid gap-14 md:grid-cols-12 md:items-center md:gap-12">
         <Reveal className="md:col-span-5">
           <Media

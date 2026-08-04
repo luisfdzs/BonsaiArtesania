@@ -25,10 +25,14 @@ const nextConfig: NextConfig = {
     globalNotFound: true,
   },
   /**
-   * Las dos secciones de la portada se anuncian con ruta propia mientras se
-   * está en ellas —ver `useActiveSection`—, así que esas rutas tienen que
-   * existir para el servidor: son las que quedan si alguien recarga, guarda el
-   * enlace o lo comparte. Devuelven a la portada, al ancla de la sección.
+   * Las secciones de la portada se anuncian con ruta propia mientras se está en
+   * ellas —ver `useActiveSection`—, así que esas rutas tienen que existir para el
+   * servidor: son las que quedan si alguien recarga, guarda el enlace o lo
+   * comparte. Devuelven a la portada, al ancla de la sección.
+   *
+   * `/encargos` es además una dirección que **existió de verdad** como página
+   * hasta que su contenido se mudó a la portada: aquí cubre las dos cosas, la
+   * ruta que se anuncia al pasar por la sección y los enlaces viejos.
    *
    * Temporales y no permanentes: la URL buena sigue siendo la portada, y una
    * 308 se queda cacheada en el navegador para siempre.
@@ -40,6 +44,7 @@ const nextConfig: NextConfig = {
    */
   async redirects() {
     return [
+      { source: '/:locale(es|gl)/encargos', destination: '/:locale/#encargos', permanent: false },
       { source: '/:locale(es|gl)/el-taller', destination: '/:locale/#taller', permanent: false },
       { source: '/:locale(es|gl)/contacto', destination: '/:locale/#contacto', permanent: false },
     ]

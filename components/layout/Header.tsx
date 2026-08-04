@@ -151,6 +151,7 @@ function DesktopNav({
   // por `/tienda`.
   const inPanel =
     panelItems.some((item) => !item.route.includes('#') && route.startsWith(item.route)) ||
+    section === 'encargos' ||
     section === 'taller'
   const contactoActive = section === 'contacto'
 

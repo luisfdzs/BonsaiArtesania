@@ -42,6 +42,12 @@ export type Product = {
   materials: Localized<string[]>
   /** La misma foto con su `alt` en cada idioma. Ver `imgLocalized`. */
   image: Localized<Image> | null
+  /**
+   * Abre su familia en el escaparate de la portada. Ya no es «una de las piezas
+   * de la rejilla de destacadas» —esa rejilla ya no existe, la portada enseña una
+   * muestra de cada familia—: lo que decide es el orden dentro de la suya. Ver
+   * `DestacadasSection` y `HOME_PREVIEW_SIZE`.
+   */
   featured: boolean
 }
 
@@ -2659,8 +2665,6 @@ export const products: Product[] = [
   },
 ]
 
-export const featuredProducts = products.filter((product) => product.featured)
-
 export function getProduct(slug: string): Product | undefined {
   return products.find((product) => product.slug === slug)
 }
@@ -2681,3 +2685,12 @@ export function getCategoryInfo(key: string): CategoryInfo | undefined {
  * última fila es justo donde va el botón, así que la fila no se rompe.
  */
 export const PREVIEW_SIZE = 11
+
+/**
+ * Y cuántas enseña cada familia en la portada, que lleva la misma barra de
+ * familias pero es un escaparate y no el catálogo: tres, que es justo una fila
+ * entera de la rejilla en escritorio. Con más, la portada se convertía en una
+ * segunda tienda —siete familias por cuatro piezas son veintiocho fotos antes
+ * de llegar a los encargos— y el botón del final dejaba de tener sentido.
+ */
+export const HOME_PREVIEW_SIZE = 3

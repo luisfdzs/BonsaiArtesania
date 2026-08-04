@@ -1,32 +1,25 @@
-import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
+import { TallerSection } from '@/components/sections/TallerSection'
 import { ContactButtons } from '@/components/ui/ContactButtons'
 import { Media } from '@/components/ui/Media'
 import { Reveal } from '@/components/ui/Reveal'
 import { customOrderMessage } from '@/lib/contact'
-import { isLocale, pick, translator, type Localized } from '@/lib/i18n/config'
-import { alternates } from '@/lib/i18n/metadata'
+import { translator, type Locale, type Localized } from '@/lib/i18n/config'
 import { img } from '@/lib/media'
 
-type Params = { params: Promise<{ locale: string }> }
-
-export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  const { locale } = await params
-  if (!isLocale(locale)) return {}
-
-  return {
-    title: pick({ es: 'Encargos', gl: 'Encargas' }, locale),
-    description: pick(
-      {
-        es: 'Convierte el ramo de tu boda o las flores de alguien especial en una joya de resina hecha a mano.',
-        gl: 'Converte o ramo da túa voda ou as flores de alguén especial nunha xoia de resina feita a man.',
-      },
-      locale,
-    ),
-    alternates: alternates(locale, '/encargos'),
-  }
-}
-
+/**
+ * Los encargos, que hasta ahora eran una página aparte (`/encargos`).
+ *
+ * Se ha traído a la portada porque era el sitio al que había que llegar por el
+ * menú para enterarse de lo único que la web no vende hecho: que puedes mandar
+ * tus flores. Y porque lo que contaba —cómo se seca, cuánto tarda, quién lo
+ * hace— es lo mismo que contaba «El taller» dos secciones más abajo, dicho dos
+ * veces en dos sitios. Ahora es una sola sección: primero el encargo, que es lo
+ * que se pide, y debajo el taller, que es cómo se hace.
+ *
+ * `id="encargos"` es el destino del menú y de la redirección de la vieja
+ * dirección; el taller conserva el suyo dentro (ver `TallerSection`), así que los
+ * enlaces a `/#taller` y a `/el-taller` siguen cayendo donde caían.
+ */
 const pasos: { n: string; titulo: Localized; texto: Localized }[] = [
   {
     n: '01',
@@ -62,13 +55,11 @@ const pasos: { n: string; titulo: Localized; texto: Localized }[] = [
   },
 ]
 
-export default async function EncargosPage({ params }: Params) {
-  const { locale } = await params
-  if (!isLocale(locale)) notFound()
+export function EncargosSection({ locale }: { locale: Locale }) {
   const t = translator(locale)
 
   return (
-    <div className="page-gutter pt-16 md:pt-24">
+    <section id="encargos" className="page-gutter pt-(--spacing-section)">
       <header>
         {/* Texto a la izquierda e imagen a la derecha **a cualquier ancho**, y
             los botones fuera de las dos columnas, debajo del bloque entero.
@@ -105,10 +96,13 @@ export default async function EncargosPage({ params }: Params) {
             bloques centrados cada uno en su hueco. */}
         <div className="mx-auto grid max-w-6xl grid-cols-12 items-center gap-x-4 md:gap-x-12">
           <div className="col-span-7 text-center md:col-span-6">
-            <p className="eyebrow">{t({ es: 'Encargos', gl: 'Encargas' })}</p>
-            <h1 className="mt-7 font-serif text-display">
+            <h2 className="eyebrow">{t({ es: 'Encargos', gl: 'Encargas' })}</h2>
+            {/* Era el `<h1>` de la página de encargos; en la portada el titular
+                de la página es el del hero, así que aquí baja un nivel y se
+                queda con el tamaño, que es lo que hacía el trabajo. */}
+            <p className="mt-7 font-serif text-display">
               {t({ es: 'Vuestras flores', gl: 'As vosas flores' })}
-            </h1>
+            </p>
             <p className="mx-auto mt-8 max-w-md text-bark-soft">
               {t({
                 es: 'El ramo de una boda, las flores de un aniversario, la planta de alguien que ya no está. Todas se secan. Lo que hago es pararlas justo antes y convertirlas en algo que puedas llevar contigo.',
@@ -133,7 +127,6 @@ export default async function EncargosPage({ params }: Params) {
               // pedía 768px para pintar 384: el doble de archivo del que se ve.
               // Y el `100vw` que hubo al principio pedía el doble otra vez.
               sizes="(min-width: 1024px) 24rem, 40vw"
-              priority
               className="rounded-t-full border border-line"
             />
           </div>
@@ -153,20 +146,20 @@ export default async function EncargosPage({ params }: Params) {
         />
       </header>
 
-      <section className="mt-(--spacing-section)">
-        <h2 className="eyebrow border-b border-line pb-4 text-center">
+      <div className="mt-(--spacing-section)">
+        <h3 className="eyebrow border-b border-line pb-4 text-center">
           {t({ es: 'Cómo funciona', gl: 'Como funciona' })}
-        </h2>
+        </h3>
         <ol className="mt-12 grid items-center gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
           {pasos.map((paso, index) => (
             <Reveal as="li" key={paso.n} step={index} className="text-center">
               <p className="eyebrow text-sage-deep">{paso.n}</p>
-              <h3 className="mt-3 font-serif text-lead">{t(paso.titulo)}</h3>
+              <h4 className="mt-3 font-serif text-lead">{t(paso.titulo)}</h4>
               <p className="mt-2 text-small text-bark-soft">{t(paso.texto)}</p>
             </Reveal>
           ))}
         </ol>
-      </section>
+      </div>
 
       <Reveal className="mt-(--spacing-section) border-t border-line pt-12 text-center">
         <p className="mx-auto max-w-2xl font-serif text-title">
@@ -177,6 +170,10 @@ export default async function EncargosPage({ params }: Params) {
         </p>
         <p className="mt-6 text-small text-bark-faint">Ana</p>
       </Reveal>
-    </div>
+
+      {/* Y debajo, cómo se hace: el taller cierra la sección. Trae su propio aire
+          y su propio `id`, así que aquí no hace falta nada más. */}
+      <TallerSection locale={locale} />
+    </section>
   )
 }
