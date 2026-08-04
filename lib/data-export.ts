@@ -205,8 +205,8 @@ export async function buildDataExportPdf(data: DataExport, locale: Locale): Prom
   text(
     sheet,
     t({
-      es: 'Estos son todos los datos personales que bonsaiartesania.com guarda sobre ti. No se almacenan datos de tarjeta.',
-      gl: 'Estes son todos os datos persoais que bonsaiartesania.com garda sobre ti. Non se almacenan datos de tarxeta.',
+      es: 'Estos son todos los datos personales que bonsaiartesania.com guarda sobre ti.',
+      gl: 'Estes son todos os datos persoais que bonsaiartesania.com garda sobre ti.',
     }),
     { size: 10.5, color: SOFT, gap: 10 },
   )
