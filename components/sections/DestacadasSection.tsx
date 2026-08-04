@@ -1,36 +1,74 @@
-import Link from 'next/link'
-import { CategoryNav } from '@/components/tienda/CategoryNav'
-import { ProductGrid } from '@/components/tienda/ProductGrid'
-import { Reveal } from '@/components/ui/Reveal'
-import { categories, HOME_PREVIEW_SIZE, productsByCategory } from '@/content/products'
+import { Escaparate, type EscaparateFamilia } from '@/components/sections/Escaparate'
+import { categories, HOME_PREVIEW_SIZE, products, productsByCategory } from '@/content/products'
 import { translator, type Locale } from '@/lib/i18n/config'
 import { path } from '@/lib/i18n/routes'
 
 /**
  * El escaparate de la portada, justo debajo del hero.
  *
- * Antes era una rejilla suelta con las piezas marcadas como `featured`, todas
- * revueltas: se veía qué hace el taller pero no **qué tipos de cosa** hace, y
- * quien buscaba pulseras no tenía forma de saber desde la portada que las hay.
- * Ahora la sección lleva la misma barra de familias que la tienda —el mismo
- * componente, no una copia— y enseña las primeras {@link HOME_PREVIEW_SIZE}
- * piezas de cada una. La portada pasa a ser el índice del catálogo, con muestra.
+ * Primero fue una rejilla suelta con las piezas marcadas como `featured`, todas
+ * revueltas: se veía qué hace el taller pero no **qué tipos de cosa** hace.
+ * Después, las siete familias enteras una debajo de otra, cada una con su
+ * muestra: eso arreglaba el índice pero convirtió la portada en una segunda
+ * tienda, veintiuna fotos que había que recorrer para llegar a los encargos.
  *
- * La barra es de entrada y no de estado: aquí no estamos en ninguna familia, así
- * que va con `outside` y no marca ninguna. Cada rótulo lleva a su subsección de
- * la tienda, igual que dentro de `/tienda`.
+ * Ahora la barra de familias —la misma de la tienda, el mismo componente— **elige**
+ * y se enseña sólo la familia elegida, con {@link HOME_PREVIEW_SIZE} piezas y un
+ * botón al final. La portada vuelve a ser la puerta del catálogo: se entra por
+ * donde se quiera, sin bajar por lo que no se busca.
  *
- * El botón único va al final, después de la última foto de la última familia, y
- * no uno por familia: el enlace por familia ya lo es su título, y siete botones
- * «Ver más …» en la portada la convertirían en una tienda con menos piezas en vez
- * de en la puerta de la tienda.
+ * Aquí, en el servidor, se lee el catálogo y se recorta la muestra; el cambio de
+ * familia lo hace {@link Escaparate} en el navegador. Lo que cruza son los
+ * rótulos ya traducidos y cinco tarjetas por familia, nada más.
  */
 export function DestacadasSection({ locale }: { locale: Locale }) {
   const t = translator(locale)
 
-  const familias = categories
+  const conPiezas = categories
     .map((category) => ({ ...category, items: productsByCategory(category.key) }))
     .filter((category) => category.items.length > 0)
+
+  // Las piezas marcadas como destacadas abren su familia; el orden del catálogo
+  // decide el resto. Así la portada sigue enseñando lo que Ana quiere enseñar,
+  // pero repartido por familia en vez de en un montón.
+  const muestra = (items: typeof products) =>
+    [...items]
+      .sort((a, b) => Number(b.featured) - Number(a.featured))
+      .slice(0, HOME_PREVIEW_SIZE)
+      .map(({ slug, name, summary, image }) => ({ slug, name, summary, image }))
+
+  // La muestra de «Todo» se reparte: la primera de cada familia, luego la segunda
+  // de cada una, hasta cinco. Cogiendo del montón entero salían cinco pendientes
+  // —son la mitad del catálogo y abren el array—, y entonces la portada volvía a
+  // decir que el taller hace pendientes.
+  const porFamilia = conPiezas.map((category) => muestra(category.items))
+  const rondaPorFamilias = Array.from({ length: HOME_PREVIEW_SIZE }, (_, ronda) =>
+    porFamilia.map((items) => items[ronda]).filter((item) => item !== undefined),
+  ).flat()
+
+  const familias: EscaparateFamilia[] = [
+    // «Todo» abre la barra igual que en la tienda, y es la que está elegida al
+    // entrar: quien llega a la portada no ha pedido ninguna familia todavía, así
+    // que lo primero que ve es una muestra del taller entero.
+    {
+      key: 'todo',
+      label: t({ es: 'Todo', gl: 'Todo' }),
+      note: t({ es: 'Una muestra del taller', gl: 'Unha mostra do taller' }),
+      count: conPiezas.reduce((sum, category) => sum + category.items.length, 0),
+      href: path(locale, '/tienda'),
+      verMasLabel: t({ es: 'Ver todas las piezas', gl: 'Ver todas as pezas' }),
+      items: rondaPorFamilias.slice(0, HOME_PREVIEW_SIZE),
+    },
+    ...conPiezas.map((category) => ({
+      key: category.key,
+      label: t(category.label),
+      note: t(category.note),
+      count: category.items.length,
+      href: path(locale, `/tienda/categoria/${category.key}`),
+      verMasLabel: `${t({ es: 'Ver todos los', gl: 'Ver todos os' })} ${t(category.plural)}`,
+      items: muestra(category.items),
+    })),
+  ]
 
   return (
     /* El `pt` no es decoración: sin él la sección arrancaba pegada al borde del
@@ -44,64 +82,14 @@ export function DestacadasSection({ locale }: { locale: Locale }) {
         <h2 className="eyebrow">{t({ es: 'Piezas destacadas', gl: 'Pezas destacadas' })}</h2>
       </div>
 
-      <CategoryNav locale={locale} outside className="mt-10" />
-
-      {familias.map((familia, index) => {
-        // Las piezas marcadas como destacadas abren su familia; el orden del
-        // catálogo decide el resto. Así la portada sigue enseñando lo que Ana
-        // quiere enseñar, pero repartido por familia en vez de en un montón.
-        const shown = [...familia.items]
-          .sort((a, b) => Number(b.featured) - Number(a.featured))
-          .slice(0, HOME_PREVIEW_SIZE)
-
-        return (
-          <div key={familia.key} className="mt-16">
-            <div className="flex items-baseline justify-between gap-6 border-b border-line pb-4">
-              {/* El título es el enlace a la familia, como en la tienda: quien ya
-                  sabe qué busca no baja hasta el botón del final. */}
-              <h3 className="eyebrow">
-                <Link
-                  href={path(locale, `/tienda/categoria/${familia.key}`)}
-                  className="link-underline tap"
-                >
-                  {t(familia.label)}
-                </Link>
-              </h3>
-              <p className="text-right text-small text-bark-faint">{t(familia.note)}</p>
-            </div>
-
-            {/* Sólo la primera rejilla de la portada entra en la carrera del LCP;
-                las demás quedan muy por debajo del pliegue. */}
-            <ProductGrid items={shown} locale={locale} priority={index === 0} />
-          </div>
-        )
-      })}
-
-      {/* Seguir a la tienda es lo que toca después de mirar la muestra, no antes:
-          arriba, junto al encabezado, el enlace invitaba a saltarse justo lo que
-          la sección venía a enseñar. Lo que ocupa el ancho es la fila, no el
-          botón: centrado bajo la rejilla se ve desde cualquier columna, y
-          estirarlo hasta el borde le habría dado un tamaño que no tiene ningún
-          otro botón de la web. */}
-      {/* «Ver más» a secas basta debajo de la rejilla, donde el destino se
-          entiende por el sitio en el que está el botón. Fuera de contexto no, así
-          que el `aria-label` conserva la frase completa: un lector de pantalla
-          que recorra los enlaces de la página oiría «ver más» sin saber más de
-          qué. */}
-      <Reveal className="mt-16 flex flex-wrap justify-center gap-x-2 gap-y-3">
-        <Link
-          href={path(locale, '/tienda')}
-          className="btn"
-          aria-label={t({ es: 'Ver todas las piezas', gl: 'Ver todas as pezas' })}
-        >
-          {t({ es: 'Ver más', gl: 'Ver máis' })}
-        </Link>
-        {/* Los encargos ya no son una página aparte: viven en la sección de
-            debajo, así que esto es un ancla de la propia portada. */}
-        <Link href={path(locale, '/#encargos')} className="btn btn-quiet">
-          {t({ es: 'Personalizar', gl: 'Personalizar' })}
-        </Link>
-      </Reveal>
+      <Escaparate
+        familias={familias}
+        locale={locale}
+        navLabel={t({ es: 'Familias de la tienda', gl: 'Familias da tenda' })}
+        verMas={t({ es: 'Ver más', gl: 'Ver máis' })}
+        personalizar={t({ es: 'Personalizar', gl: 'Personalizar' })}
+        personalizarHref={path(locale, '/#encargos')}
+      />
     </section>
   )
 }

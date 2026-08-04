@@ -1,10 +1,10 @@
 import { ProductCard } from '@/components/sections/ProductCard'
 import { Reveal } from '@/components/ui/Reveal'
-import type { Product } from '@/content/products'
+import type { ProductCardData } from '@/content/products'
 import type { Locale } from '@/lib/i18n/config'
 
 type Props = {
-  items: Product[]
+  items: ProductCardData[]
   locale: Locale
   /** La primera tarjeta de la primera rejilla de la página es candidata a LCP. */
   priority?: boolean

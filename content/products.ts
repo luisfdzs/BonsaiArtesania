@@ -52,6 +52,16 @@ export type Product = {
 }
 
 /**
+ * Lo único que necesita una tarjeta de la rejilla. La rejilla del escaparate de
+ * la portada se monta en el navegador —hay que poder cambiar de familia sin
+ * recargar—, así que sus piezas viajan por la red: pasando este recorte y no la
+ * pieza entera, los párrafos de la ficha y los materiales de cien piezas se
+ * quedan en el servidor, que es donde se leen. `Product` lo cumple tal cual, así
+ * que la tienda sigue pasando sus piezas sin tocar nada.
+ */
+export type ProductCardData = Pick<Product, 'slug' | 'name' | 'summary' | 'image'>
+
+/**
  * Familias de la tienda. Cada una es además una subsección propia en
  * `/tienda/<clave>`: `plural` es lo que se lee en el botón «Ver más …» y
  * `intro` la línea que encabeza esa página.
@@ -2687,10 +2697,11 @@ export function getCategoryInfo(key: string): CategoryInfo | undefined {
 export const PREVIEW_SIZE = 11
 
 /**
- * Y cuántas enseña cada familia en la portada, que lleva la misma barra de
- * familias pero es un escaparate y no el catálogo: tres, que es justo una fila
- * entera de la rejilla en escritorio. Con más, la portada se convertía en una
- * segunda tienda —siete familias por cuatro piezas son veintiocho fotos antes
- * de llegar a los encargos— y el botón del final dejaba de tener sentido.
+ * Y cuántas enseña la portada, que lleva la misma barra de familias pero es un
+ * escaparate y no el catálogo: cinco. Ahora la portada enseña **una sola**
+ * familia —la que se elige en la barra— en vez de todas seguidas, así que el
+ * número ya no se multiplica por siete: cinco fotos son una fila entera de la
+ * rejilla en escritorio y dos que asoman debajo, justo lo que hace falta para
+ * que se vea que hay más y para que el botón del final siga teniendo sentido.
  */
-export const HOME_PREVIEW_SIZE = 3
+export const HOME_PREVIEW_SIZE = 5

@@ -698,20 +698,24 @@
 
   /* El estado activo cuelga de `aria-current` y no de una clase aparte: es el
      atributo que ya hay que poner para que un lector de pantalla lo diga, y así
-     no hay dos formas de estar activo que puedan discrepar.
+     no hay dos formas de estar activo que puedan discrepar. `aria-selected` es
+     el mismo estado en la barra de la portada, donde las entradas no son enlaces
+     a otra página sino pestañas de la que se está viendo. Ver `Escaparate`.
 
      Verde por tres sitios a la vez —rótulo, fondo y filete—, que es lo que hace
      que se vea de un golpe de vista y no al comparar dos rótulos. El fondo es el
      mismo lavado de salvia con el que la cabecera marca el icono de la sección
      abierta; aquí va redondeado sólo por arriba, para que la pestaña nazca del
      filete de la barra en vez de flotar sobre él. */
-  &[aria-current='page'] {
+  &[aria-current='page'],
+  &[aria-selected='true'] {
     color: var(--color-sage-deep);
     background: color-mix(in srgb, var(--color-sage-deep) 12%, transparent);
   }
 
   /* Y el filete a 2px: a 1px, con el lavado verde detrás, se perdía. */
-  &[aria-current='page']::after {
+  &[aria-current='page']::after,
+  &[aria-selected='true']::after {
     height: 2px;
     opacity: 1;
     transform: scaleX(1);
@@ -727,7 +731,8 @@
 
   /* En la familia abierta el número se tiñe también: un dígito en gris dentro de
      un rótulo verde se lee como si no fuera del mismo sitio. */
-  .shop-tab[aria-current='page'] & {
+  .shop-tab[aria-current='page'] &,
+  .shop-tab[aria-selected='true'] & {
     color: color-mix(in srgb, var(--color-sage-deep) 70%, transparent);
   }
 }
