@@ -95,7 +95,12 @@ export function EncargosSection({ locale }: { locale: Locale }) {
         </header>
 
         <div className="lg:col-span-6 lg:col-start-7">
-          <h3 className="eyebrow border-b border-line pb-4 text-center">
+          {/* El rótulo y su filete sólo en pantallas estrechas. Ahí los pasos van
+              debajo del texto y sin nada que los presente parecerían la
+              continuación del párrafo. En escritorio están al lado y a la misma
+              altura, así que ya se leen como el cómo de ese qué: el rótulo era una
+              etiqueta de más y el filete cortaba en dos un bloque que es uno. */}
+          <h3 className="eyebrow border-b border-line pb-4 text-center lg:hidden">
             {t({ es: 'Cómo funciona', gl: 'Como funciona' })}
           </h3>
           {/* Dos filas de dos y no cuatro en fila —ni cuatro apilados en móvil—:
@@ -105,7 +110,7 @@ export function EncargosSection({ locale }: { locale: Locale }) {
               a cualquier ancho, y es lo que deja que quepan al lado del texto sin
               alargar la sección. El hueco lateral crece con la pantalla: a 360px
               cada píxel de aire entre columnas se lo quita a las palabras. */}
-          <ol className="mx-auto mt-12 grid max-w-4xl grid-cols-2 items-start gap-x-6 gap-y-12 sm:gap-x-10">
+          <ol className="mx-auto mt-12 grid max-w-4xl grid-cols-2 items-start gap-x-6 gap-y-12 sm:gap-x-10 lg:mt-0">
             {pasos.map((paso, index) => (
               <Reveal as="li" key={paso.n} step={index} className="text-center">
                 <p className="eyebrow text-sage-deep">{paso.n}</p>
@@ -117,7 +122,11 @@ export function EncargosSection({ locale }: { locale: Locale }) {
         </div>
       </div>
 
-      <Reveal className="mt-(--spacing-section) border-t border-line pt-12 text-center">
+      {/* La frase de Ana va entre dos filetes y no colgando de uno: con la línea
+          sólo arriba, lo de debajo —la firma y el aire hasta el taller— parecía
+          seguir perteneciendo a la cita. Cerrada por los dos lados es una placa,
+          que es lo que es. */}
+      <Reveal className="mt-(--spacing-section) border-t border-b border-line py-12 text-center">
         <p className="mx-auto max-w-2xl font-serif text-title">
           {t({
             es: '«No hay dos ramos iguales, así que no hay dos piezas iguales. Cuéntame el tuyo y lo vemos con calma.»',

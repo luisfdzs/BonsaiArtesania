@@ -74,10 +74,14 @@ export function DestacadasSection({ locale }: { locale: Locale }) {
     /* El `pt` no es decoración: sin él la sección arrancaba pegada al borde del
        hero. Mientras la portada era aire y titular se disimulaba, pero contra un
        vídeo a sangre el filete de «Piezas destacadas» parece parte del hero en
-       vez del principio de lo siguiente. `--spacing-section` es el mismo aire con
-       el que entran las otras secciones, así que la página respira igual en los
-       tres saltos. */
-    <section className="page-gutter pt-(--spacing-section)">
+       vez del principio de lo siguiente.
+
+       Pero tampoco el `--spacing-section` entero, que es lo que había: ese aire
+       es el que separa dos secciones de texto, y aquí lo de arriba es un vídeo a
+       sangre que ya termina en un borde limpio. Doce rem de lino en blanco entre
+       el hero y la primera pieza dejaban la portada como si le faltara algo justo
+       ahí. Con dos tercios, la sección sigue empezando y no cuelga del hero. */
+    <section className="page-gutter pt-[clamp(3.5rem,8vw,8rem)]">
       <div className="border-b border-line pb-4">
         <h2 className="eyebrow">{t({ es: 'Piezas destacadas', gl: 'Pezas destacadas' })}</h2>
       </div>
