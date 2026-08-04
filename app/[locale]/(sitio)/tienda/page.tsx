@@ -89,11 +89,15 @@ export default async function TiendaPage({ params }: Params) {
 
             <ProductGrid items={shown} locale={locale} priority={categoryIndex === 0} />
 
+            {/* El botón ya no dice cuántas quedan —llevaba «(33)» detrás—: con los
+                números fuera de la barra de familias y de la cabecera de cada
+                subsección, era la única cifra que quedaba pegada a un rótulo. El
+                `rest` sigue decidiendo si el botón aparece, que es para lo que
+                hace falta contar. */}
             {rest > 0 && (
               <div className="mt-14 flex justify-center">
                 <Link href={path(locale, `/tienda/categoria/${category.key}`)} className="btn">
                   {t({ es: 'Ver más', gl: 'Ver máis' })} {t(category.plural)}
-                  <span className="text-bark-faint">({rest})</span>
                 </Link>
               </div>
             )}

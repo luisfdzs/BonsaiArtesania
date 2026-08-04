@@ -66,6 +66,8 @@
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
   --animate-bloom: bloom 1.6s var(--ease-out-soft) both;
+  /* El vaivén de la flecha de volver arriba. Ver `nudge-up`. */
+  --animate-nudge-up: nudge-up 2.8s var(--ease-in-out-soft) infinite;
 }
 
 @keyframes reveal {
@@ -76,6 +78,23 @@
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* La flecha de volver arriba se asoma tres píxeles y vuelve, con una pausa larga
+   en el sitio. Tres y no diez, y 2,8s y no medio segundo: aquí nada rebota —ver
+   `--ease-out-soft`—, así que lo que tiene que hacer es que el ojo la encuentre
+   al pararse a mirar, no saltar en la esquina mientras se lee. Con
+   `prefers-reduced-motion` la regla de base la deja en un fotograma y la flecha
+   se queda quieta, que es lo suyo. */
+@keyframes nudge-up {
+  0%,
+  55%,
+  100% {
+    transform: none;
+  }
+  30% {
+    transform: translateY(-3px);
   }
 }
 
@@ -698,39 +717,33 @@
 
   /* El estado activo cuelga de `aria-current` y no de una clase aparte: es el
      atributo que ya hay que poner para que un lector de pantalla lo diga, y así
-     no hay dos formas de estar activo que puedan discrepar.
+     no hay dos formas de estar activo que puedan discrepar. `aria-selected` es
+     el mismo estado en la barra de la portada, donde las entradas no son enlaces
+     a otra página sino pestañas de la que se está viendo. Ver `Escaparate`.
 
      Verde por tres sitios a la vez —rótulo, fondo y filete—, que es lo que hace
      que se vea de un golpe de vista y no al comparar dos rótulos. El fondo es el
      mismo lavado de salvia con el que la cabecera marca el icono de la sección
      abierta; aquí va redondeado sólo por arriba, para que la pestaña nazca del
      filete de la barra en vez de flotar sobre él. */
-  &[aria-current='page'] {
+  &[aria-current='page'],
+  &[aria-selected='true'] {
     color: var(--color-sage-deep);
     background: color-mix(in srgb, var(--color-sage-deep) 12%, transparent);
   }
 
   /* Y el filete a 2px: a 1px, con el lavado verde detrás, se perdía. */
-  &[aria-current='page']::after {
+  &[aria-current='page']::after,
+  &[aria-selected='true']::after {
     height: 2px;
     opacity: 1;
     transform: scaleX(1);
   }
 }
 
-/* El número de piezas de cada familia. Sale de la escala micro, que lleva 0.18em
-   de interletraje: con esa apertura los dígitos se descuelgan del rótulo y
-   parecen otra palabra. */
-@utility shop-tab-count {
-  letter-spacing: 0;
-  color: var(--color-bark-faint);
-
-  /* En la familia abierta el número se tiñe también: un dígito en gris dentro de
-     un rótulo verde se lee como si no fuera del mismo sitio. */
-  .shop-tab[aria-current='page'] & {
-    color: color-mix(in srgb, var(--color-sage-deep) 70%, transparent);
-  }
-}
+/* Aquí vivía `shop-tab-count`, el número de piezas que llevaba cada familia al
+   lado del rótulo. Fuera: ocho cifras en una barra de ocho no se leen, y ponerle
+   un número a cada familia acercaba el taller a un inventario. Ver `CategoryNav`. */
 
 /* Tarjeta de la zona de cuenta: un pedido, una dirección, un bloque de ajustes.
    Antes eran filas separadas por un filete de 1px; con varias seguidas la página

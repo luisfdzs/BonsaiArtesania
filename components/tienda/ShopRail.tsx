@@ -21,7 +21,10 @@ export function ShopRail({ children }: { children: React.ReactNode }) {
     const node = rail.current
     if (!node) return
 
-    const active = node.querySelector<HTMLElement>('[aria-current="page"]')
+    // La tienda marca la familia abierta con `aria-current` y la portada, donde
+    // las entradas son pestañas y no enlaces, con `aria-selected`. Ver
+    // `Escaparate`.
+    const active = node.querySelector<HTMLElement>('[aria-current="page"], [aria-selected="true"]')
     if (!active) return
 
     // `scrollIntoView` movería también la página —la barra está a media altura

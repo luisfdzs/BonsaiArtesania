@@ -7,7 +7,7 @@ import { localeOf, path, routeOf } from '@/lib/i18n/routes'
 /**
  * Las secciones de la portada que se comportan como una página propia en la
  * navegación: tienen su propio hueco en la barra (Contacto) o cuentan para el
- * estado del desplegable «Más» (El taller).
+ * estado del desplegable «Más» (Encargos y, dentro de ella, El taller).
  *
  * Cada una lleva además la ruta que se enseña mientras se está en ella. Antes
  * se escribía el hash —`/#taller`— y la almohadilla queda rara en la barra de
@@ -22,7 +22,17 @@ import { localeOf, path, routeOf } from '@/lib/i18n/routes'
  * los enlaces guardados y la que redirige `next.config.ts`, y cambiarla no
  * arreglaría nada.
  */
+/*
+ * En orden de documento, que es lo que da por bueno el bucle de `read()`: se
+ * queda con la última sección cruzada. Encargos va antes que el taller porque el
+ * taller está **dentro** de ella, al final: la primera mitad de la sección se
+ * anuncia como `/encargos` y a partir del taller como `/el-taller`.
+ *
+ * `/encargos` fue una página de verdad hasta que su contenido se mudó aquí, así
+ * que la ruta que se anuncia es la misma que ya circula en enlaces viejos.
+ */
 const SECTIONS = [
+  { id: 'encargos', path: '/encargos' },
   { id: 'taller', path: '/el-taller' },
   { id: 'contacto', path: '/contacto' },
 ] as const

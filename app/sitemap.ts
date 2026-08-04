@@ -18,10 +18,11 @@ import { path } from '@/lib/i18n/routes'
 export default function sitemap(): MetadataRoute.Sitemap {
   // Sólo las páginas públicas. No entra nada tras el login (cuenta, carrito,
   // gestión), que además lleva `robots: noindex` en sus metadatos.
+  // Encargos no se lista: ya no es una página, es una sección de la portada, y
+  // `/encargos` sólo redirige a su ancla (`next.config.ts`).
   const routes = [
     '/',
     '/tienda',
-    '/encargos',
     '/legal/privacidad',
     // Las subsecciones de la tienda son páginas propias y la portada de la
     // tienda ya no enseña el catálogo entero: sin ellas quedarían piezas a las

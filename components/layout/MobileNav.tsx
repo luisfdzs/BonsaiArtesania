@@ -78,14 +78,15 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
   // de repetirse aquí: el menú tiene que decir lo mismo en móvil y en escritorio.
   const panelItems = navigation.filter((item) => item.route !== '/#contacto')
 
-  // Estando en Tienda o en Encargos, ninguno de los cinco iconos diría dónde
-  // está: la sección vive detrás del menú. Así que el que la guarda se marca
-  // como activo, y la barra nunca queda sin señalar la página.
+  // Estando en Tienda, en Encargos o en El taller, ninguno de los cinco iconos
+  // diría dónde está: la sección vive detrás del menú. Así que el que la guarda
+  // se marca como activo, y la barra nunca queda sin señalar la página.
   //
   // Se compara contra `route` —la ruta sin idioma— y no contra `pathname`: con
   // el idioma delante, `/gl/tienda` no empieza por `/tienda`.
   const inPanel =
     panelItems.some((item) => !item.route.includes('#') && route.startsWith(item.route)) ||
+    section === 'encargos' ||
     section === 'taller'
 
   return (
