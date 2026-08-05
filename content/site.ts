@@ -20,6 +20,7 @@ export const site = {
    *  ninguno debe aparecer en los metadatos. */
   url: 'https://bonsaiartesania.com',
   location: 'Galicia',
+  timezone: 'Europe/Madrid',
   intro: {
     es: 'Flores recogidas, secadas y guardadas para siempre en resina. Cada pieza se hace a mano, de una en una, y no vuelve a repetirse.',
     gl: 'Flores recollidas, secadas e gardadas para sempre en resina. Cada peza faise a man, dunha en unha, e non se volve repetir.',

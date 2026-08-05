@@ -85,6 +85,7 @@ export default async function GestionPedidoPage({ params }: Params) {
                 tiene nada que centrar, pero este siempre enseña un valor, y
                 alineado a la izquierda se salía del eje de la página. */}
             <select
+              key={order.status}
               id="status"
               name="status"
               defaultValue={order.status}

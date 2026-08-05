@@ -188,8 +188,12 @@ export async function buildDataExportPdf(data: DataExport, locale: Locale): Prom
   const dateTime = new Intl.DateTimeFormat(localeHtmlLang[locale], {
     dateStyle: 'long',
     timeStyle: 'short',
+    timeZone: site.timezone,
   })
-  const date = new Intl.DateTimeFormat(localeHtmlLang[locale], { dateStyle: 'long' })
+  const date = new Intl.DateTimeFormat(localeHtmlLang[locale], {
+    dateStyle: 'long',
+    timeZone: site.timezone,
+  })
   const empty = t({ es: 'sin rellenar', gl: 'sen encher' })
 
   text(sheet, site.nameFull, { size: 9, font: sheet.bold, color: FAINT, gap: 10 })
@@ -287,7 +291,12 @@ export async function buildDataExportPdf(data: DataExport, locale: Locale): Prom
 
 /** El nombre con el que se guarda el fichero. */
 export function dataExportFilename(generatedAt: Date, locale: Locale): string {
-  const day = generatedAt.toISOString().slice(0, 10)
+  const day = new Intl.DateTimeFormat('en-CA', {
+    timeZone: site.timezone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(generatedAt)
   const stem = translator(locale)({ es: 'mis-datos', gl: 'os-meus-datos' })
   return `${stem}-bonsaiartesania-${day}.pdf`
 }
