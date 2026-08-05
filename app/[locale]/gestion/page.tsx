@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { cn } from '@/lib/cn'
+import { EstadoFiltro, type EstadoOption } from '@/components/gestion/EstadoFiltro'
 import { isLocale, localeHtmlLang, translator } from '@/lib/i18n/config'
 import { path } from '@/lib/i18n/routes'
 import { orderStatusAdminLabel, ORDER_STATUS_FLOW } from '@/lib/order-status'
@@ -11,7 +11,6 @@ type Props = {
   searchParams: Promise<{ estado?: string }>
 }
 
-/** Lo que Ana quiere ver primero: lo que hay que preparar. */
 const PENDING: OrderStatus[] = ['pendiente_pago', 'preparando']
 
 export default async function GestionPedidosPage({ params, searchParams }: Props) {
@@ -28,10 +27,15 @@ export default async function GestionPedidosPage({ params, searchParams }: Props
   const { estado } = await searchParams
 
   const collection = await orders()
-  // Contra la lista de estados y no contra el objeto de rótulos, que ya no existe
-  // como tal: `ORDER_STATUS_FLOW` es la única lista de estados del proyecto.
   const known = (ORDER_STATUS_FLOW as string[]).includes(estado ?? '')
-  const filter = known ? { status: estado as OrderStatus } : { status: { $in: PENDING } }
+  const todos = estado === 'todos'
+  const selected = todos ? 'todos' : known ? (estado as string) : 'pendientes'
+
+  const filter = todos
+    ? {}
+    : known
+      ? { status: estado as OrderStatus }
+      : { status: { $in: PENDING } }
 
   const docs = await collection.find(filter).sort({ createdAt: -1 }).limit(100).toArray()
 
@@ -42,104 +46,59 @@ export default async function GestionPedidosPage({ params, searchParams }: Props
     .toArray()
 
   const countBy = new Map(counts.map((row) => [row._id, row.total]))
+  const total = counts.reduce((sum, row) => sum + row.total, 0)
+  const pendingCount = PENDING.reduce((sum, status) => sum + (countBy.get(status) ?? 0), 0)
 
-  // «Por preparar» no es un estado, es la vista de entrada —lo que hay encima de
-  // la mesa—, así que va delante y sin contador. El resto son los estados en el
-  // orden en que ocurren, cada uno con cuántos pedidos hay.
-  const tabs = [
+  const options: (EstadoOption & { count: number })[] = [
     {
-      key: 'pendientes',
-      href: path(locale, '/gestion'),
-      label: t({ es: 'Por preparar', gl: 'Por preparar' }),
-      active: !estado,
+      value: 'pendientes',
+      label: `${t({ es: 'Por preparar', gl: 'Por preparar' })} (${pendingCount})`,
+      count: pendingCount,
+    },
+    {
+      value: 'todos',
+      label: `${t({ es: 'Todos', gl: 'Todos' })} (${total})`,
+      count: total,
     },
     ...ORDER_STATUS_FLOW.map((status) => ({
-      key: status,
-      href: `${path(locale, '/gestion')}?estado=${status}`,
+      value: status,
       label: `${orderStatusAdminLabel(status, locale)} (${countBy.get(status) ?? 0})`,
-      active: estado === status,
+      count: countBy.get(status) ?? 0,
     })),
-  ]
+  ].filter((option) => option.count > 0 || option.value === selected)
 
   return (
     <section>
-      {/* Los estados son un menú de navegación y no una fila de enlaces sueltos:
-          es la barra con la que Ana se mueve por el taller, y ahora se dice como
-          las demás del sitio —píldora salvia en la que está, `aria-current` para
-          quien no ve el color—. Ver `components/gestion/GestionNav.tsx`, que es
-          el mismo lenguaje un nivel más arriba.
-
-          Sigue siendo servidor: lo que está encendido sale de `?estado=`, que ya
-          está aquí, y no hace falta `usePathname` ni bajar nada al navegador. */}
-      <nav aria-label={t({ es: 'Estado de los pedidos', gl: 'Estado dos pedidos' })}>
-        <ul className="flex flex-wrap justify-center gap-x-2 gap-y-1">
-          {tabs.map(({ key, href, label, active }) => (
-            <li key={key}>
-              <Link
-                href={href}
-                aria-current={active ? 'page' : undefined}
-                className={cn(
-                  'block rounded-full px-4 py-2.5 text-small transition-colors duration-500',
-                  active
-                    ? 'bg-sage-deep/12 text-sage-deep'
-                    : 'text-bark-soft hover:bg-sage-deep/8 hover:text-bark',
-                )}
-              >
-                {label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
+      {total > 0 && (
+        <EstadoFiltro
+          base={path(locale, '/gestion')}
+          value={selected}
+          options={options}
+          label={t({ es: 'Estado', gl: 'Estado' })}
+          waiting={t({ es: 'Buscando pedidos', gl: 'Buscando pedidos' })}
+        />
+      )}
 
       {docs.length === 0 ? (
         <p className="mt-12 text-bark-soft">{t({ es: 'Nada por aquí.', gl: 'Nada por aquí.' })}</p>
       ) : (
-        <ul className="mt-12 flex flex-col">
+        <ul className="mt-10 grid grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] gap-3">
           {docs.map((order) => (
-            <li key={order.number} className="border-b border-line first:border-t">
-              {/* El enlace envuelve la fila entera y no sólo el número. Antes
-                  había que acertarle a «BA-2026-0004» —nueve caracteres en una
-                  fila de cinco líneas—, y todo lo demás, que es lo que de verdad
-                  se está mirando (el nombre, las piezas, el estado), no hacía
-                  nada al pulsarlo. Dentro no hay ningún otro botón ni enlace, así
-                  que no hay nada que anidar y el bloque puede ser el enlace.
-
-                  El nombre accesible sale del contenido entero de la fila, que
-                  es largo pero exacto: dice a qué pedido se entra.
-
-                  Y con la fila entera pulsable, el número deja de llevar
-                  subrayado: `link-underline` sólo se dibuja al pasar por encima
-                  de sí mismo, así que señalaría como zona pulsable justo el
-                  trozo pequeño que antes lo era. Lo que responde ahora es la
-                  fila, con un fondo salvia muy rebajado —el mismo verde con el
-                  que responde todo lo demás—, y se enciende igual llegando con
-                  el tabulador.
-
-                  Antes eran dos columnas, pedido a la izquierda y total a la
-                  derecha. Centrado se apilan: el número primero y el estado
-                  debajo. El total ya no está —aquí tampoco se enseña ninguna
-                  cifra—, así que abajo queda sólo por dónde va. */}
+            <li key={order.number}>
               <Link
                 href={path(locale, `/gestion/pedidos/${order.number}`)}
-                className="-mx-4 flex flex-col items-center gap-3 px-4 py-5 transition-colors duration-500 hover:bg-sage-deep/8 focus-visible:bg-sage-deep/8"
+                aria-label={`${order.number} · ${order.shipping.address.recipient}`}
+                className="flex h-full flex-col items-center gap-1 rounded-sm border border-line px-3 py-4 text-center transition-colors duration-500 hover:bg-sage-deep/8 focus-visible:bg-sage-deep/8"
               >
-                <div>
-                  <span>{order.number}</span>
-                  <p className="mt-2 text-small text-bark-faint">
-                    {dateFormat.format(order.createdAt)} · {order.shipping.address.recipient} ·{' '}
-                    {order.shipping.address.city}
-                  </p>
-                  <p className="mt-1 text-small text-bark-soft">
-                    {order.items
-                      .map((item) => `${item.name}${item.qty > 1 ? ` ×${item.qty}` : ''}`)
-                      .join(' · ')}
-                  </p>
-                </div>
-
-                <p className="text-small text-bark-soft">
+                <span className="w-full truncate text-small text-bark">
+                  {order.shipping.address.recipient}
+                </span>
+                <span className="text-small text-bark-faint">
+                  {dateFormat.format(order.createdAt)}
+                </span>
+                <span className="w-full truncate text-small text-bark-soft">
                   {orderStatusAdminLabel(order.status, locale)}
-                </p>
+                </span>
               </Link>
             </li>
           ))}

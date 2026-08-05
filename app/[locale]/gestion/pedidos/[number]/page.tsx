@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { FlowerBud } from '@/components/ui/FlowerBud'
 import { LocaleField } from '@/components/ui/LocaleField'
+import { Media } from '@/components/ui/Media'
+import { getProduct } from '@/content/products'
 import { isLocale, localeHtmlLang, translator } from '@/lib/i18n/config'
 import { path } from '@/lib/i18n/routes'
 import { orderStatusAdminLabel, ORDER_STATUS_FLOW } from '@/lib/order-status'
@@ -43,17 +45,31 @@ export default async function GestionPedidoPage({ params }: Params) {
       </header>
 
       <ul className="mt-10 flex flex-col">
-        {order.items.map((item) => (
-          <li
-            key={item.slug}
-            className="flex flex-col items-center gap-1 border-b border-line py-4 first:border-t"
-          >
-            <Link href={path(locale, `/tienda/${item.slug}`)} className="link-underline tap">
-              {item.name}
-              {item.qty > 1 && ` × ${item.qty}`}
-            </Link>
-          </li>
-        ))}
+        {order.items.map((item) => {
+          const product = getProduct(item.slug)
+          const image = product?.image ? t(product.image) : null
+
+          return (
+            <li
+              key={item.slug}
+              className="flex items-center gap-4 border-b border-line py-4 first:border-t"
+            >
+              <Link href={path(locale, `/tienda/${item.slug}`)} className="w-16 shrink-0 sm:w-20">
+                <Media
+                  image={image}
+                  ratio="1 / 1"
+                  sizes="(max-width: 640px) 4rem, 5rem"
+                  className="border border-line"
+                />
+              </Link>
+
+              <Link href={path(locale, `/tienda/${item.slug}`)} className="link-underline tap">
+                {item.name}
+                {item.qty > 1 && ` × ${item.qty}`}
+              </Link>
+            </li>
+          )
+        })}
       </ul>
 
       <div className="mt-12 border-t border-line pt-8">
