@@ -34,7 +34,7 @@ export default async function GestionPedidoPage({ params }: Params) {
   })
 
   return (
-    <section>
+    <section className="-mb-(--spacing-section) pb-16">
       <Link href={path(locale, '/gestion')} className="link-underline tap eyebrow">
         ← {t({ es: 'Pedidos', gl: 'Pedidos' })}
       </Link>
