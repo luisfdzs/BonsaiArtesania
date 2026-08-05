@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { EstadoFiltro, type EstadoOption } from '@/components/gestion/EstadoFiltro'
+import { NavPending } from '@/components/ui/NavPending'
 import { isLocale, localeHtmlLang, translator } from '@/lib/i18n/config'
 import { path } from '@/lib/i18n/routes'
 import { orderStatusAdminLabel, ORDER_STATUS_FLOW } from '@/lib/order-status'
@@ -99,6 +100,7 @@ export default async function GestionPedidosPage({ params, searchParams }: Props
                 <span className="w-full truncate text-small text-bark-soft">
                   {orderStatusAdminLabel(order.status, locale)}
                 </span>
+                <NavPending label={t({ es: 'Abriendo el pedido', gl: 'Abrindo o pedido' })} />
               </Link>
             </li>
           ))}

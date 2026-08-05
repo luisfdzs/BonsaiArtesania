@@ -29,8 +29,8 @@ export default async function GestionPedidoPage({ params }: Params) {
   const address = order.shipping.address
   // El mismo texto en el rótulo y en el hueco del campo, escrito una vez.
   const nota = t({
-    es: 'Nota (opcional, queda en el historial)',
-    gl: 'Nota (opcional, queda no historial)',
+    es: 'Nota (opcional)',
+    gl: 'Nota (opcional)',
   })
 
   return (
@@ -39,31 +39,28 @@ export default async function GestionPedidoPage({ params }: Params) {
         ← {t({ es: 'Pedidos', gl: 'Pedidos' })}
       </Link>
 
-      <ul className="mt-8 flex flex-col gap-4">
+      <ul className="mt-8 flex flex-wrap justify-center gap-4">
         {order.items.map((item) => {
           const product = getProduct(item.slug)
           const image = product?.image ? t(product.image) : null
 
           return (
-            <li key={item.slug}>
+            <li key={item.slug} className="relative w-20 sm:w-24">
               <Link
                 href={path(locale, `/tienda/${item.slug}`)}
                 aria-label={`${item.name} × ${item.qty}`}
-                className="tap flex items-center gap-4"
+                className="tap block"
               >
-                <span className="w-20 shrink-0 sm:w-24">
-                  <Media
-                    image={image}
-                    ratio="1 / 1"
-                    sizes="(max-width: 640px) 5rem, 6rem"
-                    className="border border-line"
-                  />
-                  <span className="mt-2 block text-small text-bark-soft">{item.name}</span>
-                </span>
-                <span aria-hidden className="ml-auto font-serif text-lead">
-                  × {item.qty}
-                </span>
+                <Media
+                  image={image}
+                  ratio="1 / 1"
+                  sizes="(max-width: 640px) 5rem, 6rem"
+                  className="border border-line"
+                />
               </Link>
+              <span aria-hidden className="cart-badge">
+                {item.qty}
+              </span>
             </li>
           )
         })}
@@ -130,9 +127,11 @@ export default async function GestionPedidoPage({ params }: Params) {
         </p>
       </div>
 
-      <details className="fold mt-12 border-t border-line pt-8">
-        <summary className="eyebrow">{t({ es: 'Historial', gl: 'Historial' })}</summary>
-        <ol className="mt-6 flex flex-col gap-3">
+      <details className="fold mt-8 border-t border-line pt-4">
+        <summary className="eyebrow justify-center py-2">
+          {t({ es: 'Historial', gl: 'Historial' })}
+        </summary>
+        <ol className="mt-4 flex flex-col gap-3">
           {[...order.history].reverse().map((entry, index) => (
             <li key={index} className="text-small text-bark-soft">
               {dateTimeFormat.format(entry.at)} — {orderStatusAdminLabel(entry.status, locale)}
