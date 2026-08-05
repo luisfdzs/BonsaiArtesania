@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { FlowerBud } from '@/components/ui/FlowerBud'
+import { FormPending } from '@/components/ui/FormPending'
 import { LocaleField } from '@/components/ui/LocaleField'
 import { Media } from '@/components/ui/Media'
 import { getProduct } from '@/content/products'
@@ -89,6 +89,7 @@ export default async function GestionPedidoPage({ params }: Params) {
       <div className="mt-12 border-t border-line pt-8">
         <h3 className="eyebrow">{t({ es: 'Cambiar estado', gl: 'Cambiar estado' })}</h3>
         <form action={updateOrderStatus} className="mt-6 flex flex-col gap-6">
+          <FormPending label={t({ es: 'Guardando el estado', gl: 'Gardando o estado' })} />
           <LocaleField />
           <input type="hidden" name="number" value={order.number} />
 
@@ -126,12 +127,6 @@ export default async function GestionPedidoPage({ params }: Params) {
           </div>
 
           <button type="submit" className="btn self-center">
-            {/* Cambiar el estado escribe el pedido y apunta la nota en el
-                historial: lo más lento del taller.
-                Y lo que cambia está arriba —el rótulo bajo el número— y
-                abajo —el historial—, nunca en el botón, así que sin la flor no hay
-                nada que mirar mientras se espera. */}
-            <FlowerBud />
             {t({ es: 'Guardar', gl: 'Gardar' })}
           </button>
         </form>
