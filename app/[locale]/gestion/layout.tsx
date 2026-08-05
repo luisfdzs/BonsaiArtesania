@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { signOut } from '@/auth'
 import { LogoutIcon } from '@/components/cuenta/CuentaIcons'
 import { GestionNav } from '@/components/gestion/GestionNav'
+import { BackButton } from '@/components/layout/BackButton'
 import { Wordmark } from '@/components/layout/Wordmark'
 import { FormPending } from '@/components/ui/FormPending'
 import { ScrollTop } from '@/components/ui/ScrollTop'
@@ -76,7 +77,9 @@ export default async function GestionLayout({
           trabaja sobre uno, y cada sección —dirección, cambio de estado,
           historial— cabe de sobra a lo ancho sin tener que bajar. En móvil no
           cambia nada, que ahí 42rem ya era más de lo que hay. */}
-      <header className="mx-auto flex max-w-2xl flex-col items-center border-b border-line pb-8 text-center md:max-w-none">
+      <header className="relative mx-auto flex max-w-2xl flex-col items-center border-b border-line pb-8 text-center md:max-w-none">
+        <BackButton className="absolute top-0 left-0" />
+
         {/* La marca, sin enlace: aquí no llevaría a ninguna parte —la portada no
             es de esta cuenta— y está sólo para decir de qué web es este panel. */}
         <Wordmark className="h-7 text-bark" />

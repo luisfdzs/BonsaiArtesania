@@ -3,10 +3,11 @@ import { ObjectId } from 'mongodb'
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { getSession } from '@/auth'
+import { CancelOrder } from '@/components/cuenta/CancelOrder'
 import { ArrowLeftIcon, PinIcon } from '@/components/cuenta/CuentaIcons'
 import { isLocale, localeHtmlLang, pick, translator } from '@/lib/i18n/config'
 import { path } from '@/lib/i18n/routes'
-import { orderStatusLabel } from '@/lib/order-status'
+import { canCustomerCancel, orderStatusLabel } from '@/lib/order-status'
 import { orders } from '@/lib/schema'
 
 type Params = { params: Promise<{ locale: string; number: string }> }
@@ -107,6 +108,11 @@ export default async function PedidoPage({ params }: Params) {
           {address.phone}
         </p>
       </div>
+      {canCustomerCancel(order.status) && (
+        <div className="mt-12 flex justify-center border-t border-line pt-10">
+          <CancelOrder number={order.number} />
+        </div>
+      )}
     </section>
   )
 }

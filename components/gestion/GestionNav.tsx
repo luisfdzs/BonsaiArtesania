@@ -34,8 +34,6 @@ export function GestionNav() {
   const route = routeOf(pathname)
   const t = useTranslator()
 
-  const onOrder = route.startsWith('/gestion/pedidos/')
-
   return (
     <nav aria-label={t({ es: 'Secciones de la gestión', gl: 'Seccións da xestión' })}>
       <ul className="flex flex-wrap justify-center gap-x-2 gap-y-1">
@@ -71,15 +69,6 @@ export function GestionNav() {
           )
         })}
       </ul>
-
-      {onOrder && (
-        <Link
-          href={path(locale, '/gestion')}
-          className="link-underline tap eyebrow mt-6 inline-block"
-        >
-          ← {t({ es: 'Pedidos', gl: 'Pedidos' })}
-        </Link>
-      )}
     </nav>
   )
 }

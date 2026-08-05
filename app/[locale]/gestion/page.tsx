@@ -83,9 +83,9 @@ export default async function GestionPedidosPage({ params, searchParams }: Props
       {docs.length === 0 ? (
         <p className="mt-12 text-bark-soft">{t({ es: 'Nada por aquí.', gl: 'Nada por aquí.' })}</p>
       ) : (
-        <ul className="mt-10 grid grid-cols-[repeat(auto-fill,minmax(10rem,12rem))] justify-center gap-3">
+        <ul className="mt-10 flex flex-wrap justify-center gap-3">
           {docs.map((order) => (
-            <li key={order.number}>
+            <li key={order.number} className="w-40 sm:w-48">
               <Link
                 href={path(locale, `/gestion/pedidos/${order.number}`)}
                 aria-label={`${order.number} · ${order.shipping.address.recipient}`}

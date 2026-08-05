@@ -54,17 +54,37 @@ function orderMessage(order: OrderDoc): string {
     .slice(0, MAX_LENGTH)
 }
 
+function cancelMessage(order: OrderDoc): string {
+  const address = order.shipping.address
+  const items = order.items
+    .map((item) => `· ${escape(item.name)}${item.qty > 1 ? ` × ${item.qty}` : ''}`)
+    .join('\n')
+
+  return [
+    `🚫 <b>Pedido cancelado ${escape(order.number)}</b>`,
+    'Lo ha cancelado el cliente desde la web. No lo prepares.',
+    '',
+    items,
+    '',
+    `Era para ${escape(address.recipient)} — ${escape(address.city)} (${escape(address.province)})`,
+    '',
+    `${site.url}${path('es', `/gestion/pedidos/${order.number}`)}`,
+  ]
+    .join('\n')
+    .slice(0, MAX_LENGTH)
+}
+
 /**
  * Manda el aviso. Devuelve si salió, para poder registrarlo, pero nadie está
  * obligado a mirarlo.
  */
-export async function notifyNewOrder(order: OrderDoc): Promise<boolean> {
+async function send(text: string, asunto: string): Promise<boolean> {
   const token = process.env.TELEGRAM_BOT_TOKEN
   const chatId = process.env.TELEGRAM_CHAT_ID
 
   if (!token || !chatId) {
     console.warn(
-      `[notify] Telegram sin configurar: Ana no recibe aviso del pedido ${order.number} en el móvil. Ver .env.example.`,
+      `[notify] Telegram sin configurar: Ana no recibe en el móvil el aviso ${asunto}. Ver .env.example.`,
     )
     return false
   }
@@ -77,7 +97,7 @@ export async function notifyNewOrder(order: OrderDoc): Promise<boolean> {
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         chat_id: chatId,
-        text: orderMessage(order),
+        text,
         parse_mode: 'HTML',
         // El enlace a la gestión es para ella; la tarjeta de previsualización sobra.
         link_preview_options: { is_disabled: true },
@@ -88,7 +108,7 @@ export async function notifyNewOrder(order: OrderDoc): Promise<boolean> {
 
     if (!response.ok) {
       console.error(
-        `[notify] Telegram respondió ${response.status} al avisar del pedido ${order.number}:`,
+        `[notify] Telegram respondió ${response.status} al mandar el aviso ${asunto}:`,
         await response.text().catch(() => ''),
       )
       return false
@@ -96,7 +116,15 @@ export async function notifyNewOrder(order: OrderDoc): Promise<boolean> {
 
     return true
   } catch (error) {
-    console.error(`[notify] No se pudo avisar por Telegram del pedido ${order.number}:`, error)
+    console.error(`[notify] No se pudo mandar por Telegram el aviso ${asunto}:`, error)
     return false
   }
+}
+
+export async function notifyNewOrder(order: OrderDoc): Promise<boolean> {
+  return send(orderMessage(order), `del pedido ${order.number}`)
+}
+
+export async function notifyCancelledOrder(order: OrderDoc): Promise<boolean> {
+  return send(cancelMessage(order), `de la cancelación del pedido ${order.number}`)
 }

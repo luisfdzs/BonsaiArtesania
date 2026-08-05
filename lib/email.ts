@@ -523,6 +523,41 @@ se le ha dicho que te pones con ello enseguida, así que no lo dejes dormir.
 Gestionar: ${site.url}${path('es', `/gestion/pedidos/${order.number}`)}`
 }
 
+function cancelledBody(order: OrderDoc): string {
+  return `Pedido cancelado ${order.number}
+
+Lo ha cancelado el cliente desde la web. No hay nada que preparar.
+
+${itemLines(order)}
+
+Era para:
+${addressBlock(order)}
+
+Ver el pedido: ${site.url}${path('es', `/gestion/pedidos/${order.number}`)}`
+}
+
+export async function sendCancelledOrderEmail(order: OrderDoc): Promise<void> {
+  const mailer = transport()
+
+  if (!mailer) {
+    console.warn(
+      `[email] SMTP sin configurar: no se avisa de la cancelación del pedido ${order.number}. Ver .env.example.`,
+    )
+    return
+  }
+
+  try {
+    await mailer.sendMail({
+      from,
+      to: site.contact.email,
+      subject: `Pedido cancelado ${order.number}`,
+      text: cancelledBody(order),
+    })
+  } catch (error) {
+    console.error(`[email] No se pudo avisar de la cancelación del pedido ${order.number}:`, error)
+  }
+}
+
 /**
  * Avisa al cliente y a Ana. Los dos envíos van en paralelo y por separado: que
  * falle uno no debe impedir el otro.

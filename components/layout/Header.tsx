@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { NavPending } from '@/components/ui/NavPending'
+import { BackButton } from '@/components/layout/BackButton'
 import { cn } from '@/lib/cn'
 import { localeOf, path, routeOf } from '@/lib/i18n/routes'
 import { useTranslator } from '@/lib/i18n/useLocale'
@@ -79,25 +80,24 @@ export function Header({ shopOpen }: { shopOpen: boolean }) {
             `MobileNav`—, así que va centrada en vez de pegada a la izquierda
             con medio ancho de barra vacío al lado. A partir de `md` aparece
             `DesktopNav` y vuelve el reparto a los extremos. */}
-        <div className="header-bar page-gutter flex h-20 items-center justify-center gap-6 md:h-24 md:justify-between">
-          <Link
-            href={path(locale, '/')}
-            aria-label="Bonsái Artesanía, inicio"
-            // Estando ya en la portada, Next no navega y el clic no haría nada:
-            // quien esté en el pie se quedaría en el pie. La marca debe llevar
-            // siempre al principio, así que ahí subimos a mano. Sin `behavior`
-            // a propósito: hereda el scroll suave del CSS —y el salto seco
-            // cuando el sistema pide menos movimiento.
-            onClick={(event) => {
-              close()
-              if (onHome(pathname)) {
-                event.preventDefault()
-                window.scrollTo({ top: 0 })
-              }
-            }}
-          >
-            <Wordmark className="h-7 md:h-9" />
-          </Link>
+        <div className="header-bar page-gutter relative flex h-20 items-center justify-center gap-6 md:h-24 md:justify-between">
+          <div className="flex items-center gap-1 md:gap-2">
+            <BackButton className="absolute left-(--spacing-gutter) md:static" />
+
+            <Link
+              href={path(locale, '/')}
+              aria-label="Bonsái Artesanía, inicio"
+              onClick={(event) => {
+                close()
+                if (onHome(pathname)) {
+                  event.preventDefault()
+                  window.scrollTo({ top: 0 })
+                }
+              }}
+            >
+              <Wordmark className="h-7 md:h-9" />
+            </Link>
+          </div>
 
           <DesktopNav
             pathname={pathname}

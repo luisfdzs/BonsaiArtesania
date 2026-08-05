@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { useRef, useState } from 'react'
+import { useRef, useState, useTransition } from 'react'
 import { ShopRail } from '@/components/tienda/ShopRail'
 import { ProductGrid } from '@/components/tienda/ProductGrid'
+import { ShopPanel } from '@/components/tienda/ShopPanel'
 import { Reveal } from '@/components/ui/Reveal'
 import { cn } from '@/lib/cn'
 import type { ProductCardData } from '@/content/products'
@@ -63,6 +64,8 @@ export function Escaparate({
   const familia = familias.find((f) => f.key === current) ?? familias[0]
   const panel = useRef<HTMLDivElement>(null)
 
+  const [swapping, startSwap] = useTransition()
+
   /**
    * Al cambiar de familia hay que volver al principio de la rejilla. Sin esto,
    * quien elige una familia estando a la altura de la última fila de la anterior
@@ -72,7 +75,7 @@ export function Escaparate({
    * están pegadas arriba: sin él, la primera fila quedaría debajo de las dos.
    */
   const elegir = (key: string) => {
-    setCurrent(key)
+    startSwap(() => setCurrent(key))
     panel.current?.scrollIntoView({ block: 'start' })
   }
 
@@ -149,23 +152,25 @@ export function Escaparate({
         {/* La primera tarjeta de la primera familia es la candidata a LCP de la
             portada. Al cambiar de familia ya no: lo que se pinta entonces no es
             lo primero que se ve, es la respuesta a un clic. */}
-        <ProductGrid
-          items={familia.items}
-          locale={locale}
-          priority={familia.key === familias[0]?.key}
-          trailing={
-            hueco > 0 && (
-              <Reveal
-                className={cn(
-                  'hidden self-center lg:flex lg:flex-col lg:items-center lg:gap-3',
-                  hueco === 2 && 'lg:col-span-2',
-                )}
-              >
-                <Botones {...botones} />
-              </Reveal>
-            )
-          }
-        />
+        <ShopPanel pending={swapping}>
+          <ProductGrid
+            items={familia.items}
+            locale={locale}
+            priority={familia.key === familias[0]?.key}
+            trailing={
+              hueco > 0 && (
+                <Reveal
+                  className={cn(
+                    'hidden self-center lg:flex lg:flex-col lg:items-center lg:gap-3',
+                    hueco === 2 && 'lg:col-span-2',
+                  )}
+                >
+                  <Botones {...botones} />
+                </Reveal>
+              )
+            }
+          />
+        </ShopPanel>
       </div>
 
       {/* Y en pantallas estrechas, debajo: ahí la rejilla es de una o dos

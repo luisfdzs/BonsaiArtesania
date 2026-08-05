@@ -23,9 +23,7 @@ import type { OrderStatus } from '@/lib/schema'
  */
 const CUSTOMER: Record<OrderStatus, Localized> = {
   // El nombre en base es heredado y así se queda —renombrarlo es una migración—,
-  // pero en pantalla no aparece nunca: quien pide sólo ha pedido algo y espera que
-  // Ana le escriba, y «Sin confirmar» describe justo eso.
-  pendiente_pago: { es: 'Sin confirmar', gl: 'Sen confirmar' },
+  pendiente_pago: { es: 'Pedido', gl: 'Pedido' },
   preparando: {
     es: 'Ana está creando tus joyas bonsái',
     gl: 'Ana está creando as túas xoias bonsái',
@@ -80,3 +78,6 @@ export const ORDER_STATUS_FLOW: OrderStatus[] = [
   'entregado',
   'cancelado',
 ]
+export function canCustomerCancel(status: OrderStatus): boolean {
+  return status === 'pendiente_pago'
+}

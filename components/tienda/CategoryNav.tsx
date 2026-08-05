@@ -1,9 +1,9 @@
-import Link from 'next/link'
 import { cn } from '@/lib/cn'
 import { categories, productsByCategory } from '@/content/products'
 import { translator, type Locale } from '@/lib/i18n/config'
 import { path } from '@/lib/i18n/routes'
 import { ShopRail } from './ShopRail'
+import { ShopTab } from './ShopTab'
 
 type Props = {
   /** Familia que se está viendo; en `/tienda` no hay ninguna activa. */
@@ -47,14 +47,14 @@ export function CategoryNav({ current, outside = false, locale, className }: Pro
       <ShopRail>
         {/* «Todo» abre la fila y no se distingue del resto: es una familia más
             —la de todas—, no la acción principal de la barra. */}
-        <Tab
+        <ShopTab
           href={path(locale, '/tienda')}
           label={t({ es: 'Todo', gl: 'Todo' })}
           active={!current && !outside}
         />
 
         {visible.map((category) => (
-          <Tab
+          <ShopTab
             key={category.key}
             href={path(locale, `/tienda/categoria/${category.key}`)}
             label={t(category.label)}
@@ -66,17 +66,15 @@ export function CategoryNav({ current, outside = false, locale, className }: Pro
   )
 }
 
-/**
+/*
  * Cada entrada es sólo su rótulo. Llevó un tiempo el número de piezas al lado,
  * para saber antes de entrar si detrás de un rótulo había veinte o dos, pero en
  * una barra de ocho eran ocho cifras que no se leen y que había que saltarse para
  * llegar a los nombres. Y ponerle un número a cada familia acercaba el taller a un
  * inventario. Cuántas hay se ve bajando, que es lo que se hace en la tienda.
+ *
+ * La entrada en sí vive en `ShopTab`, que es de cliente: el clic no recarga la
+ * página, cambia sólo la rejilla. Aquí se queda lo que se puede resolver en el
+ * servidor —qué familias hay y cuál está abierta—, que es lo que evita mandar al
+ * navegador el catálogo entero.
  */
-function Tab({ href, label, active }: { href: string; label: string; active: boolean }) {
-  return (
-    <Link href={href} aria-current={active ? 'page' : undefined} className="shop-tab">
-      {label}
-    </Link>
-  )
-}

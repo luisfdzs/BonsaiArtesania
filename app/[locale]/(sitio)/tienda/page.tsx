@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { CategoryNav } from '@/components/tienda/CategoryNav'
 import { ProductGrid } from '@/components/tienda/ProductGrid'
+import { ShopPanel } from '@/components/tienda/ShopPanel'
 import { categories, PREVIEW_SIZE, productsByCategory } from '@/content/products'
 import { isLocale, pick, translator } from '@/lib/i18n/config'
 import { alternates } from '@/lib/i18n/metadata'
@@ -64,46 +65,41 @@ export default async function TiendaPage({ params }: Params) {
 
       <CategoryNav locale={locale} className="mt-12" />
 
-      {categories.map((category, categoryIndex) => {
-        const items = productsByCategory(category.key)
-        if (items.length === 0) return null
+      <ShopPanel>
+        {categories.map((category, categoryIndex) => {
+          const items = productsByCategory(category.key)
+          if (items.length === 0) return null
 
-        const shown = items.slice(0, PREVIEW_SIZE)
-        const rest = items.length - shown.length
+          const shown = items.slice(0, PREVIEW_SIZE)
+          const rest = items.length - shown.length
 
-        return (
-          <section key={category.key} className="mt-(--spacing-section)">
-            <div className="flex items-baseline justify-between gap-6 border-b border-line pb-4">
-              {/* El título es el enlace a la subsección: quien ya sabe qué busca
-                  no tiene que bajar hasta el botón del final. */}
-              <h2 className="eyebrow">
-                <Link
-                  href={path(locale, `/tienda/categoria/${category.key}`)}
-                  className="link-underline tap"
-                >
-                  {t(category.label)}
-                </Link>
-              </h2>
-              <p className="text-right text-small text-bark-faint">{t(category.note)}</p>
-            </div>
-
-            <ProductGrid items={shown} locale={locale} priority={categoryIndex === 0} />
-
-            {/* El botón ya no dice cuántas quedan —llevaba «(33)» detrás—: con los
-                números fuera de la barra de familias y de la cabecera de cada
-                subsección, era la única cifra que quedaba pegada a un rótulo. El
-                `rest` sigue decidiendo si el botón aparece, que es para lo que
-                hace falta contar. */}
-            {rest > 0 && (
-              <div className="mt-14 flex justify-center">
-                <Link href={path(locale, `/tienda/categoria/${category.key}`)} className="btn">
-                  {t({ es: 'Ver más', gl: 'Ver máis' })} {t(category.plural)}
-                </Link>
+          return (
+            <section key={category.key} className="mt-(--spacing-section)">
+              <div className="flex items-baseline justify-between gap-6 border-b border-line pb-4">
+                <h2 className="eyebrow">
+                  <Link
+                    href={path(locale, `/tienda/categoria/${category.key}`)}
+                    className="link-underline tap"
+                  >
+                    {t(category.label)}
+                  </Link>
+                </h2>
+                <p className="text-right text-small text-bark-faint">{t(category.note)}</p>
               </div>
-            )}
-          </section>
-        )
-      })}
+
+              <ProductGrid items={shown} locale={locale} priority={categoryIndex === 0} />
+
+              {rest > 0 && (
+                <div className="mt-14 flex justify-center">
+                  <Link href={path(locale, `/tienda/categoria/${category.key}`)} className="btn">
+                    {t({ es: 'Ver más', gl: 'Ver máis' })} {t(category.plural)}
+                  </Link>
+                </div>
+              )}
+            </section>
+          )
+        })}
+      </ShopPanel>
     </div>
   )
 }

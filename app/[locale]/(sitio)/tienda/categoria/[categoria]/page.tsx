@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { CategoryNav } from '@/components/tienda/CategoryNav'
 import { ProductGrid } from '@/components/tienda/ProductGrid'
+import { ShopPanel } from '@/components/tienda/ShopPanel'
 import { categories, getCategoryInfo, productsByCategory } from '@/content/products'
 import { isLocale, locales, pick, translator } from '@/lib/i18n/config'
 import { alternates } from '@/lib/i18n/metadata'
@@ -82,9 +83,9 @@ export default async function CategoriaPage({ params }: Params) {
 
       <CategoryNav current={category.key} locale={locale} className="mt-12" />
 
-      <section className="mt-16">
+      <ShopPanel className="mt-16">
         <ProductGrid items={items} locale={locale} priority />
-      </section>
+      </ShopPanel>
     </div>
   )
 }
