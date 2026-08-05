@@ -1,48 +1,14 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
-import { ShopRail } from '@/components/tienda/ShopRail'
+import { useRef } from 'react'
 import { ProductGrid } from '@/components/tienda/ProductGrid'
-import { ShopPanel } from '@/components/tienda/ShopPanel'
+import { ShopDeck, ShopDeckProvider, useShopDeck } from '@/components/tienda/ShopDeck'
+import { ShopRail } from '@/components/tienda/ShopRail'
 import { Reveal } from '@/components/ui/Reveal'
 import { cn } from '@/lib/cn'
 import type { ProductCardData } from '@/content/products'
 import type { Locale } from '@/lib/i18n/config'
-import { useSwipe } from '@/lib/useSwipe'
-
-const MAX_WAIT = 2_000
-
-function esperarFotos(node: HTMLElement | null, listo: () => void): () => void {
-  const fotos = node ? [...node.querySelectorAll('img')] : []
-
-  const pendientes = fotos.filter((foto) => {
-    if (foto.complete) return false
-    const caja = foto.getBoundingClientRect()
-    return caja.bottom > 0 && caja.top < window.innerHeight
-  })
-
-  let quedan = pendientes.length
-  const una = () => {
-    quedan -= 1
-    if (quedan <= 0) listo()
-  }
-
-  pendientes.forEach((foto) => {
-    foto.addEventListener('load', una, { once: true })
-    foto.addEventListener('error', una, { once: true })
-  })
-
-  const timer = setTimeout(listo, pendientes.length ? MAX_WAIT : 0)
-
-  return () => {
-    clearTimeout(timer)
-    pendientes.forEach((foto) => {
-      foto.removeEventListener('load', una)
-      foto.removeEventListener('error', una)
-    })
-  }
-}
 
 export type EscaparateFamilia = {
   key: string
@@ -53,82 +19,103 @@ export type EscaparateFamilia = {
   items: ProductCardData[]
 }
 
-export function Escaparate({
-  familias,
-  locale,
-  navLabel,
-  verMas,
-  personalizar,
-  personalizarHref,
-}: {
+type Props = {
   familias: EscaparateFamilia[]
   locale: Locale
   navLabel: string
   verMas: string
   personalizar: string
   personalizarHref: string
-}) {
-  const [current, setCurrent] = useState(familias[0]?.key)
-  const familia = familias.find((f) => f.key === current) ?? familias[0]
-  const panel = useRef<HTMLDivElement>(null)
+}
 
-  const [waiting, setWaiting] = useState(false)
-
-  useEffect(() => {
-    if (!waiting) return
-    return esperarFotos(panel.current, () => setWaiting(false))
-  }, [waiting, current])
-
-  const elegir = (key: string) => {
-    if (key === current) return
-    setWaiting(true)
-    setCurrent(key)
-    panel.current?.scrollIntoView({ block: 'start' })
-  }
-
-  useSwipe(
-    (step) => {
-      const index = familias.findIndex((f) => f.key === current)
-      const next = familias[index + step]
-      if (next) elegir(next.key)
-    },
-    { dentro: panel, ignorar: '.shop-rail' },
+export function Escaparate(props: Props) {
+  return (
+    <ShopDeckProvider count={props.familias.length} initial={0}>
+      <Vitrina {...props} />
+    </ShopDeckProvider>
   )
+}
+
+function Vitrina({ familias, locale, navLabel, verMas, personalizar, personalizarHref }: Props) {
+  const { index, go } = useShopDeck()
+  const panel = useRef<HTMLDivElement>(null)
+  const familia = familias[index]
+
+  const elegir = (i: number) => {
+    if (i === index) return
+    panel.current?.scrollIntoView({ block: 'start' })
+    go(i)
+  }
 
   if (!familia) return null
 
-  const hueco = (3 - (familia.items.length % 3)) % 3
-
-  const botones = {
-    href: familia.href,
+  const botones = (f: EscaparateFamilia) => ({
+    href: f.href,
     verMas,
-    verMasLabel: familia.verMasLabel,
+    verMasLabel: f.verMasLabel,
     personalizar,
     personalizarHref,
-  }
+  })
+
+  const hueco = (f: EscaparateFamilia) => (3 - (f.items.length % 3)) % 3
+
+  const panels = familias.map((f, i) => {
+    const libre = hueco(f)
+
+    return (
+      <div key={f.key}>
+        <div className="flex items-baseline justify-between gap-6 border-b border-line pb-4">
+          <h3 className="eyebrow">
+            <Link href={f.href} className="link-underline tap">
+              {f.label}
+            </Link>
+          </h3>
+          {f.note && <p className="text-right text-small text-bark-faint">{f.note}</p>}
+        </div>
+
+        <ProductGrid
+          items={f.items}
+          locale={locale}
+          priority={i === 0}
+          trailing={
+            libre > 0 && (
+              <Reveal
+                className={cn(
+                  'hidden self-center lg:flex lg:flex-col lg:items-center lg:gap-3',
+                  libre === 2 && 'lg:col-span-2',
+                )}
+              >
+                <Botones {...botones(f)} />
+              </Reveal>
+            )
+          }
+        />
+      </div>
+    )
+  })
 
   return (
     <>
       <div role="tablist" aria-label={navLabel} className="shop-nav mt-10">
-        <ShopRail>
-          {familias.map((f) => (
+        <ShopRail follow={index}>
+          {familias.map((f, i) => (
             <button
               key={f.key}
               type="button"
               role="tab"
               id={`escaparate-tab-${f.key}`}
-              aria-selected={f.key === familia.key}
+              aria-selected={i === index}
               aria-controls="escaparate-panel"
-              tabIndex={f.key === familia.key ? 0 : -1}
-              onClick={() => elegir(f.key)}
+              tabIndex={i === index ? 0 : -1}
+              onClick={() => elegir(i)}
               onKeyDown={(event) => {
                 const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0
                 if (!step) return
                 event.preventDefault()
-                const index = familias.findIndex((x) => x.key === familia.key)
-                const next = familias[(index + step + familias.length) % familias.length]
+                const siguiente = (index + step + familias.length) % familias.length
+                const next = familias[siguiente]
                 if (!next) return
-                elegir(next.key)
+                elegir(siguiente)
                 document.getElementById(`escaparate-tab-${next.key}`)?.focus()
               }}
               className="shop-tab tap"
@@ -146,43 +133,16 @@ export function Escaparate({
         aria-labelledby={`escaparate-tab-${familia.key}`}
         className="mt-16 scroll-mt-[7.75rem] md:scroll-mt-[8.75rem]"
       >
-        <div className="flex items-baseline justify-between gap-6 border-b border-line pb-4">
-          <h3 className="eyebrow">
-            <Link href={familia.href} className="link-underline tap">
-              {familia.label}
-            </Link>
-          </h3>
-          {familia.note && <p className="text-right text-small text-bark-faint">{familia.note}</p>}
-        </div>
-
-        <ShopPanel pending={waiting}>
-          <ProductGrid
-            items={familia.items}
-            locale={locale}
-            priority={familia.key === familias[0]?.key}
-            trailing={
-              hueco > 0 && (
-                <Reveal
-                  className={cn(
-                    'hidden self-center lg:flex lg:flex-col lg:items-center lg:gap-3',
-                    hueco === 2 && 'lg:col-span-2',
-                  )}
-                >
-                  <Botones {...botones} />
-                </Reveal>
-              )
-            }
-          />
-        </ShopPanel>
+        <ShopDeck panels={panels} />
       </div>
 
       <Reveal
         className={cn(
           'mt-16 flex flex-wrap justify-center gap-x-2 gap-y-3',
-          hueco > 0 && 'lg:hidden',
+          hueco(familia) > 0 && 'lg:hidden',
         )}
       >
-        <Botones {...botones} />
+        <Botones {...botones(familia)} />
       </Reveal>
     </>
   )

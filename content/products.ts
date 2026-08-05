@@ -2690,13 +2690,6 @@ export function getCategoryInfo(key: string): CategoryInfo | undefined {
 }
 
 /**
- * Cuántas piezas enseña cada familia en `/tienda` antes del botón «Ver más …».
- * Once y no doce: con la rejilla de tres columnas el hueco que queda libre en la
- * última fila es justo donde va el botón, así que la fila no se rompe.
- */
-export const PREVIEW_SIZE = 11
-
-/**
  * Y cuántas enseña la portada, que lleva la misma barra de familias pero es un
  * escaparate y no el catálogo: cinco. Ahora la portada enseña **una sola**
  * familia —la que se elige en la barra— en vez de todas seguidas, así que el

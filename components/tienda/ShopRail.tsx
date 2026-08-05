@@ -14,7 +14,7 @@ import { useEffect, useRef } from 'react'
  * familias, y marcar ese componente como cliente lo mandaría al navegador entero
  * para no usar de él más que los rótulos.
  */
-export function ShopRail({ children }: { children: React.ReactNode }) {
+export function ShopRail({ children, follow }: { children: React.ReactNode; follow?: unknown }) {
   const rail = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export function ShopRail({ children }: { children: React.ReactNode }) {
     // mueve el carril y nada más. El navegador ya recorta lo que se pase de los
     // extremos, así que «Todo» centrado sale simplemente pegado a la izquierda.
     node.scrollLeft = active.offsetLeft - (node.clientWidth - active.offsetWidth) / 2
-  }, [])
+  }, [follow])
 
   return (
     <div ref={rail} className="shop-rail">

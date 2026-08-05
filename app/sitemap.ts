@@ -22,11 +22,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // `/encargos` sólo redirige a su ancla (`next.config.ts`).
   const routes = [
     '/',
-    '/tienda',
     '/legal/privacidad',
-    // Las subsecciones de la tienda son páginas propias y la portada de la
-    // tienda ya no enseña el catálogo entero: sin ellas quedarían piezas a las
-    // que sólo se llega desde el sitemap de fichas.
     ...categories
       .filter((category) => productsByCategory(category.key).length > 0)
       .map((category) => `/tienda/categoria/${category.key}`),

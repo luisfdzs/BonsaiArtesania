@@ -37,36 +37,14 @@ export function DestacadasSection({ locale }: { locale: Locale }) {
       .slice(0, HOME_PREVIEW_SIZE)
       .map(({ slug, name, summary, image }) => ({ slug, name, summary, image }))
 
-  // La muestra de «Todo» se reparte: la primera de cada familia, luego la segunda
-  // de cada una, hasta cinco. Cogiendo del montón entero salían cinco pendientes
-  // —son la mitad del catálogo y abren el array—, y entonces la portada volvía a
-  // decir que el taller hace pendientes.
-  const porFamilia = conPiezas.map((category) => muestra(category.items))
-  const rondaPorFamilias = Array.from({ length: HOME_PREVIEW_SIZE }, (_, ronda) =>
-    porFamilia.map((items) => items[ronda]).filter((item) => item !== undefined),
-  ).flat()
-
-  const familias: EscaparateFamilia[] = [
-    // «Todo» abre la barra igual que en la tienda, y es la que está elegida al
-    // entrar: quien llega a la portada no ha pedido ninguna familia todavía, así
-    // que lo primero que ve es una muestra del taller entero.
-    {
-      key: 'todo',
-      label: t({ es: 'Todo', gl: 'Todo' }),
-      note: t({ es: 'Una muestra del taller', gl: 'Unha mostra do taller' }),
-      href: path(locale, '/tienda'),
-      verMasLabel: t({ es: 'Ver todas las piezas', gl: 'Ver todas as pezas' }),
-      items: rondaPorFamilias.slice(0, HOME_PREVIEW_SIZE),
-    },
-    ...conPiezas.map((category) => ({
-      key: category.key,
-      label: t(category.label),
-      note: t(category.note),
-      href: path(locale, `/tienda/categoria/${category.key}`),
-      verMasLabel: `${t({ es: 'Ver todos los', gl: 'Ver todos os' })} ${t(category.plural)}`,
-      items: muestra(category.items),
-    })),
-  ]
+  const familias: EscaparateFamilia[] = conPiezas.map((category) => ({
+    key: category.key,
+    label: t(category.label),
+    note: t(category.note),
+    href: path(locale, `/tienda/categoria/${category.key}`),
+    verMasLabel: `${t({ es: 'Ver todos los', gl: 'Ver todos os' })} ${t(category.plural)}`,
+    items: muestra(category.items),
+  }))
 
   return (
     /* El `pt` no es decoración: sin él la sección arrancaba pegada al borde del

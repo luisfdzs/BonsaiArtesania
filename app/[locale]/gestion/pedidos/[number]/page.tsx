@@ -78,7 +78,7 @@ export default async function GestionPedidoPage({ params }: Params) {
 
           <form
             action={updateOrderStatus}
-            className="flex flex-col gap-6 rounded-xl border border-line p-5"
+            className="flex flex-col justify-center gap-6 rounded-xl border border-line p-5"
           >
             <FormPending label={t({ es: 'Guardando el estado', gl: 'Gardando o estado' })} />
             <LocaleField />

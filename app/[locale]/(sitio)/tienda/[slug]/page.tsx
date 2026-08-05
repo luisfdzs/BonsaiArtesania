@@ -58,25 +58,16 @@ export default async function ProductPage({ params }: Params) {
       {/* La vuelta atrás lleva a la familia de la pieza, no a la portada de la
           tienda: desde que cada familia tiene subsección propia, ahí es de donde
           se viene casi siempre y donde están las piezas parecidas. */}
-      <nav
-        aria-label={t({ es: 'Migas', gl: 'Migas' })}
-        className="flex flex-wrap items-baseline gap-3 eyebrow"
-      >
-        <Link href={path(locale, '/tienda')} className="link-underline tap">
-          ← {t({ es: 'Tienda', gl: 'Tenda' })}
-        </Link>
-        {category && (
-          <>
-            <span aria-hidden>·</span>
-            <Link
-              href={path(locale, `/tienda/categoria/${category.key}`)}
-              className="link-underline tap"
-            >
-              {t(category.label)}
-            </Link>
-          </>
-        )}
-      </nav>
+      {category && (
+        <nav aria-label={t({ es: 'Migas', gl: 'Migas' })} className="eyebrow">
+          <Link
+            href={path(locale, `/tienda/categoria/${category.key}`)}
+            className="link-underline tap"
+          >
+            ← {t(category.label)}
+          </Link>
+        </nav>
+      )}
 
       <article className="mt-10 grid gap-14 md:grid-cols-12 md:gap-12">
         <div className="md:col-span-7">

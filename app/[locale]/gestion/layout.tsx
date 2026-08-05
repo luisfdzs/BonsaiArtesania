@@ -46,16 +46,20 @@ export default async function GestionLayout({
 
           <Wordmark className="h-7 md:h-9" />
         </div>
+
+        <div className="page-gutter border-t border-line py-2 md:hidden">
+          <GestionNav />
+        </div>
       </header>
 
       <main id="main" className="page-gutter flex-1 pb-(--spacing-section)">
-        <div className="mx-auto flex max-w-2xl flex-col items-center border-b border-line pb-8 text-center md:max-w-none">
-          <h1 className="sr-only">{t(TITLE)}</h1>
+        <h1 className="sr-only">{t(TITLE)}</h1>
 
+        <div className="mx-auto hidden max-w-2xl flex-col items-center border-b border-line pb-8 text-center md:flex md:max-w-none">
           <GestionNav />
         </div>
 
-        <div className="mx-auto mt-12 max-w-2xl text-center md:max-w-none">{children}</div>
+        <div className="mx-auto mt-8 max-w-2xl text-center md:mt-12 md:max-w-none">{children}</div>
 
         <div className="mx-auto mt-20 flex max-w-2xl flex-col items-center gap-6 border-t border-line pt-10 text-center md:max-w-none">
           {email && (

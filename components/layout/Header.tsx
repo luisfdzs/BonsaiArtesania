@@ -76,28 +76,23 @@ export function Header({ shopOpen }: { shopOpen: boolean }) {
           {t({ es: 'Saltar al contenido', gl: 'Ir ao contido' })}
         </a>
 
-        {/* En móvil la barra sólo lleva la marca —los iconos viven abajo, en
-            `MobileNav`—, así que va centrada en vez de pegada a la izquierda
-            con medio ancho de barra vacío al lado. A partir de `md` aparece
-            `DesktopNav` y vuelve el reparto a los extremos. */}
-        <div className="header-bar page-gutter relative flex h-20 items-center justify-center gap-6 md:h-24 md:justify-between">
-          <div className="flex items-center gap-1 md:gap-2">
-            <BackButton className="absolute left-(--spacing-gutter) md:static" />
+        <div className="header-bar page-gutter relative flex h-20 items-center justify-center gap-6 md:h-24 md:justify-end">
+          <BackButton className="absolute left-(--spacing-gutter)" />
 
-            <Link
-              href={path(locale, '/')}
-              aria-label="Bonsái Artesanía, inicio"
-              onClick={(event) => {
-                close()
-                if (onHome(pathname)) {
-                  event.preventDefault()
-                  window.scrollTo({ top: 0 })
-                }
-              }}
-            >
-              <Wordmark className="h-7 md:h-9" />
-            </Link>
-          </div>
+          <Link
+            href={path(locale, '/')}
+            aria-label="Bonsái Artesanía, inicio"
+            onClick={(event) => {
+              close()
+              if (onHome(pathname)) {
+                event.preventDefault()
+                window.scrollTo({ top: 0 })
+              }
+            }}
+            className="md:absolute md:left-1/2 md:-translate-x-1/2"
+          >
+            <Wordmark className="h-7 md:h-9" />
+          </Link>
 
           <DesktopNav
             pathname={pathname}
