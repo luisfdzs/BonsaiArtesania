@@ -39,6 +39,7 @@ export function LocalePicker({ onNavigate }: { onNavigate?: () => void }) {
           <Link
             key={option}
             href={swapLocale(pathname, option)}
+            scroll={false}
             // `hrefLang` para que un lector de pantalla lea «Galego» con la voz
             // gallega y no con la castellana, que es lo que hace si el enlace no
             // dice en qué idioma está escrito.
