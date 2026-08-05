@@ -40,7 +40,7 @@ export default async function GestionPedidoPage({ params }: Params) {
   ].join(' · ')
 
   return (
-    <section className="-mb-(--spacing-section) pb-8">
+    <section className="-mb-12 pb-8">
       <div className="panel mx-auto max-w-6xl text-left">
         <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-center">
           <span className="font-serif">{order.number}</span>
