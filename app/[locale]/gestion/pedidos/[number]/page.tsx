@@ -34,12 +34,8 @@ export default async function GestionPedidoPage({ params }: Params) {
   })
 
   return (
-    <section className="-mb-(--spacing-section) pb-16">
-      <Link href={path(locale, '/gestion')} className="link-underline tap eyebrow">
-        ← {t({ es: 'Pedidos', gl: 'Pedidos' })}
-      </Link>
-
-      <ul className="mt-8 flex flex-wrap justify-center gap-4">
+    <section className="-mb-(--spacing-section) pb-8">
+      <ul className="flex flex-wrap justify-center gap-4">
         {order.items.map((item) => {
           const product = getProduct(item.slug)
           const image = product?.image ? t(product.image) : null
