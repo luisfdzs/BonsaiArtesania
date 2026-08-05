@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { adminSession } from '@/lib/admin'
 import { locales } from '@/lib/i18n/config'
 import { path } from '@/lib/i18n/routes'
-import { ORDER_STATUS_FLOW } from '@/lib/order-status'
+import { NOTE_MAX_LENGTH, ORDER_STATUS_FLOW } from '@/lib/order-status'
 import { orders, type OrderStatus } from '@/lib/schema'
 
 /**
@@ -23,7 +23,9 @@ export async function updateOrderStatus(formData: FormData): Promise<void> {
 
   const number = String(formData.get('number') ?? '')
   const status = String(formData.get('status') ?? '') as OrderStatus
-  const note = String(formData.get('note') ?? '').trim()
+  const note = String(formData.get('note') ?? '')
+    .trim()
+    .slice(0, NOTE_MAX_LENGTH)
 
   // La lista válida es la misma que pinta el desplegable, importada y no copiada:
   // si mañana se añade un estado, no puede quedarse fuera de la validación.

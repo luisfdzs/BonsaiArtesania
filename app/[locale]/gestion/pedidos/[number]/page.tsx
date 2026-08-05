@@ -6,7 +6,7 @@ import { Media } from '@/components/ui/Media'
 import { getProduct } from '@/content/products'
 import { isLocale, localeHtmlLang, translator } from '@/lib/i18n/config'
 import { path } from '@/lib/i18n/routes'
-import { orderStatusAdminLabel, ORDER_STATUS_FLOW } from '@/lib/order-status'
+import { NOTE_MAX_LENGTH, orderStatusAdminLabel, ORDER_STATUS_FLOW } from '@/lib/order-status'
 import { orders } from '@/lib/schema'
 import { updateOrderStatus } from '../../actions'
 
@@ -39,68 +39,43 @@ export default async function GestionPedidoPage({ params }: Params) {
         ← {t({ es: 'Pedidos', gl: 'Pedidos' })}
       </Link>
 
-      <header className="mt-8 flex flex-col items-center gap-2">
-        <h2 className="font-serif text-title">{order.number}</h2>
-        <p className="text-small text-bark-soft">{orderStatusAdminLabel(order.status, locale)}</p>
-      </header>
-
-      <ul className="mt-10 flex flex-col">
+      <ul className="mt-8 flex flex-wrap justify-center gap-4">
         {order.items.map((item) => {
           const product = getProduct(item.slug)
           const image = product?.image ? t(product.image) : null
 
           return (
-            <li
-              key={item.slug}
-              className="flex items-center gap-4 border-b border-line py-4 first:border-t"
-            >
-              <Link href={path(locale, `/tienda/${item.slug}`)} className="w-16 shrink-0 sm:w-20">
+            <li key={item.slug} className="relative w-20 sm:w-24">
+              <Link
+                href={path(locale, `/tienda/${item.slug}`)}
+                aria-label={`${item.name} × ${item.qty}`}
+                className="tap block"
+              >
                 <Media
                   image={image}
                   ratio="1 / 1"
-                  sizes="(max-width: 640px) 4rem, 5rem"
+                  sizes="(max-width: 640px) 5rem, 6rem"
                   className="border border-line"
                 />
               </Link>
-
-              <Link href={path(locale, `/tienda/${item.slug}`)} className="link-underline tap">
-                {item.name}
-                {item.qty > 1 && ` × ${item.qty}`}
-              </Link>
+              <span aria-hidden className="cart-badge">
+                {item.qty}
+              </span>
             </li>
           )
         })}
       </ul>
 
-      <div className="mt-12 border-t border-line pt-8">
-        <h3 className="eyebrow">{t({ es: 'Enviar a', gl: 'Enviar a' })}</h3>
-        <p className="mt-4 text-small text-bark-soft">
-          {address.recipient}
-          <br />
-          {address.line1}
-          {address.line2 ? `, ${address.line2}` : ''}
-          <br />
-          {address.postalCode} {address.city} ({address.province})
-          <br />
-          {address.phone}
-        </p>
-      </div>
-
-      <div className="mt-12 border-t border-line pt-8">
-        <h3 className="eyebrow">{t({ es: 'Cambiar estado', gl: 'Cambiar estado' })}</h3>
-        <form action={updateOrderStatus} className="mt-6 flex flex-col gap-6">
+      <div className="mt-10 border-t border-line pt-8">
+        <form action={updateOrderStatus} className="flex flex-col gap-6">
           <FormPending label={t({ es: 'Guardando el estado', gl: 'Gardando o estado' })} />
           <LocaleField />
           <input type="hidden" name="number" value={order.number} />
 
           <div>
-            <label className="field-label" htmlFor="status">
+            <label className="sr-only" htmlFor="status">
               {t({ es: 'Estado', gl: 'Estado' })}
             </label>
-            {/* El texto va centrado, como todo lo demás de esta columna. El
-                `select` es el único campo que no lo estaba: un `input` vacío no
-                tiene nada que centrar, pero este siempre enseña un valor, y
-                alineado a la izquierda se salía del eje de la página. */}
             <select
               key={order.status}
               id="status"
@@ -117,19 +92,39 @@ export default async function GestionPedidoPage({ params }: Params) {
           </div>
 
           <div>
-            {/* El rótulo va dentro del campo, como en `Field`. El del desplegable
-                de arriba no puede: un `select` ya enseña un valor, así que no le
-                queda hueco donde poner el nombre de lo que se está eligiendo. */}
             <label className="sr-only" htmlFor="note">
               {nota}
             </label>
-            <input id="note" name="note" type="text" placeholder={nota} className="field" />
+            <textarea
+              id="note"
+              name="note"
+              rows={2}
+              maxLength={NOTE_MAX_LENGTH}
+              placeholder={nota}
+              className="field resize-none text-center field-sizing-content"
+            />
           </div>
 
           <button type="submit" className="btn self-center">
             {t({ es: 'Guardar', gl: 'Gardar' })}
           </button>
         </form>
+      </div>
+
+      <div className="mt-10 border-t border-line pt-6">
+        <h3 className="eyebrow">{t({ es: 'Enviar a', gl: 'Enviar a' })}</h3>
+        <p className="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
+          <span className="font-serif">{order.number}</span>
+          <span className="badge">{orderStatusAdminLabel(order.status, locale)}</span>
+        </p>
+        <p className="mt-3 text-small text-bark-soft">
+          {[
+            address.recipient,
+            address.line2 ? `${address.line1}, ${address.line2}` : address.line1,
+            `${address.postalCode} ${address.city} (${address.province})`,
+            address.phone,
+          ].join(' · ')}
+        </p>
       </div>
 
       <div className="mt-12 border-t border-line pt-8">

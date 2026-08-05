@@ -71,6 +71,7 @@ export function orderStatusAdminLabel(status: OrderStatus, locale: Locale): stri
  * `cancelado` va al final y fuera de la secuencia porque no es un paso más: es la
  * salida, y puede ocurrir desde cualquier punto.
  */
+export const NOTE_MAX_LENGTH = 500
 export const ORDER_STATUS_FLOW: OrderStatus[] = [
   'pendiente_pago',
   'preparando',
