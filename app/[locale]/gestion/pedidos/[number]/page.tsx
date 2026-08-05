@@ -39,28 +39,31 @@ export default async function GestionPedidoPage({ params }: Params) {
         ← {t({ es: 'Pedidos', gl: 'Pedidos' })}
       </Link>
 
-      <ul className="mt-8 flex flex-wrap justify-center gap-4">
+      <ul className="mt-8 flex flex-col gap-4">
         {order.items.map((item) => {
           const product = getProduct(item.slug)
           const image = product?.image ? t(product.image) : null
 
           return (
-            <li key={item.slug} className="relative w-20 sm:w-24">
+            <li key={item.slug}>
               <Link
                 href={path(locale, `/tienda/${item.slug}`)}
                 aria-label={`${item.name} × ${item.qty}`}
-                className="tap block"
+                className="tap flex items-center gap-4"
               >
-                <Media
-                  image={image}
-                  ratio="1 / 1"
-                  sizes="(max-width: 640px) 5rem, 6rem"
-                  className="border border-line"
-                />
+                <span className="w-20 shrink-0 sm:w-24">
+                  <Media
+                    image={image}
+                    ratio="1 / 1"
+                    sizes="(max-width: 640px) 5rem, 6rem"
+                    className="border border-line"
+                  />
+                  <span className="mt-2 block text-small text-bark-soft">{item.name}</span>
+                </span>
+                <span aria-hidden className="ml-auto font-serif text-lead">
+                  × {item.qty}
+                </span>
               </Link>
-              <span aria-hidden className="cart-badge">
-                {item.qty}
-              </span>
             </li>
           )
         })}
@@ -112,11 +115,11 @@ export default async function GestionPedidoPage({ params }: Params) {
       </div>
 
       <div className="mt-10 border-t border-line pt-6">
-        <h3 className="eyebrow">{t({ es: 'Enviar a', gl: 'Enviar a' })}</h3>
-        <p className="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
+        <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
           <span className="font-serif">{order.number}</span>
-          <span className="badge">{orderStatusAdminLabel(order.status, locale)}</span>
+          <span className="badge badge-sage">{orderStatusAdminLabel(order.status, locale)}</span>
         </p>
+        <h3 className="eyebrow mt-6">{t({ es: 'Enviar a', gl: 'Enviar a' })}</h3>
         <p className="mt-3 text-small text-bark-soft">
           {[
             address.recipient,
@@ -127,8 +130,8 @@ export default async function GestionPedidoPage({ params }: Params) {
         </p>
       </div>
 
-      <div className="mt-12 border-t border-line pt-8">
-        <h3 className="eyebrow">{t({ es: 'Historial', gl: 'Historial' })}</h3>
+      <details className="fold mt-12 border-t border-line pt-8">
+        <summary className="eyebrow">{t({ es: 'Historial', gl: 'Historial' })}</summary>
         <ol className="mt-6 flex flex-col gap-3">
           {[...order.history].reverse().map((entry, index) => (
             <li key={index} className="text-small text-bark-soft">
@@ -137,7 +140,7 @@ export default async function GestionPedidoPage({ params }: Params) {
             </li>
           ))}
         </ol>
-      </div>
+      </details>
     </section>
   )
 }

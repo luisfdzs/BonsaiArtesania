@@ -784,6 +784,39 @@
   text-transform: uppercase;
 }
 
+@utility badge-sage {
+  background: color-mix(in srgb, var(--color-sage-deep) 14%, transparent);
+  color: var(--color-sage-deep);
+}
+
+@utility fold {
+  & > summary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  & > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  & > summary::after {
+    content: '';
+    width: 0.4rem;
+    height: 0.4rem;
+    border-right: 1px solid currentColor;
+    border-bottom: 1px solid currentColor;
+    transform: translateY(-0.1rem) rotate(45deg);
+    transition: transform 0.4s var(--ease-out-soft);
+  }
+
+  &[open] > summary::after {
+    transform: translateY(0.05rem) rotate(-135deg);
+  }
+}
+
 /* Aparición al entrar en viewport. La hace CSS con scroll-driven animations
    (cero JS); si el navegador no las soporta, el contenido simplemente se ve
    — nunca contenido invisible por una animación que no corre. */
