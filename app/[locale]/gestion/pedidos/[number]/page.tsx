@@ -27,7 +27,6 @@ export default async function GestionPedidoPage({ params }: Params) {
   if (!order) notFound()
 
   const address = order.shipping.address
-  // El mismo texto en el rótulo y en el hueco del campo, escrito una vez.
   const nota = t({
     es: 'Nota (opcional)',
     gl: 'Nota (opcional)',
@@ -42,42 +41,45 @@ export default async function GestionPedidoPage({ params }: Params) {
 
   return (
     <section className="-mb-(--spacing-section) pb-8">
-      <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 border-b border-line pb-6">
-        <span className="font-serif">{order.number}</span>
-        <span className="badge badge-sage">{orderStatusAdminLabel(order.status, locale)}</span>
-        <span className="text-small text-bark-soft">{destino}</span>
-      </p>
+      <div className="panel mx-auto max-w-6xl text-left">
+        <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-center">
+          <span className="font-serif">{order.number}</span>
+          <span className="badge badge-sage">{orderStatusAdminLabel(order.status, locale)}</span>
+          <span className="text-small text-bark-soft">{destino}</span>
+        </p>
 
-      <div className="mt-10 flex flex-col gap-10 md:flex-row md:items-start md:gap-14">
-        <ul className="flex flex-wrap justify-center gap-4 md:flex-1">
-          {order.items.map((item) => {
-            const product = getProduct(item.slug)
-            const image = product?.image ? t(product.image) : null
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <ul className="flex flex-wrap content-start justify-center gap-4 rounded-xl border border-line p-5">
+            {order.items.map((item) => {
+              const product = getProduct(item.slug)
+              const image = product?.image ? t(product.image) : null
 
-            return (
-              <li key={item.slug} className="relative w-20 sm:w-24">
-                <Link
-                  href={path(locale, `/tienda/${item.slug}`)}
-                  aria-label={`${item.name} × ${item.qty}`}
-                  className="tap block"
-                >
-                  <Media
-                    image={image}
-                    ratio="1 / 1"
-                    sizes="(max-width: 640px) 5rem, 6rem"
-                    className="border border-line"
-                  />
-                </Link>
-                <span aria-hidden className="cart-badge">
-                  {item.qty}
-                </span>
-              </li>
-            )
-          })}
-        </ul>
+              return (
+                <li key={item.slug} className="relative w-20 sm:w-24">
+                  <Link
+                    href={path(locale, `/tienda/${item.slug}`)}
+                    aria-label={`${item.name} × ${item.qty}`}
+                    className="tap block"
+                  >
+                    <Media
+                      image={image}
+                      ratio="1 / 1"
+                      sizes="(max-width: 640px) 5rem, 6rem"
+                      className="border border-line"
+                    />
+                  </Link>
+                  <span aria-hidden className="cart-badge">
+                    {item.qty}
+                  </span>
+                </li>
+              )
+            })}
+          </ul>
 
-        <div className="border-t border-line pt-8 md:w-80 md:shrink-0 md:border-t-0 md:pt-0 lg:w-96">
-          <form action={updateOrderStatus} className="flex flex-col gap-6">
+          <form
+            action={updateOrderStatus}
+            className="flex flex-col gap-6 rounded-xl border border-line p-5"
+          >
             <FormPending label={t({ es: 'Guardando el estado', gl: 'Gardando o estado' })} />
             <LocaleField />
             <input type="hidden" name="number" value={order.number} />
@@ -120,11 +122,9 @@ export default async function GestionPedidoPage({ params }: Params) {
             </button>
           </form>
 
-          <details className="fold mt-8 border-t border-line pt-4">
-            <summary className="eyebrow justify-center py-2">
-              {t({ es: 'Historial', gl: 'Historial' })}
-            </summary>
-            <ol className="mt-4 flex flex-col gap-3">
+          <div className="rounded-xl border border-line p-5">
+            <h2 className="eyebrow text-center">{t({ es: 'Historial', gl: 'Historial' })}</h2>
+            <ol className="mt-4 flex max-h-64 flex-col gap-3 overflow-y-auto">
               {[...order.history].reverse().map((entry, index) => (
                 <li key={index} className="text-small text-bark-soft">
                   {dateTimeFormat.format(entry.at)} — {orderStatusAdminLabel(entry.status, locale)}
@@ -132,7 +132,7 @@ export default async function GestionPedidoPage({ params }: Params) {
                 </li>
               ))}
             </ol>
-          </details>
+          </div>
         </div>
       </div>
     </section>
