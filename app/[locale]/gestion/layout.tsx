@@ -23,37 +23,6 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   }
 }
 
-/**
- * El panel de gestión: **lo único que tiene la cuenta del taller**.
- *
- * Antes vivía en `/taller` y era una página más de la web: llegaba con la
- * cabecera del sitio encima —portada, tienda, encargos, carrito— y con el pie
- * debajo. Nada de eso le sirve a Ana, que entra a preparar pedidos y no a pedir, y
- * el carrito era además un enlace a una página que su propia cuenta tiene
- * cerrada. Ahora el panel es su propio armazón: cuelga de la raíz y no del
- * grupo `(sitio)`, así que no hereda ninguna de esas dos cosas. Ver
- * `components/layout/SiteChrome.tsx` para el reparto.
- *
- * Se llama `/gestion` y no `/taller` porque «el taller» ya significaba otra cosa
- * de cara al público —la sección de la portada donde se cuenta cómo se trabaja—,
- * y dos sitios con el mismo nombre no se distinguen ni al hablar ni en la barra
- * de direcciones.
- *
- * A quien no es administrador se le devuelve un 404, no un «no autorizado»: un
- * 403 confirma que la ruta existe. Si no hay sesión tampoco se redirige a entrar,
- * porque eso también delataría que hay algo detrás.
- *
- * Se maqueta como una sola columna centrada, igual que las páginas de texto del
- * sitio: es el mismo sitio, y no había razón para que la parte de dentro se
- * leyera como un panel de administración distinto. En ordenador, eso sí, esa
- * columna se abre hasta el ancho de la pantalla —ver el comentario de abajo—;
- * en móvil se queda como estaba.
- *
- * Lo que sí lleva propio, arriba y abajo, es lo que la cabecera de la web daba
- * gratis: la marca —para saber dónde se está—, las dos secciones que hay, y
- * **con qué cuenta se está dentro y cómo se sale**. Los pedidos de todo el mundo
- * están detrás de esta sesión, así que cerrarla tiene que estar a mano.
- */
 export default async function GestionLayout({
   children,
   params,
@@ -70,62 +39,48 @@ export default async function GestionLayout({
   const email = session.user?.email ?? ''
 
   return (
-    <main id="main" className="page-gutter flex-1 pt-16 pb-(--spacing-section) md:pt-24">
-      {/* En pantalla de ordenador el panel ocupa el ancho entero y no la columna
-          de 42rem del resto del sitio. Las páginas de texto se leen mejor
-          estrechas, pero aquí no se lee: se barre una lista de pedidos y se
-          trabaja sobre uno, y cada sección —dirección, cambio de estado,
-          historial— cabe de sobra a lo ancho sin tener que bajar. En móvil no
-          cambia nada, que ahí 42rem ya era más de lo que hay. */}
-      <header className="relative mx-auto flex max-w-2xl flex-col items-center border-b border-line pb-8 text-center md:max-w-none">
-        <BackButton className="absolute top-0 left-0" />
+    <>
+      <header className="sticky top-0 z-50 bg-linen/90 text-bark backdrop-blur-md">
+        <div className="page-gutter relative flex h-20 items-center justify-center md:h-24">
+          <BackButton className="absolute left-(--spacing-gutter)" />
 
-        {/* La marca, sin enlace: aquí no llevaría a ninguna parte —la portada no
-            es de esta cuenta— y está sólo para decir de qué web es este panel. */}
-        <Wordmark className="h-7 text-bark" />
-        <h1 className="mt-6 font-serif text-title">{t(TITLE)}</h1>
-        <p className="mt-3 text-small text-bark-faint">
-          {t({
-            es: 'Los pedidos de la tienda, todos. Aquí se cambia por dónde va cada uno.',
-            gl: 'Os pedidos da tenda, todos. Aquí cámbiase por onde vai cada un.',
-          })}
-        </p>
-
-        <div className="mt-8">
-          <GestionNav />
+          <Wordmark className="h-7 md:h-9" />
         </div>
       </header>
 
-      <div className="mx-auto mt-12 max-w-2xl text-center md:max-w-none">{children}</div>
+      <main id="main" className="page-gutter flex-1 pb-(--spacing-section)">
+        <div className="mx-auto flex max-w-2xl flex-col items-center border-b border-line pb-8 text-center md:max-w-none">
+          <h1 className="sr-only">{t(TITLE)}</h1>
 
-      <div className="mx-auto mt-20 flex max-w-2xl flex-col items-center gap-6 border-t border-line pt-10 text-center md:max-w-none">
-        {email && (
-          <p className="text-small text-bark-faint">
-            {t({ es: 'Dentro como', gl: 'Dentro como' })} {email}
-          </p>
-        )}
+          <GestionNav />
+        </div>
 
-        <form
-          action={async () => {
-            'use server'
-            await signOut({ redirectTo: path(locale, '/') })
-          }}
-        >
-          {/* Igual que en la cuenta: salir borra la sesión de la base y luego
-              lleva a la portada, y hasta el segundo viaje la gestión sigue en
-              pantalla como si no se hubiera pulsado nada. */}
-          <FormPending label={t({ es: 'Cerrando tu sesión', gl: 'Pechando a túa sesión' })} />
+        <div className="mx-auto mt-12 max-w-2xl text-center md:max-w-none">{children}</div>
 
-          <button type="submit" className="btn btn-quiet btn-sm">
-            <LogoutIcon className="h-4 w-4" />
-            {t({ es: 'Salir', gl: 'Saír' })}
-          </button>
-        </form>
-      </div>
+        <div className="mx-auto mt-20 flex max-w-2xl flex-col items-center gap-6 border-t border-line pt-10 text-center md:max-w-none">
+          {email && (
+            <p className="text-small text-bark-faint">
+              {t({ es: 'Dentro como', gl: 'Dentro como' })} {email}
+            </p>
+          )}
 
-      {/* La flecha de volver arriba también aquí: el panel no hereda el armazón
-          del sitio, y la lista de pedidos es lo más largo que tiene esta web. */}
-      <ScrollTop />
-    </main>
+          <form
+            action={async () => {
+              'use server'
+              await signOut({ redirectTo: path(locale, '/') })
+            }}
+          >
+            <FormPending label={t({ es: 'Cerrando tu sesión', gl: 'Pechando a túa sesión' })} />
+
+            <button type="submit" className="btn btn-quiet btn-sm">
+              <LogoutIcon className="h-4 w-4" />
+              {t({ es: 'Salir', gl: 'Saír' })}
+            </button>
+          </form>
+        </div>
+
+        <ScrollTop />
+      </main>
+    </>
   )
 }
