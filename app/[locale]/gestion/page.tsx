@@ -83,7 +83,7 @@ export default async function GestionPedidosPage({ params, searchParams }: Props
       {docs.length === 0 ? (
         <p className="mt-12 text-bark-soft">{t({ es: 'Nada por aquí.', gl: 'Nada por aquí.' })}</p>
       ) : (
-        <ul className="mt-10 grid grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] gap-3">
+        <ul className="mt-10 grid grid-cols-[repeat(auto-fill,minmax(10rem,12rem))] justify-center gap-3">
           {docs.map((order) => (
             <li key={order.number}>
               <Link
