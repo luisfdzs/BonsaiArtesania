@@ -2,8 +2,10 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { localeNames, locales } from '@/lib/i18n/config'
+import { localeNames, locales, type Locale } from '@/lib/i18n/config'
 import { localeOf, swapLocale } from '@/lib/i18n/routes'
+import { localeFlags } from '@/components/ui/FlagIcons'
+import { NavPending } from '@/components/ui/NavPending'
 import { cn } from '@/lib/cn'
 
 /**
@@ -35,6 +37,7 @@ export function LocalePicker({ onNavigate }: { onNavigate?: () => void }) {
     <div className="mt-4 flex items-center justify-center gap-6 border-t border-line pt-8">
       {locales.map((option) => {
         const active = option === current
+        const Flag = localeFlags[option]
         return (
           <Link
             key={option}
@@ -48,14 +51,22 @@ export function LocalePicker({ onNavigate }: { onNavigate?: () => void }) {
             aria-current={active ? 'true' : undefined}
             onClick={onNavigate}
             className={cn(
-              'tap eyebrow transition-colors duration-500',
-              active ? 'text-sage-deep' : 'text-bark opacity-55 hover:opacity-100',
+              'tap block overflow-hidden rounded-sm ring-1 transition-all duration-500',
+              active
+                ? 'ring-sage-deep opacity-100'
+                : 'ring-line opacity-55 hover:opacity-100',
             )}
           >
-            {localeNames[option]}
+            <Flag className="block h-6 w-9" />
+            {!active && <NavPending label={waiting[option]} />}
           </Link>
         )
       })}
     </div>
   )
+}
+
+const waiting: Record<Locale, string> = {
+  es: 'Cambiando el idioma',
+  gl: 'Cambiando o idioma',
 }
