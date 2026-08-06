@@ -78,6 +78,14 @@ function Vitrina({ familias, locale, navLabel, verMas, personalizar, personaliza
             )
           }
         />
+        <Reveal
+          className={cn(
+            'mt-16 flex flex-wrap justify-center gap-x-2 gap-y-3',
+            libre > 0 && 'lg:hidden',
+          )}
+        >
+          <Botones {...botones(f)} />
+        </Reveal>
       </div>
     )
   })
@@ -122,15 +130,6 @@ function Vitrina({ familias, locale, navLabel, verMas, personalizar, personaliza
       >
         <ShopDeck panels={panels} className="scroll-mt-[9.75rem] md:scroll-mt-[10.75rem]" />
       </div>
-
-      <Reveal
-        className={cn(
-          'mt-16 flex flex-wrap justify-center gap-x-2 gap-y-3',
-          hueco(familia) > 0 && 'lg:hidden',
-        )}
-      >
-        <Botones {...botones(familia)} />
-      </Reveal>
     </>
   )
 }

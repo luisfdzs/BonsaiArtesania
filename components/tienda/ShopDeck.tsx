@@ -27,7 +27,7 @@ const RUBBER = 0.3
 
 type Vista = {
   slide: (index: number) => void
-  anclar: () => void
+  saltar: (index: number) => void
 }
 
 type Deck = {
@@ -82,10 +82,8 @@ export function ShopDeckProvider({
     (next: number) => {
       if (next === index || next < 0 || next >= count) return
       if (Math.abs(next - index) === 1 && vista.current) vista.current.slide(next)
-      else {
-        vista.current?.anclar()
-        settle(next)
-      }
+      else if (vista.current) vista.current.saltar(next)
+      else settle(next)
     },
     [index, count, settle],
   )
@@ -171,6 +169,45 @@ export function ShopDeck({ panels, className }: { panels: ReactNode[]; className
     setDesfase(Math.max(0, tope() - nodo.getBoundingClientRect().top))
   }, [tope])
 
+  const creciendo = useRef(0)
+  const estirar = useCallback((salia: number) => {
+    const nodo = view.current
+    if (!nodo) return
+
+    window.clearTimeout(creciendo.current)
+    nodo.style.transition = 'none'
+    nodo.style.height = ''
+    const entra = nodo.getBoundingClientRect().height
+
+    if (Math.abs(entra - salia) < 1) {
+      nodo.style.transition = ''
+      return
+    }
+
+    nodo.style.height = `${salia}px`
+    void nodo.offsetHeight
+    nodo.style.transition = `height ${SNAP_MS}ms var(--ease-out-soft)`
+    nodo.style.height = `${entra}px`
+
+    creciendo.current = window.setTimeout(() => {
+      nodo.style.transition = ''
+      nodo.style.height = ''
+    }, SNAP_MS)
+  }, [])
+
+  const saltar = useCallback(
+    (next: number) => {
+      const salia = view.current?.getBoundingClientRect().height ?? 0
+      anclar()
+      flushSync(() => {
+        setDesfase(0)
+        deck.settle(next)
+      })
+      estirar(salia)
+    },
+    [deck, anclar, estirar],
+  )
+
   const slide = useCallback(
     (next: number) => {
       const ancho = (view.current?.clientWidth ?? 0) + GAP
@@ -180,22 +217,20 @@ export function ShopDeck({ panels, className }: { panels: ReactNode[]; className
       mover(-paso * ancho, SNAP_MS)
 
       window.setTimeout(() => {
-        anclar()
-        flushSync(() => {
-          setDesfase(0)
-          deck.settle(next)
-        })
+        saltar(next)
         mover(0)
         ocupado.current = false
       }, SNAP_MS)
     },
-    [deck, alinear, anclar],
+    [deck.index, alinear, saltar],
   )
 
   useEffect(() => {
-    deck.attach({ slide, anclar })
+    deck.attach({ slide, saltar })
     return () => deck.attach(null)
-  }, [deck, slide, anclar])
+  }, [deck, slide, saltar])
+
+  useEffect(() => () => window.clearTimeout(creciendo.current), [])
 
   const onStart = (event: React.TouchEvent) => {
     if (ocupado.current || event.touches.length !== 1) return
@@ -245,7 +280,7 @@ export function ShopDeck({ panels, className }: { panels: ReactNode[]; className
   return (
     <div
       ref={view}
-      className={cn('relative overflow-x-clip', className)}
+      className={cn('relative overflow-clip', className)}
       style={{ touchAction: 'pan-y pinch-zoom' }}
       onTouchStart={onStart}
       onTouchMove={onMove}
@@ -268,7 +303,7 @@ export function ShopDeck({ panels, className }: { panels: ReactNode[]; className
             <div
               key={i}
               aria-hidden
-              className="pointer-events-none absolute inset-x-0"
+              className="pointer-events-none absolute inset-x-0 max-h-dvh overflow-hidden"
               style={{
                 top: desfase,
                 transform: `translateX(calc(${salto * 100}% + ${salto * GAP}px))`,

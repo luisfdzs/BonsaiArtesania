@@ -48,14 +48,13 @@ function Board({ locale, familias, current, navLabel, notice }: Props) {
   const { index } = useShopDeck()
 
   const panels = familias.map((f, i) => (
-    <div key={f.key} className="min-h-[calc(100dvh-9.75rem)] md:min-h-[calc(100dvh-10.75rem)]">
-      <ProductGrid
-        items={f.items}
-        locale={locale}
-        priority={i === current}
-        className="grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3"
-      />
-    </div>
+    <ProductGrid
+      key={f.key}
+      items={f.items}
+      locale={locale}
+      priority={i === current}
+      className="grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3"
+    />
   ))
 
   return (
