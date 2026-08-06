@@ -162,7 +162,7 @@ export function ShopDeck({ panels, className }: { panels: ReactNode[]; className
     const nodo = view.current
     if (!nodo) return
     const dy = nodo.getBoundingClientRect().top - tope()
-    if (dy < 0) window.scrollBy(0, dy)
+    if (dy < 0) window.scrollBy({ top: dy, behavior: 'instant' })
   }, [tope])
 
   const alinear = useCallback(() => {
