@@ -13,7 +13,6 @@ import type { Locale } from '@/lib/i18n/config'
 export type EscaparateFamilia = {
   key: string
   label: string
-  note?: string
   href: string
   verMasLabel: string
   items: ProductCardData[]
@@ -64,19 +63,11 @@ function Vitrina({ familias, locale, navLabel, verMas, personalizar, personaliza
 
     return (
       <div key={f.key}>
-        <div className="flex items-baseline justify-between gap-6 border-b border-line pb-4">
-          <h3 className="eyebrow">
-            <Link href={f.href} className="link-underline tap">
-              {f.label}
-            </Link>
-          </h3>
-          {f.note && <p className="text-right text-small text-bark-faint">{f.note}</p>}
-        </div>
-
         <ProductGrid
           items={f.items}
           locale={locale}
           priority={i === 0}
+          className="grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3"
           trailing={
             libre > 0 && (
               <Reveal
@@ -96,7 +87,7 @@ function Vitrina({ familias, locale, navLabel, verMas, personalizar, personaliza
 
   return (
     <>
-      <div role="tablist" aria-label={navLabel} className="shop-nav mt-10">
+      <div role="tablist" aria-label={navLabel} className="shop-nav">
         <ShopRail follow={index}>
           {familias.map((f, i) => (
             <button
@@ -131,7 +122,7 @@ function Vitrina({ familias, locale, navLabel, verMas, personalizar, personaliza
         role="tabpanel"
         id="escaparate-panel"
         aria-labelledby={`escaparate-tab-${familia.key}`}
-        className="mt-16 scroll-mt-[7.75rem] md:scroll-mt-[8.75rem]"
+        className="mt-14 scroll-mt-[7.75rem] md:scroll-mt-[8.75rem]"
       >
         <ShopDeck panels={panels} />
       </div>

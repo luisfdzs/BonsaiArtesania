@@ -40,7 +40,6 @@ export function DestacadasSection({ locale }: { locale: Locale }) {
   const familias: EscaparateFamilia[] = conPiezas.map((category) => ({
     key: category.key,
     label: t(category.label),
-    note: t(category.note),
     href: path(locale, `/tienda/categoria/${category.key}`),
     verMasLabel: `${t({ es: 'Ver todos los', gl: 'Ver todos os' })} ${t(category.plural)}`,
     items: muestra(category.items),
@@ -58,10 +57,6 @@ export function DestacadasSection({ locale }: { locale: Locale }) {
        el hero y la primera pieza dejaban la portada como si le faltara algo justo
        ahí. Con dos tercios, la sección sigue empezando y no cuelga del hero. */
     <section className="page-gutter pt-[clamp(3.5rem,8vw,8rem)]">
-      <div className="border-b border-line pb-4">
-        <h2 className="eyebrow">{t({ es: 'Piezas destacadas', gl: 'Pezas destacadas' })}</h2>
-      </div>
-
       <Escaparate
         familias={familias}
         locale={locale}

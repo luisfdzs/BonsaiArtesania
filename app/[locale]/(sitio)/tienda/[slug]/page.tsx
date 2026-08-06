@@ -1,16 +1,14 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ProductCard } from '@/components/sections/ProductCard'
 import { AddToCart } from '@/components/tienda/AddToCart'
 import { ContactButtons } from '@/components/ui/ContactButtons'
 import { Media } from '@/components/ui/Media'
 import { Reveal } from '@/components/ui/Reveal'
-import { getCategoryInfo, getProduct, products } from '@/content/products'
+import { getProduct, products } from '@/content/products'
 import { orderMessage } from '@/lib/contact'
 import { isLocale, locales, pick, translator } from '@/lib/i18n/config'
 import { alternates } from '@/lib/i18n/metadata'
-import { path } from '@/lib/i18n/routes'
 import { shopOpen } from '@/lib/shop'
 
 type Params = { params: Promise<{ locale: string; slug: string }> }
@@ -43,7 +41,6 @@ export default async function ProductPage({ params }: Params) {
 
   const name = t(product.name)
   const message = orderMessage(name, locale)
-  const category = getCategoryInfo(product.category)
   // Tres sugerencias de la misma familia; si la familia es corta, se completa con
   // el resto del catálogo antes que dejar el bloque a medias.
   const related = products
@@ -55,21 +52,7 @@ export default async function ProductPage({ params }: Params) {
 
   return (
     <div className="page-gutter pt-10 md:pt-16">
-      {/* La vuelta atrás lleva a la familia de la pieza, no a la portada de la
-          tienda: desde que cada familia tiene subsección propia, ahí es de donde
-          se viene casi siempre y donde están las piezas parecidas. */}
-      {category && (
-        <nav aria-label={t({ es: 'Migas', gl: 'Migas' })} className="eyebrow">
-          <Link
-            href={path(locale, `/tienda/categoria/${category.key}`)}
-            className="link-underline tap"
-          >
-            ← {t(category.label)}
-          </Link>
-        </nav>
-      )}
-
-      <article className="mt-10 grid gap-14 md:grid-cols-12 md:gap-12">
+      <article className="grid gap-14 md:grid-cols-12 md:gap-12">
         <div className="md:col-span-7">
           <Media
             image={product.image && t(product.image)}
