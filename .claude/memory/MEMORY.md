@@ -1,0 +1,3 @@
+- [Sin comentarios en el texto](sin-comentarios-en-el-texto.md) — no añadir comentarios al código ni acotaciones al contenido que se entrega
+- [Respuestas de menos de 50 palabras](respuestas-de-menos-de-50-palabras.md) — por defecto siempre, salvo que Luis pida explícitamente una más completa; qué queda fuera del recuento
+- [Sugerir el mensaje de commit sin commitear](sugerir-mensaje-de-commit-sin-commitear.md) — mensaje en inglés justo después de la respuesta corta, y nunca ejecutar el commit sin petición explícita
