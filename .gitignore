@@ -4,10 +4,10 @@ out/
 build/
 .env*.local
 .vercel
-.claude/
 *.tsbuildinfo
 next-env.d.ts
 .DS_Store
 
 # Originales: pesan mucho y no se sirven; sólo se procesan.
 fotos-originales/
+.git - copia/
