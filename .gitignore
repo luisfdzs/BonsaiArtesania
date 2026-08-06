@@ -11,3 +11,4 @@ next-env.d.ts
 
 # Originales: pesan mucho y no se sirven; sólo se procesan.
 fotos-originales/
+.git - copia/
