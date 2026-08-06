@@ -3,6 +3,7 @@
 import { ProductGrid } from '@/components/tienda/ProductGrid'
 import { ShopDeck, ShopDeckProvider, ShopLink, useShopDeck } from '@/components/tienda/ShopDeck'
 import { ShopRail } from '@/components/tienda/ShopRail'
+import { cn } from '@/lib/cn'
 import type { ProductCardData } from '@/content/products'
 import type { Locale } from '@/lib/i18n/config'
 
@@ -45,21 +46,45 @@ export function ShopBoard(props: Props) {
 
 function Board({ locale, familias, current, navLabel, notice }: Props) {
   const { index } = useShopDeck()
-  const familia = familias[index]
 
   const panels = familias.map((f, i) => (
-    <ProductGrid key={f.key} items={f.items} locale={locale} priority={i === current} />
+    <ProductGrid
+      key={f.key}
+      items={f.items}
+      locale={locale}
+      priority={i === current}
+      className="grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3"
+    />
   ))
 
   return (
     <div className="page-gutter pt-16 md:pt-24">
-      <header className="max-w-xl">
-        <h1 className="font-serif text-display">{familia?.label}</h1>
-        <p className="mt-7 text-bark-soft">{familia?.intro}</p>
+      <header className="grid max-w-xl">
+        {familias.map((f, i) => {
+          const abierta = i === index
 
-        {familia?.notice && (
-          <p className="mt-8 bg-petal-soft p-5 text-small text-bark-soft">{notice}</p>
-        )}
+          return (
+            <div
+              key={f.key}
+              aria-hidden={!abierta}
+              className={cn(
+                'col-start-1 row-start-1 transition-opacity duration-500 ease-(--ease-out-soft)',
+                abierta ? 'opacity-100' : 'pointer-events-none opacity-0',
+              )}
+            >
+              {abierta ? (
+                <h1 className="font-serif text-display">{f.label}</h1>
+              ) : (
+                <p className="font-serif text-display">{f.label}</p>
+              )}
+              <p className="mt-7 text-bark-soft">{f.intro}</p>
+
+              {f.notice && (
+                <p className="mt-8 bg-petal-soft p-5 text-small text-bark-soft">{notice}</p>
+              )}
+            </div>
+          )
+        })}
       </header>
 
       <nav aria-label={navLabel} className="shop-nav mt-12">
@@ -72,7 +97,7 @@ function Board({ locale, familias, current, navLabel, notice }: Props) {
         </ShopRail>
       </nav>
 
-      <ShopDeck panels={panels} className="mt-16" />
+      <ShopDeck panels={panels} className="mt-28" />
     </div>
   )
 }

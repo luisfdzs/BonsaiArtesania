@@ -221,7 +221,7 @@ export function ShopDeck({ panels, className }: { panels: ReactNode[]; className
           const salto = i - deck.index
           if (salto === 0) {
             return (
-              <div key={i} className="relative">
+              <div key={i} className="relative flow-root">
                 {panel}
               </div>
             )
