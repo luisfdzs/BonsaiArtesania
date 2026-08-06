@@ -12,6 +12,7 @@ import {
   useSyncExternalStore,
   type ReactNode,
 } from 'react'
+import { flushSync } from 'react-dom'
 import { cn } from '@/lib/cn'
 
 const GAP = 32
@@ -24,12 +25,17 @@ const SNAP_MS = 420
 
 const RUBBER = 0.3
 
+type Vista = {
+  slide: (index: number) => void
+  anclar: () => void
+}
+
 type Deck = {
   index: number
   count: number
   go: (index: number) => void
   settle: (index: number) => void
-  attach: (slide: ((index: number) => void) | null) => void
+  attach: (vista: Vista | null) => void
 }
 
 const DeckContext = createContext<Deck | null>(null)
@@ -56,7 +62,7 @@ export function ShopDeckProvider({
   children: ReactNode
 }) {
   const [index, setIndex] = useState(initial)
-  const slide = useRef<((index: number) => void) | null>(null)
+  const vista = useRef<Vista | null>(null)
 
   const aviso = useRef(onChange)
   useEffect(() => {
@@ -68,15 +74,18 @@ export function ShopDeckProvider({
     aviso.current?.(next)
   }, [])
 
-  const attach = useCallback((fn: ((index: number) => void) | null) => {
-    slide.current = fn
+  const attach = useCallback((next: Vista | null) => {
+    vista.current = next
   }, [])
 
   const go = useCallback(
     (next: number) => {
       if (next === index || next < 0 || next >= count) return
-      if (Math.abs(next - index) === 1 && slide.current) slide.current(next)
-      else settle(next)
+      if (Math.abs(next - index) === 1 && vista.current) vista.current.slide(next)
+      else {
+        vista.current?.anclar()
+        settle(next)
+      }
     },
     [index, count, settle],
   )
@@ -134,6 +143,8 @@ export function ShopDeck({ panels, className }: { panels: ReactNode[]; className
   const gesto = useRef({ x: 0, y: 0, dx: 0, eje: '' as '' | 'x' | 'y', vivo: false })
   const ocupado = useRef(false)
 
+  const [desfase, setDesfase] = useState(0)
+
   const mover = (px: number, ms = 0) => {
     const nodo = layer.current
     if (!nodo) return
@@ -141,32 +152,50 @@ export function ShopDeck({ panels, className }: { panels: ReactNode[]; className
     nodo.style.transform = `translate3d(${px}px, 0, 0)`
   }
 
+  const tope = useCallback(() => {
+    const nodo = view.current
+    if (!nodo) return 0
+    return parseFloat(getComputedStyle(nodo).scrollMarginTop) || 0
+  }, [])
+
+  const anclar = useCallback(() => {
+    const nodo = view.current
+    if (!nodo) return
+    const dy = nodo.getBoundingClientRect().top - tope()
+    if (dy < 0) window.scrollBy(0, dy)
+  }, [tope])
+
+  const alinear = useCallback(() => {
+    const nodo = view.current
+    if (!nodo) return
+    setDesfase(Math.max(0, tope() - nodo.getBoundingClientRect().top))
+  }, [tope])
+
   const slide = useCallback(
     (next: number) => {
       const ancho = (view.current?.clientWidth ?? 0) + GAP
       const paso = next - deck.index
       ocupado.current = true
+      alinear()
       mover(-paso * ancho, SNAP_MS)
 
       window.setTimeout(() => {
+        anclar()
+        flushSync(() => {
+          setDesfase(0)
+          deck.settle(next)
+        })
         mover(0)
         ocupado.current = false
-        deck.settle(next)
       }, SNAP_MS)
     },
-    [deck],
+    [deck, alinear, anclar],
   )
 
   useEffect(() => {
-    deck.attach(slide)
+    deck.attach({ slide, anclar })
     return () => deck.attach(null)
-  }, [deck, slide])
-
-  useEffect(() => {
-    const nodo = view.current
-    if (!nodo || nodo.getBoundingClientRect().top >= 0) return
-    nodo.scrollIntoView({ block: 'start' })
-  }, [deck.index])
+  }, [deck, slide, anclar])
 
   const onStart = (event: React.TouchEvent) => {
     if (ocupado.current || event.touches.length !== 1) return
@@ -191,6 +220,7 @@ export function ShopDeck({ panels, className }: { panels: ReactNode[]; className
         g.vivo = false
         return
       }
+      alinear()
     }
 
     const hay = dx < 0 ? deck.index < deck.count - 1 : deck.index > 0
@@ -238,8 +268,11 @@ export function ShopDeck({ panels, className }: { panels: ReactNode[]; className
             <div
               key={i}
               aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-0"
-              style={{ transform: `translateX(calc(${salto * 100}% + ${salto * GAP}px))` }}
+              className="pointer-events-none absolute inset-x-0"
+              style={{
+                top: desfase,
+                transform: `translateX(calc(${salto * 100}% + ${salto * GAP}px))`,
+              }}
             >
               {montado && vecina ? panel : null}
             </div>

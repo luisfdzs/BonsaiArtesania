@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { useRef } from 'react'
 import { ProductGrid } from '@/components/tienda/ProductGrid'
 import { ShopDeck, ShopDeckProvider, useShopDeck } from '@/components/tienda/ShopDeck'
 import { ShopRail } from '@/components/tienda/ShopRail'
@@ -37,12 +36,10 @@ export function Escaparate(props: Props) {
 
 function Vitrina({ familias, locale, navLabel, verMas, personalizar, personalizarHref }: Props) {
   const { index, go } = useShopDeck()
-  const panel = useRef<HTMLDivElement>(null)
   const familia = familias[index]
 
   const elegir = (i: number) => {
     if (i === index) return
-    panel.current?.scrollIntoView({ block: 'start' })
     go(i)
   }
 
@@ -118,13 +115,12 @@ function Vitrina({ familias, locale, navLabel, verMas, personalizar, personaliza
       </div>
 
       <div
-        ref={panel}
         role="tabpanel"
         id="escaparate-panel"
         aria-labelledby={`escaparate-tab-${familia.key}`}
-        className="mt-14 scroll-mt-[7.75rem] md:scroll-mt-[8.75rem]"
+        className="mt-14"
       >
-        <ShopDeck panels={panels} />
+        <ShopDeck panels={panels} className="scroll-mt-[9.75rem] md:scroll-mt-[10.75rem]" />
       </div>
 
       <Reveal
