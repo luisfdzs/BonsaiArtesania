@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { PackageIcon } from '@/components/cuenta/CuentaIcons'
+import { GestionPendingSignal } from '@/components/gestion/GestionPending'
 import { AccountIcon } from '@/components/layout/NavIcons'
 import { cn } from '@/lib/cn'
 import type { Localized } from '@/lib/i18n/config'
@@ -12,10 +13,21 @@ import { useTranslator } from '@/lib/i18n/useLocale'
 const items: {
   route: string
   label: Localized
+  waiting: Localized
   Icon: (props: { className?: string }) => React.ReactElement
 }[] = [
-  { route: '/gestion', label: { es: 'Pedidos', gl: 'Pedidos' }, Icon: PackageIcon },
-  { route: '/gestion/cuenta', label: { es: 'Tu cuenta', gl: 'A túa conta' }, Icon: AccountIcon },
+  {
+    route: '/gestion',
+    label: { es: 'Pedidos', gl: 'Pedidos' },
+    waiting: { es: 'Abriendo los pedidos', gl: 'Abrindo os pedidos' },
+    Icon: PackageIcon,
+  },
+  {
+    route: '/gestion/cuenta',
+    label: { es: 'Tu cuenta', gl: 'A túa conta' },
+    waiting: { es: 'Abriendo tu cuenta', gl: 'Abrindo a túa conta' },
+    Icon: AccountIcon,
+  },
 ]
 
 /**
@@ -38,7 +50,7 @@ export function GestionNav() {
     <nav aria-label={t({ es: 'Secciones de la gestión', gl: 'Seccións da xestión' })}>
       <ul className="flex flex-wrap justify-center gap-x-2 gap-y-1">
         {items.map((item) => {
-          const { label, Icon } = item
+          const { label, waiting, Icon } = item
           // Exacto para «Pedidos» y por prefijo para el resto: si no, la raíz
           // del panel se quedaría encendida en todas las secciones. La ficha de
           // un pedido cuelga de `/gestion/pedidos`, así que sigue marcando
@@ -64,6 +76,7 @@ export function GestionNav() {
               >
                 <Icon className="h-4 w-4 shrink-0" />
                 {t(label)}
+                {!active && <GestionPendingSignal label={t(waiting)} />}
               </Link>
             </li>
           )

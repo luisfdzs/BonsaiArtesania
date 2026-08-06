@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { signOut } from '@/auth'
 import { LogoutIcon } from '@/components/cuenta/CuentaIcons'
 import { GestionNav } from '@/components/gestion/GestionNav'
+import { GestionPendingProvider, GestionPendingSlot } from '@/components/gestion/GestionPending'
 import { BackButton } from '@/components/layout/BackButton'
 import { Wordmark } from '@/components/layout/Wordmark'
 import { FormPending } from '@/components/ui/FormPending'
@@ -39,15 +40,15 @@ export default async function GestionLayout({
   const email = session.user?.email ?? ''
 
   return (
-    <>
-      <header className="sticky top-0 z-50 bg-linen/90 text-bark backdrop-blur-md">
+    <GestionPendingProvider>
+      <header className="sticky top-0 z-50 border-b border-line bg-linen/90 text-bark backdrop-blur-md">
         <div className="page-gutter relative flex h-20 items-center justify-center md:h-24">
           <BackButton className="absolute left-(--spacing-gutter)" />
 
           <Wordmark className="h-7 md:h-9" />
         </div>
 
-        <div className="page-gutter border-t border-line py-2 md:hidden">
+        <div className="page-gutter pb-2 md:pb-4">
           <GestionNav />
         </div>
       </header>
@@ -55,11 +56,9 @@ export default async function GestionLayout({
       <main id="main" className="page-gutter flex-1 pb-(--spacing-section)">
         <h1 className="sr-only">{t(TITLE)}</h1>
 
-        <div className="mx-auto hidden max-w-2xl flex-col items-center border-b border-line pb-8 text-center md:flex md:max-w-none">
-          <GestionNav />
+        <div className="mx-auto mt-8 max-w-2xl text-center md:mt-12 md:max-w-none">
+          <GestionPendingSlot>{children}</GestionPendingSlot>
         </div>
-
-        <div className="mx-auto mt-8 max-w-2xl text-center md:mt-12 md:max-w-none">{children}</div>
 
         <div className="mx-auto mt-20 flex max-w-2xl flex-col items-center gap-6 border-t border-line pt-10 text-center md:max-w-none">
           {email && (
@@ -85,6 +84,6 @@ export default async function GestionLayout({
 
         <ScrollTop />
       </main>
-    </>
+    </GestionPendingProvider>
   )
 }
