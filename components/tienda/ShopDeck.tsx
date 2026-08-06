@@ -162,6 +162,12 @@ export function ShopDeck({ panels, className }: { panels: ReactNode[]; className
     return () => deck.attach(null)
   }, [deck, slide])
 
+  useEffect(() => {
+    const nodo = view.current
+    if (!nodo || nodo.getBoundingClientRect().top >= 0) return
+    nodo.scrollIntoView({ block: 'start' })
+  }, [deck.index])
+
   const onStart = (event: React.TouchEvent) => {
     if (ocupado.current || event.touches.length !== 1) return
     const toque = event.touches[0]
