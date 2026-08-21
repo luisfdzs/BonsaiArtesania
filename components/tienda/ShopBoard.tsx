@@ -48,13 +48,7 @@ function Board({ locale, familias, current, navLabel, notice }: Props) {
   const { index } = useShopDeck()
 
   const panels = familias.map((f, i) => (
-    <ProductGrid
-      key={f.key}
-      items={f.items}
-      locale={locale}
-      priority={i === current}
-      className="grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3"
-    />
+    <ProductGrid key={f.key} items={f.items} locale={locale} priority={i === current} />
   ))
 
   return (
