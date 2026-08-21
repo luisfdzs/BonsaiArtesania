@@ -11,7 +11,7 @@ import { navigation } from '@/lib/navigation'
 import { onHome, useActiveSection } from '@/lib/useActiveSection'
 import { useCartCount } from './CartCount'
 import { LocalePicker } from './LocalePicker'
-import { AccountIcon, CartIcon, CloseIcon, ContactIcon, HomeIcon, MenuIcon } from './NavIcons'
+import { AccountIcon, CartIcon, CloseIcon, HomeIcon, MenuIcon, ShopIcon } from './NavIcons'
 
 /**
  * La navegación de móvil: un cilindro fijo abajo, flotando con aire alrededor,
@@ -22,10 +22,10 @@ import { AccountIcon, CartIcon, CloseIcon, ContactIcon, HomeIcon, MenuIcon } fro
  * recolocar el aparato y la esquina superior derecha no. Arriba se queda sólo la
  * marca, que es identidad y no navegación.
  *
- * Cinco sitios, de izquierda a derecha: inicio, cuenta, carrito, contacto y el
+ * Cinco sitios, de izquierda a derecha: inicio, cuenta, carrito, tienda y el
  * resto del menú. Los cuatro primeros son destinos y el quinto abre un panel con
- * las tres secciones editoriales que no caben en la barra. Con la tienda cerrada
- * el carrito no aparece y quedan cuatro.
+ * las secciones que no caben en la barra. Con la tienda cerrada el carrito no
+ * aparece y quedan cuatro.
  *
  * Sólo iconos, sin rótulo: cinco palabras en versalitas a lo ancho de un móvil de
  * 360px o se cortan o se aprietan hasta ser ilegibles. El nombre accesible va en
@@ -71,23 +71,23 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
   // vez, que es peor que marcar sólo el que toca.
   const section = useActiveSection()
   const homeActive = onHome(pathname) && !section
-  const contactoActive = section === 'contacto'
 
-  // «Contacto» sale de la barra con su propio icono; las otras tres entradas del
+  // «Tienda» sale de la barra con su propio icono; las otras tres entradas del
   // menú del sitio son las que se despliegan. Se derivan de `navigation` en vez
-  // de repetirse aquí: el menú tiene que decir lo mismo en móvil y en escritorio.
-  const panelItems = navigation.filter((item) => item.route !== '/#contacto')
+  // de repetirse aquí.
+  const panelItems = navigation.filter((item) => item.route !== '/tienda')
 
-  // Estando en Tienda, en Encargos o en El taller, ninguno de los cinco iconos
-  // diría dónde está: la sección vive detrás del menú. Así que el que la guarda
-  // se marca como activo, y la barra nunca queda sin señalar la página.
+  // Estando en Encargos, en El taller o en Contacto, ninguno de los cinco
+  // iconos diría dónde está: la sección vive detrás del menú. Así que el que la
+  // guarda se marca como activo, y la barra nunca queda sin señalar la página.
   //
   // Se compara contra `route` —la ruta sin idioma— y no contra `pathname`: con
   // el idioma delante, `/gl/tienda` no empieza por `/tienda`.
   const inPanel =
     panelItems.some((item) => !item.route.includes('#') && route.startsWith(item.route)) ||
     section === 'encargos' ||
-    section === 'taller'
+    section === 'taller' ||
+    section === 'contacto'
 
   return (
     <>
@@ -101,10 +101,11 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
           impide que el menú se le meta por detrás. */}
       <div
         id="menu-movil"
-        hidden={!open}
-        // Sin utilidad de `display`: el atributo `hidden` es quien apaga el panel
-        // y un `flex` aquí discutiría con él. El centrado lo pone el <nav>.
-        className="page-gutter fixed inset-0 z-50 overflow-y-auto bg-linen pb-(--spacing-nav-mobile) md:hidden"
+        inert={!open}
+        className={cn(
+          'page-gutter fixed inset-0 z-50 overflow-y-auto bg-linen pb-(--spacing-nav-mobile) transition-opacity duration-300 ease-out md:hidden',
+          open ? 'opacity-100' : 'opacity-0',
+        )}
       >
         <nav
           className="flex min-h-full flex-col items-center justify-center gap-7 py-12 text-center"
@@ -198,12 +199,12 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
         )}
 
         <NavSlot
-          href={path(locale, '/#contacto')}
-          label={t({ es: 'Contacto', gl: 'Contacto' })}
-          active={contactoActive && !open}
+          href={path(locale, '/tienda')}
+          label={t({ es: 'Tienda', gl: 'Tenda' })}
+          active={route.startsWith('/tienda') && !open}
           onClick={close}
         >
-          <ContactIcon className="h-6 w-6" />
+          <ShopIcon className="h-6 w-6" />
         </NavSlot>
 
         <button

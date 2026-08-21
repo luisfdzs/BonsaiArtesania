@@ -107,7 +107,35 @@ export function Hero({ locale }: { locale: Locale }) {
           })}
         </h1>
         <p className="mt-8 max-w-md text-linen/85">{t(site.intro)}</p>
+
+        <div className="mt-12 flex justify-center">
+          <a
+            href="#catalogo"
+            className="tap flex flex-col items-center gap-2 text-linen/75 transition-colors duration-700 hover:text-linen"
+          >
+            <span className="eyebrow">{t({ es: 'Catálogo', gl: 'Catálogo' })}</span>
+            <ArrowDownIcon className="h-5 w-5 animate-nudge-down" />
+          </a>
+        </div>
       </div>
     </section>
+  )
+}
+
+function ArrowDownIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      className={className}
+    >
+      <path d="M12 5v14" />
+      <path d="m19 12-7 7-7-7" />
+    </svg>
   )
 }
