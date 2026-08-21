@@ -1,7 +1,10 @@
 import { cache } from 'react'
+import { ObjectId } from 'mongodb'
 import NextAuth from 'next-auth'
+import Google from 'next-auth/providers/google'
 import { MongoDBAdapter } from '@auth/mongodb-adapter'
 import { getClient, DB_NAME } from '@/lib/db'
+import { users } from '@/lib/schema'
 
 /**
  * Sesiones y cuenta: **correo verificado con un código, y contraseña para volver**.
@@ -11,11 +14,12 @@ import { getClient, DB_NAME } from '@/lib/db'
  * sin volver a pisar el buzón. Si se olvida, el mismo código sirve para ponerla de
  * nuevo. Todo eso vive en `app/entrar/actions.ts`, `lib/codes.ts` y `lib/password.ts`.
  *
- * **Aquí ya no hay `providers`, y no es un olvido.** Antes había uno de Nodemailer
- * que mandaba un enlace de un solo uso; se quitó porque obligaba a abrir el correo
- * en el mismo navegador donde estabas comprando y porque dejaba en el buzón, vivo,
- * algo que abría la cuenta entera con un clic. Con contraseña se entra en dos
- * segundos y desde cualquier sitio, y el correo sólo hace falta el día del alta.
+ * **El único `providers` que hay es Google**, y es el atajo, no el camino. Antes
+ * hubo uno de Nodemailer que mandaba un enlace de un solo uso; se quitó porque
+ * obligaba a abrir el correo en el mismo navegador donde estabas comprando y
+ * porque dejaba en el buzón, vivo, algo que abría la cuenta entera con un clic.
+ * Con contraseña se entra en dos segundos y desde cualquier sitio, y el correo
+ * sólo hace falta el día del alta.
  *
  * Auth.js no ofrece ninguna pieza para eso: su proveedor de credenciales existe,
  * pero se niega a funcionar con `strategy: 'database'`. Así que de esta librería se
@@ -35,20 +39,53 @@ import { getClient, DB_NAME } from '@/lib/db'
 // durante el build (ver el comentario en lib/db.ts).
 export const adapter = MongoDBAdapter(getClient, { databaseName: DB_NAME })
 
-export const { handlers, auth, signOut } = NextAuth({
+const googleId = process.env.AUTH_GOOGLE_ID
+const googleSecret = process.env.AUTH_GOOGLE_SECRET
+
+export const googleEnabled = Boolean(googleId && googleSecret)
+
+export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter,
   session: { strategy: 'database' },
   /**
-   * Vacío a propósito: no hay ningún proveedor externo ni ninguna pantalla de
-   * acceso de Auth.js. La nuestra está en `/entrar` y habla con la base de datos
-   * directamente.
+   * El único proveedor de Auth.js que hay es Google, y sólo abre cuenta: entrar
+   * con correo y contraseña lo sigue haciendo `lib/session.ts` a mano, porque el
+   * proveedor de credenciales de la librería no admite `strategy: 'database'`.
+   *
+   * `allowDangerousEmailAccountLinking` engancha la cuenta de Google a la que ya
+   * existiera con ese mismo correo en vez de plantar un error. El nombre asusta
+   * con razón —fiarse de un proveedor que no verifique las direcciones deja entrar
+   * en cuentas ajenas— pero aquí no se le cree a Google por defecto: el callback
+   * `signIn` de abajo exige `email_verified` en cada entrada.
+   *
+   * Sin esto, quien se dio de alta con contraseña y luego pulsa el botón de Google
+   * se estrella contra `OAuthAccountNotLinked` sin manera de arreglarlo desde la
+   * web, que es el peor final posible para el atajo que se venía a usar.
    */
-  providers: [],
+  providers: googleEnabled
+    ? [
+        Google({
+          clientId: googleId,
+          clientSecret: googleSecret,
+          allowDangerousEmailAccountLinking: true,
+          profile: (profile) => ({
+            id: profile.sub,
+            name: profile.name ?? null,
+            email: profile.email.toLowerCase(),
+            image: profile.picture ?? null,
+          }),
+        }),
+      ]
+    : [],
   pages: {
     signIn: '/entrar',
     error: '/entrar',
   },
   callbacks: {
+    signIn({ account, profile }) {
+      if (account?.provider !== 'google') return true
+      return profile?.email_verified === true && typeof profile.email === 'string'
+    },
     /**
      * El id del usuario no viaja en la sesión por defecto. Lo necesitamos en cada
      * consulta —direcciones, carrito y pedidos son siempre «los de este usuario»—,
@@ -59,6 +96,22 @@ export const { handlers, auth, signOut } = NextAuth({
         session.user.id = user.id
       }
       return session
+    },
+  },
+  events: {
+    async createUser({ user }) {
+      if (!user.id) return
+      const now = new Date()
+      const collection = await users()
+      await collection.updateOne({ _id: new ObjectId(user.id) }, [
+        {
+          $set: {
+            emailVerified: { $ifNull: ['$emailVerified', now] },
+            createdAt: { $ifNull: ['$createdAt', now] },
+            updatedAt: now,
+          },
+        },
+      ])
     },
   },
 })

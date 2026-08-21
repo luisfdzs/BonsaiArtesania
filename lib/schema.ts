@@ -182,6 +182,16 @@ export type EmailCodeDoc = {
   createdAt: Date
 }
 
+export type PushSubscriptionDoc = {
+  _id: ObjectId
+  email: string
+  endpoint: string
+  keys: { p256dh: string; auth: string }
+  userAgent?: string | null
+  createdAt: Date
+  updatedAt: Date
+}
+
 export async function users(): Promise<Collection<UserDoc>> {
   return (await getDb()).collection<UserDoc>('users')
 }
@@ -200,6 +210,10 @@ export async function carts(): Promise<Collection<CartDoc>> {
 
 export async function orders(): Promise<Collection<OrderDoc>> {
   return (await getDb()).collection<OrderDoc>('orders')
+}
+
+export async function pushSubscriptions(): Promise<Collection<PushSubscriptionDoc>> {
+  return (await getDb()).collection<PushSubscriptionDoc>('push_subscriptions')
 }
 
 /** Euros del catálogo → céntimos del pedido. Redondea para evitar 3199.9999. */

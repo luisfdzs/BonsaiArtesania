@@ -167,6 +167,25 @@ const validators = {
       },
     },
   },
+  push_subscriptions: {
+    bsonType: 'object',
+    required: ['email', 'endpoint', 'keys'],
+    properties: {
+      email: { bsonType: 'string', minLength: 3, maxLength: 160 },
+      endpoint: { bsonType: 'string', maxLength: 1000 },
+      keys: {
+        bsonType: 'object',
+        required: ['p256dh', 'auth'],
+        properties: {
+          p256dh: { bsonType: 'string', maxLength: 400 },
+          auth: { bsonType: 'string', maxLength: 400 },
+        },
+      },
+      userAgent: { bsonType: ['string', 'null'] },
+      createdAt: { bsonType: 'date' },
+      updatedAt: { bsonType: 'date' },
+    },
+  },
 }
 
 /** Índices. El comentario de cada uno explica qué consulta lo justifica. */
@@ -244,6 +263,10 @@ const indexes = {
     // llevar los contadores en la base es barato.
     { keys: { expiresAt: 1 }, options: { expireAfterSeconds: 0, name: 'caducidad' } },
   ],
+
+  push_subscriptions: [
+    { keys: { endpoint: 1 }, options: { unique: true, name: 'endpoint_unico' } },
+  ],
 }
 
 const client = new MongoClient(uri)
@@ -270,6 +293,8 @@ try {
     'counters',
     // Contadores de los límites de uso. Se vacían solos por TTL; ver lib/rate-limit.ts.
     'rate_limits',
+    // Dispositivos que reciben el aviso de pedido en la app. Uno por navegador.
+    'push_subscriptions',
   ]
 
   console.log(`\n  Base: ${DB_NAME}\n`)

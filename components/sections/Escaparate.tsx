@@ -1,9 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { FamilyFlow, bucle } from '@/components/tienda/FamilyFlow'
+import { FamilyFlow } from '@/components/tienda/FamilyFlow'
 import { ProductGrid } from '@/components/tienda/ProductGrid'
-import { ShopDeck, ShopDeckProvider, useShopDeck } from '@/components/tienda/ShopDeck'
+import { ShopDeck, ShopDeckProvider, bucle, useShopDeck } from '@/components/tienda/ShopDeck'
 import { Reveal } from '@/components/ui/Reveal'
 import { cn } from '@/lib/cn'
 import type { ProductCardData } from '@/content/products'
@@ -38,7 +38,7 @@ export function Escaparate(props: Props) {
 }
 
 function Vitrina({ familias, locale, navLabel, verMas, personalizar, personalizarHref }: Props) {
-  const { index, go } = useShopDeck()
+  const { index, go, seguir } = useShopDeck()
   const familia = familias[index]
 
   const elegir = (i: number) => {
@@ -103,6 +103,7 @@ function Vitrina({ familias, locale, navLabel, verMas, personalizar, personaliza
           index={index}
           onSelect={(i) => elegir(bucle(i, familias.length))}
           navLabel={navLabel}
+          arrastre={seguir}
         />
       </div>
 

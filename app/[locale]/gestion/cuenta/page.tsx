@@ -4,8 +4,10 @@ import { notFound } from 'next/navigation'
 import { PasswordForm } from '@/components/cuenta/PasswordForm'
 import { ProfileForm } from '@/components/cuenta/ProfileForm'
 import { SectionIntro } from '@/components/cuenta/SectionIntro'
+import { AvisosMovil } from '@/components/gestion/AvisosMovil'
 import { adminSession } from '@/lib/admin'
 import { isLocale, pick, translator } from '@/lib/i18n/config'
+import { pushPublicKey } from '@/lib/push'
 import { users } from '@/lib/schema'
 
 type Params = { params: Promise<{ locale: string }> }
@@ -88,6 +90,19 @@ export default async function GestionCuentaPage({ params }: Params) {
 
         <div className="mt-12">
           <PasswordForm hasPassword={Boolean(user.passwordHash)} />
+        </div>
+      </div>
+
+      <div className="mt-16">
+        <SectionIntro title={t({ es: 'Avisos en el móvil', gl: 'Avisos no móbil' })}>
+          {t({
+            es: 'Cada dispositivo se activa por separado, desde la app añadida a la pantalla de inicio.',
+            gl: 'Cada dispositivo actívase por separado, desde a app engadida á pantalla de inicio.',
+          })}
+        </SectionIntro>
+
+        <div className="mt-12">
+          <AvisosMovil publicKey={pushPublicKey()} />
         </div>
       </div>
     </section>

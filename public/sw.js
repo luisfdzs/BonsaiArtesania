@@ -54,3 +54,43 @@ self.addEventListener('fetch', (event) => {
     }),
   )
 })
+
+self.addEventListener('push', (event) => {
+  let aviso = {}
+  try {
+    aviso = event.data ? event.data.json() : {}
+  } catch {
+    aviso = {}
+  }
+
+  const titulo = aviso.title || 'Bonsái Artesanía'
+  const opciones = {
+    body: aviso.body || '',
+    icon: '/icons/app-192.png',
+    badge: '/icons/app-192.png',
+    tag: aviso.tag || 'bonsai-aviso',
+    renotify: true,
+    data: { url: aviso.url || '/es/gestion' },
+  }
+
+  event.waitUntil(self.registration.showNotification(titulo, opciones))
+})
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close()
+
+  const destino = new URL(
+    (event.notification.data && event.notification.data.url) || '/es/gestion',
+    self.location.origin,
+  )
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((ventanas) => {
+      for (const ventana of ventanas) {
+        if (new URL(ventana.url).origin !== destino.origin) continue
+        return ventana.focus().then((abierta) => abierta.navigate(destino.href))
+      }
+      return self.clients.openWindow(destino.href)
+    }),
+  )
+})
