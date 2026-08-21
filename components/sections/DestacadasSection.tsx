@@ -35,15 +35,21 @@ export function DestacadasSection({ locale }: { locale: Locale }) {
     [...items]
       .sort((a, b) => Number(b.featured) - Number(a.featured))
       .slice(0, HOME_PREVIEW_SIZE)
-      .map(({ slug, name, summary, image }) => ({ slug, name, summary, image }))
+      .map(({ slug, name, image }) => ({ slug, name, image }))
 
-  const familias: EscaparateFamilia[] = conPiezas.map((category) => ({
-    key: category.key,
-    label: t(category.label),
-    href: path(locale, `/tienda/categoria/${category.key}`),
-    verMasLabel: `${t({ es: 'Ver todos los', gl: 'Ver todos os' })} ${t(category.plural)}`,
-    items: muestra(category.items),
-  }))
+  const familias: EscaparateFamilia[] = conPiezas.map((category) => {
+    const primera = category.items[0]
+
+    return {
+      key: category.key,
+      label: t(category.label),
+      href: path(locale, `/tienda/categoria/${category.key}`),
+      verMasLabel: `${t({ es: 'Ver todos los', gl: 'Ver todos os' })} ${t(category.plural)}`,
+      // La miniatura de la barra de familias. Ver `FamilyFlow`.
+      thumb: primera?.image ? t(primera.image) : null,
+      items: muestra(category.items),
+    }
+  })
 
   return (
     /* El `pt` no es decoración: sin él la sección arrancaba pegada al borde del

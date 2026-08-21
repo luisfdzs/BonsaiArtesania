@@ -1,19 +1,22 @@
 'use client'
 
 import Link from 'next/link'
+import { FamilyFlow, bucle } from '@/components/tienda/FamilyFlow'
 import { ProductGrid } from '@/components/tienda/ProductGrid'
 import { ShopDeck, ShopDeckProvider, useShopDeck } from '@/components/tienda/ShopDeck'
-import { ShopRail } from '@/components/tienda/ShopRail'
 import { Reveal } from '@/components/ui/Reveal'
 import { cn } from '@/lib/cn'
 import type { ProductCardData } from '@/content/products'
 import type { Locale } from '@/lib/i18n/config'
+import type { Image } from '@/lib/media'
 
 export type EscaparateFamilia = {
   key: string
   label: string
   href: string
   verMasLabel: string
+  /** La primera foto de la familia: la miniatura de la barra. */
+  thumb: Image | null
   items: ProductCardData[]
 }
 
@@ -91,43 +94,23 @@ function Vitrina({ familias, locale, navLabel, verMas, personalizar, personaliza
 
   return (
     <>
-      <div role="tablist" aria-label={navLabel} className="shop-nav">
-        <ShopRail follow={index}>
-          {familias.map((f, i) => (
-            <button
-              key={f.key}
-              type="button"
-              role="tab"
-              id={`escaparate-tab-${f.key}`}
-              aria-selected={i === index}
-              aria-controls="escaparate-panel"
-              tabIndex={i === index ? 0 : -1}
-              onClick={() => elegir(i)}
-              onKeyDown={(event) => {
-                const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0
-                if (!step) return
-                event.preventDefault()
-                const siguiente = (index + step + familias.length) % familias.length
-                const next = familias[siguiente]
-                if (!next) return
-                elegir(siguiente)
-                document.getElementById(`escaparate-tab-${next.key}`)?.focus()
-              }}
-              className="shop-tab tap"
-            >
-              {f.label}
-            </button>
-          ))}
-        </ShopRail>
+      {/* La misma barra que la tienda: `FamilyFlow`. Aquí las familias no son
+          enlaces —no se sale de la portada, se cambia lo que enseña el mazo—, así
+          que la lista desplegable las pinta como botones. Ver `FamilyFlow`. */}
+      <div className="shop-nav">
+        <FamilyFlow
+          familias={familias}
+          index={index}
+          onSelect={(i) => elegir(bucle(i, familias.length))}
+          navLabel={navLabel}
+        />
       </div>
 
-      <div
-        role="tabpanel"
-        id="escaparate-panel"
-        aria-labelledby={`escaparate-tab-${familia.key}`}
-        className="mt-14"
-      >
-        <ShopDeck panels={panels} className="scroll-mt-[9.75rem] md:scroll-mt-[10.75rem]" />
+      <div className="mt-8">
+        <ShopDeck
+          panels={panels}
+          className="shop-deck scroll-mt-[9.75rem] md:scroll-mt-[10.75rem]"
+        />
       </div>
     </>
   )

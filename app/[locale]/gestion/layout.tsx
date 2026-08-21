@@ -4,7 +4,6 @@ import { signOut } from '@/auth'
 import { LogoutIcon } from '@/components/cuenta/CuentaIcons'
 import { GestionNav } from '@/components/gestion/GestionNav'
 import { GestionPendingProvider, GestionPendingSlot } from '@/components/gestion/GestionPending'
-import { BackButton } from '@/components/layout/BackButton'
 import { Wordmark } from '@/components/layout/Wordmark'
 import { FormPending } from '@/components/ui/FormPending'
 import { ScrollTop } from '@/components/ui/ScrollTop'
@@ -43,8 +42,6 @@ export default async function GestionLayout({
     <GestionPendingProvider>
       <header className="sticky top-0 z-50 border-b border-line bg-linen/90 text-bark backdrop-blur-md">
         <div className="page-gutter relative flex h-20 items-center justify-center md:h-24">
-          <BackButton className="absolute left-(--spacing-gutter)" />
-
           <Wordmark className="h-7 md:h-9" />
         </div>
 
