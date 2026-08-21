@@ -12,7 +12,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   return (
     <>
       <Hero locale={locale} />
-      <DestacadasSection locale={locale} />
+      <div id="catalogo" className="scroll-mt-20 md:scroll-mt-24">
+        <DestacadasSection locale={locale} />
+      </div>
       {/* Los encargos y el taller, en ese orden y en una sola sección: eran una
           página aparte y una sección suelta que contaban lo mismo. Ver
           `EncargosSection`. */}

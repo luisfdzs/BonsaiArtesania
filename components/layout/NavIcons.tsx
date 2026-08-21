@@ -83,3 +83,13 @@ export function CloseIcon({ className }: IconProps) {
     </svg>
   )
 }
+
+export function ShopIcon({ className }: IconProps) {
+  return (
+    <svg {...common} aria-hidden className={className}>
+      <path d="M2 7h20l-1.5-3.5A1 1 0 0 0 19.6 3H4.4a1 1 0 0 0-.9.5z" />
+      <path d="M4 7v13a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V7" />
+      <path d="M9 21v-6h6v6" />
+    </svg>
+  )
+}

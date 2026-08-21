@@ -35,7 +35,7 @@ export type Product = {
    * `null` = pieza a medida: no pasa por el carrito y se pide escribiendo.
    */
   price: number | null
-  /** Una línea. Es lo que se lee bajo el nombre en la rejilla. */
+  /** Una línea. Encabeza la ficha de la pieza; en la rejilla no se lee. */
   summary: Localized
   /** Párrafos de la ficha. */
   description: Localized<string[]>
@@ -59,7 +59,7 @@ export type Product = {
  * quedan en el servidor, que es donde se leen. `Product` lo cumple tal cual, así
  * que la tienda sigue pasando sus piezas sin tocar nada.
  */
-export type ProductCardData = Pick<Product, 'slug' | 'name' | 'summary' | 'image'>
+export type ProductCardData = Pick<Product, 'slug' | 'name' | 'image'>
 
 /**
  * Familias de la tienda. Cada una es además una subsección propia en

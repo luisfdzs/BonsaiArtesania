@@ -67,6 +67,7 @@
   --animate-bloom: bloom 1.6s var(--ease-out-soft) both;
   /* El vaivén de la flecha de volver arriba. Ver `nudge-up`. */
   --animate-nudge-up: nudge-up 2.8s var(--ease-in-out-soft) infinite;
+  --animate-nudge-down: nudge-down 2.8s var(--ease-in-out-soft) infinite;
 }
 
 @keyframes reveal {
@@ -94,6 +95,17 @@
   }
   30% {
     transform: translateY(-3px);
+  }
+}
+
+@keyframes nudge-down {
+  0%,
+  55%,
+  100% {
+    transform: none;
+  }
+  30% {
+    transform: translateY(3px);
   }
 }
 
@@ -763,6 +775,225 @@
   &:hover {
     border-color: var(--color-sage);
     background: color-mix(in srgb, var(--color-linen-deep) 85%, transparent);
+  }
+}
+
+/* La tarjeta de una pieza del catálogo. A diferencia de `panel`, que es una caja
+   plana para agrupar datos, ésta tiene espesor: el canto de abajo es un pelo más
+   oscuro que el resto del filete, arriba lleva un brillo de un píxel y debajo dos
+   sombras, una pegada al canto y otra abierta y muy suave. Es lo que la separa
+   del lino sin recurrir a un contorno más fuerte. Al pasar por encima se levanta
+   tres píxeles; al pulsarla se hunde uno, que es la única forma de que el gesto
+   se sienta físico en el móvil, donde no hay hover. */
+@utility piece {
+  border: 1px solid var(--color-line);
+  border-bottom-color: color-mix(in srgb, var(--color-bark) 18%, var(--color-line));
+  border-radius: 1.4rem;
+  background: var(--color-linen);
+  padding: 0.5rem;
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--color-bark) 10%, transparent),
+    0 2px 3px -1px color-mix(in srgb, var(--color-bark) 8%, transparent),
+    0 16px 30px -16px color-mix(in srgb, var(--color-bark) 28%, transparent);
+  transition:
+    transform 0.7s var(--ease-out-soft),
+    box-shadow 0.7s var(--ease-out-soft);
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 1px 0 color-mix(in srgb, var(--color-bark) 10%, transparent),
+      0 4px 6px -2px color-mix(in srgb, var(--color-bark) 10%, transparent),
+      0 28px 46px -18px color-mix(in srgb, var(--color-bark) 34%, transparent);
+  }
+
+  &:active {
+    transform: translateY(1px);
+    box-shadow:
+      0 1px 0 color-mix(in srgb, var(--color-bark) 10%, transparent),
+      0 2px 4px -2px color-mix(in srgb, var(--color-bark) 12%, transparent);
+  }
+}
+
+/* El recorte de la foto dentro de la tarjeta. El aro interior —luz arriba,
+   sombra abajo— es lo que hace que la foto parezca encajada en el cartón y no
+   pegada encima. Va en un pseudoelemento porque `Media` no admite hijos. */
+@utility piece-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.95rem;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.5),
+      inset 0 -1px 0 color-mix(in srgb, var(--color-bark) 8%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--color-bark) 5%, transparent);
+  }
+}
+
+/* CARRUSEL DE FAMILIAS · las miniaturas en perspectiva de la barra de la tienda.
+   Es un cover flow en miniatura: la familia abierta va de frente en el centro y
+   las vecinas se giran sobre su eje y se van hacia atrás, así que la barra dice
+   a la vez dónde estás y que hay más a los lados. Lo mueve CSS con
+   `animation-timeline: view()` —la misma técnica que `reveal`, sin una línea de
+   JavaScript por fotograma— y por eso va envuelto en `@supports`: donde no haya
+   timelines de scroll el carril se queda plano, que se lee igual de bien.
+
+   El giro y la profundidad se miden en variables para poder afinarlos sin tocar
+   los fotogramas. `--flow-step` es la distancia entre centros y es menor que la
+   miniatura a propósito: las tarjetas se solapan, que es lo que hace que parezca
+   un mazo y no una fila. */
+@utility thumb-flow {
+  --flow-card: 4.5rem;
+  --flow-step: 3.1rem;
+  --flow-turn: 52deg;
+  --flow-depth: 2.25rem;
+  --flow-dim: 0.45;
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  /* Sin `scroll-snap`, y no por gusto: con `mandatory` el navegador reengancha
+     **cada** desplazamiento programático al punto de anclaje anterior, así que el
+     carril se quedaba clavado donde estaba y el cambio de familia se veía como un
+     tirón —probado en local: ni `scrollIntoView` ni `scrollTo` lo movían—. El
+     asentado al levantar el dedo lo hace `FamilyFlow`, que además lo hace con la
+     curva del sistema y no con la del navegador. */
+  /* Sitio a los lados para que la primera y la última también puedan quedar
+     centradas, y para que el giro de las de los extremos no se recorte. */
+  padding-inline: calc(50% - var(--flow-card) / 2);
+  padding-block: 0.6rem;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility thumb-flow-item {
+  flex: 0 0 var(--flow-card);
+  /* El solape: media miniatura menos medio paso a cada lado. */
+  margin-inline: calc((var(--flow-step) - var(--flow-card)) / 2);
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      view-timeline-name: --thumb-flow;
+      view-timeline-axis: inline;
+    }
+  }
+}
+
+/* La perspectiva va por miniatura y no en el carril: en un contenedor que
+   scrollea, un punto de fuga común se arrastra con el scroll y las tarjetas se
+   deforman al pasar. Una perspectiva propia por tarjeta las mantiene iguales
+   en cualquier posición. */
+@utility thumb-flow-stage {
+  display: block;
+  height: 100%;
+  perspective: 11rem;
+}
+
+@utility thumb-flow-card {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.55rem;
+  background: var(--color-linen);
+  box-shadow: 0 0 0 1px var(--color-line);
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      animation: thumb-flow-turn linear both;
+      animation-timeline: --thumb-flow;
+      animation-range: cover 12% cover 88%;
+    }
+  }
+
+  /* Las vecinas se apagan con un velo de lino por encima y NO bajando la
+     opacidad de la tarjeta. Con opacidad se transparentaban entre ellas: al
+     solaparse se veía la de detrás a través de la de delante, y en la abierta
+     —que es la que se mira— era justo donde más cantaba. Un velo opaco deja las
+     fotos macizas y apaga lo mismo. */
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: var(--color-linen);
+    opacity: var(--flow-dim);
+
+    @supports (animation-timeline: view()) {
+      @media (prefers-reduced-motion: no-preference) {
+        animation: thumb-flow-veil linear both;
+        animation-timeline: --thumb-flow;
+        animation-range: cover 12% cover 88%;
+      }
+    }
+  }
+}
+
+@keyframes thumb-flow-turn {
+  0% {
+    transform: translateZ(calc(var(--flow-depth) * -1)) rotateY(calc(var(--flow-turn) * -1));
+  }
+  50% {
+    transform: translateZ(0) rotateY(0deg);
+  }
+  100% {
+    transform: translateZ(calc(var(--flow-depth) * -1)) rotateY(var(--flow-turn));
+  }
+}
+
+@keyframes thumb-flow-veil {
+  0%,
+  100% {
+    opacity: var(--flow-dim);
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* La familia abierta, además del giro, lleva el aro de salvia y pasa por encima
+   de sus vecinas: sin esto la de la derecha la tapa por orden de pintado. */
+@utility thumb-flow-open {
+  z-index: 2;
+
+  & .thumb-flow-card {
+    box-shadow:
+      0 0 0 1.5px var(--color-sage-deep),
+      0 8px 16px -10px color-mix(in srgb, var(--color-bark) 55%, transparent);
+  }
+
+  /* Y sin velo, siempre: la familia abierta es la que se está mirando, así que
+     no se apaga ni mientras el carril va en camino de centrarla. */
+  & .thumb-flow-card::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* EL MAZO DE LA TIENDA. Lo que se desliza al cambiar de familia es todo lo que
+   hay debajo del selector, y llega hasta el final de la pantalla: con el bloque a
+   pantalla completa, la cabecera y la barra de familias se quedan quietas y lo
+   único que se mueve es el contenido, de una pieza. Sin esta altura mínima, una
+   familia de dos piezas dejaba el bloque a media pantalla y el cambio se veía
+   como un salto de alto además de un desplazamiento de lado.
+
+   Las cantidades son las mismas con las que el mazo ancla el scroll —la cabecera
+   más la barra—, de ahí que se repitan a partir de `md`. */
+@utility shop-deck {
+  min-height: calc(100svh - 13rem);
+
+  @media (width >= 48rem) {
+    min-height: calc(100svh - 14rem);
   }
 }
 

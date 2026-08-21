@@ -13,7 +13,9 @@ import {
   type ReactNode,
 } from 'react'
 import { flushSync } from 'react-dom'
+import { FlowerLoader } from '@/components/ui/FlowerLoader'
 import { cn } from '@/lib/cn'
+import { useTranslator } from '@/lib/i18n/useLocale'
 
 const GAP = 32
 
@@ -125,6 +127,13 @@ export function ShopLink({
       {children}
     </Link>
   )
+}
+
+/** La flor de espera, a la altura del bloque del mazo. */
+function Espera() {
+  const t = useTranslator()
+
+  return <FlowerLoader label={t({ es: 'Abriendo la familia', gl: 'Abrindo a familia' })} />
 }
 
 const sinCambios = () => () => {}
@@ -309,7 +318,11 @@ export function ShopDeck({ panels, className }: { panels: ReactNode[]; className
                 transform: `translateX(calc(${salto * 100}% + ${salto * GAP}px))`,
               }}
             >
-              {montado && vecina ? panel : null}
+              {/* La vecina se pinta sólo cuando ya se puede: antes de hidratar no
+                  hay nada que poner, y si el mazo se desliza en ese momento el
+                  hueco lo ocupa la flor de espera en vez de un blanco. Es el mismo
+                  indicador que el resto del sitio. Ver `FlowerLoader`. */}
+              {vecina ? montado ? panel : <Espera /> : null}
             </div>
           )
         })}
