@@ -2,10 +2,12 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { ProductCard } from '@/components/sections/ProductCard'
 import { AddToCart } from '@/components/tienda/AddToCart'
+import { productGridClass } from '@/components/tienda/ProductGrid'
 import { ContactButtons } from '@/components/ui/ContactButtons'
 import { Media } from '@/components/ui/Media'
 import { Reveal } from '@/components/ui/Reveal'
 import { getProduct, products } from '@/content/products'
+import { cn } from '@/lib/cn'
 import { orderMessage } from '@/lib/contact'
 import { isLocale, locales, pick, translator } from '@/lib/i18n/config'
 import { alternates } from '@/lib/i18n/metadata'
@@ -118,7 +120,7 @@ export default async function ProductPage({ params }: Params) {
         <h2 className="eyebrow border-b border-line pb-4">
           {t({ es: 'También te puede gustar', gl: 'Tamén te pode gustar' })}
         </h2>
-        <div className="mt-12 grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
+        <div className={cn('mt-12', productGridClass)}>
           {related.map((item, index) => (
             <Reveal key={item.slug} step={index}>
               <ProductCard product={item} locale={locale} />
