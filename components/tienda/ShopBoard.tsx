@@ -1,8 +1,8 @@
 'use client'
 
-import { FamilyFlow, bucle } from '@/components/tienda/FamilyFlow'
+import { FamilyFlow } from '@/components/tienda/FamilyFlow'
 import { ProductGrid } from '@/components/tienda/ProductGrid'
-import { ShopDeck, ShopDeckProvider, useShopDeck } from '@/components/tienda/ShopDeck'
+import { ShopDeck, ShopDeckProvider, bucle, useShopDeck } from '@/components/tienda/ShopDeck'
 import type { ProductCardData } from '@/content/products'
 import type { Locale } from '@/lib/i18n/config'
 import type { Image } from '@/lib/media'
@@ -46,7 +46,7 @@ export function ShopBoard(props: Props) {
 }
 
 function Board({ locale, familias, current, navLabel, notice }: Props) {
-  const { index, go } = useShopDeck()
+  const { index, go, seguir } = useShopDeck()
 
   const abierta = familias[index]
 
@@ -70,6 +70,7 @@ function Board({ locale, familias, current, navLabel, notice }: Props) {
           index={index}
           onSelect={(i) => go(bucle(i, familias.length))}
           navLabel={navLabel}
+          arrastre={seguir}
         />
       </div>
 

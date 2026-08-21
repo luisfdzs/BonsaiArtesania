@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Media } from '@/components/ui/Media'
 import { cn } from '@/lib/cn'
+import type { Seguir } from '@/components/tienda/ShopDeck'
 import type { Image } from '@/lib/media'
 
 export type FlowFamily = {
@@ -20,11 +21,11 @@ type Props = {
   index: number
   onSelect: (index: number) => void
   navLabel: string
-}
-
-/** El índice siempre dentro del rango: de la última familia a la primera. */
-export function bucle(index: number, count: number): number {
-  return ((index % count) + count) % count
+  /**
+   * El arrastre del mazo de productos, para que las miniaturas se muevan a la vez
+   * que las piezas y no cuando el gesto acaba. Ver `Seguir` en `ShopDeck`.
+   */
+  arrastre?: Seguir
 }
 
 /**
@@ -38,17 +39,19 @@ export function bucle(index: number, count: number): number {
  * consecuencia. Donde no haya timelines de scroll el carril se queda plano, que
  * se lee igual de bien.
  *
- * Debajo, el nombre de la familia abierta con una flecha; al pulsarlo se
- * despliega la lista entera flotando sobre el catálogo, sin empujarlo.
+ * Debajo, el nombre de la familia abierta con un chevrón; al pulsarlo se
+ * despliega la lista entera flotando sobre el catálogo, sin empujarlo. No hay
+ * flechas a los lados: el catálogo se cambia con el dedo o desde esa lista, y dos
+ * botones fijos sobre las miniaturas sólo tapaban mazo.
  */
-export function FamilyFlow({ familias, index, onSelect, navLabel }: Props) {
+export function FamilyFlow({ familias, index, onSelect, navLabel, arrastre }: Props) {
   const [desplegado, setDesplegado] = useState(false)
   const abierta = familias[index]
 
   return (
     <div className="relative">
       <nav aria-label={navLabel}>
-        <Carril familias={familias} index={index} onSelect={onSelect} />
+        <Carril familias={familias} index={index} onSelect={onSelect} arrastre={arrastre} />
       </nav>
 
       <div className="relative">
@@ -59,7 +62,7 @@ export function FamilyFlow({ familias, index, onSelect, navLabel }: Props) {
           /* La flecha va debajo del rótulo y no a su derecha: centrada bajo el
              nombre, la columna entera —miniatura, nombre, flecha— queda en un
              solo eje y la barra se lee de arriba abajo sin nada que la desvíe. */
-          className="mx-auto flex flex-col items-center gap-1 pb-1 text-sage-deep"
+          className="mx-auto flex flex-col items-center gap-1.5 pt-2.5 pb-4 text-sage-deep"
         >
           <span className="font-serif text-lead leading-none">{abierta?.label}</span>
           <Chevron abierto={desplegado} />
@@ -89,7 +92,7 @@ export function FamilyFlow({ familias, index, onSelect, navLabel }: Props) {
  *    trompicones: el carril se mueve libre y, cuando se para, la familia abierta
  *    pasa a ser la que ha quedado centrada. El movimiento es continuo porque es
  *    el del propio dedo.
- * 2. **La copia más cercana.** Al pulsar una flecha se centra la copia de esa
+ * 2. **La copia más cercana.** Al cambiar de familia se centra la copia de esa
  *    familia que ya esté más cerca, no la de la copia central. Si siempre se
  *    fuera a la central, cerrar el bucle —de la última a la primera— obligaba a
  *    recorrer el mazo entero de vuelta: eso era el salto raro.
@@ -97,13 +100,22 @@ export function FamilyFlow({ familias, index, onSelect, navLabel }: Props) {
  *    carril al centro se hace sólo cuando ya no se mueve nada. Hacerlo a media
  *    animación la cortaba, y ése era el otro tirón.
  */
-function Carril({ familias, index, onSelect }: Omit<Props, 'navLabel'>) {
+function Carril({ familias, index, onSelect, arrastre }: Omit<Props, 'navLabel'>) {
   const rail = useRef<HTMLDivElement>(null)
   const montado = useRef(false)
   const reposo = useRef<number | undefined>(undefined)
   const marco = useRef(0)
   const count = familias.length
   const copias = [...familias, ...familias, ...familias]
+
+  /** El índice de ahora mismo, para las devoluciones de llamada que viven fuera
+   *  del ciclo de render —el arrastre del mazo—. Se pone al día en un efecto y no
+   *  al pintar: escribir en una `ref` durante el render es de las cosas que React
+   *  no garantiza. */
+  const indice = useRef(index)
+  useEffect(() => {
+    indice.current = index
+  }, [index])
 
   /**
    * Lleva al centro la copia más cercana de una familia.
@@ -112,18 +124,23 @@ function Carril({ familias, index, onSelect }: Omit<Props, 'navLabel'>) {
    * a `behavior: 'smooth'`. Dos razones. La curva: el scroll suave del navegador
    * usa la suya, y aquí nada se mueve con una curva que no sea la del sistema
    * —`--ease-out-soft`, desaceleración larga—. Y el mando único: el asentado al
-   * levantar el dedo sale de esta misma función, así que arrastrar y pulsar una
-   * flecha se sienten igual en vez de ser dos movimientos distintos.
+   * levantar el dedo sale de esta misma función, así que arrastrar y elegir en la
+   * lista se sienten igual en vez de ser dos movimientos distintos.
    *
    * Por lo mismo el carril no lleva `scroll-snap`: con `mandatory`, el navegador
    * reengancha cada escritura de `scrollLeft` al punto de anclaje anterior y le
    * pelea el fotograma a esta animación. El anclaje lo hace `asentar`.
    */
-  const centrar = useCallback((familia: number, suave: boolean) => {
+  const centrar = useCallback((familia: number, suave: boolean, desdeElMedio = false) => {
     const node = rail.current
     if (!node) return
 
-    const objetivo = copiaCercana(node, familia)
+    // Al colocar la barra por primera vez se va a la copia del bloque del medio y
+    // no a la más cercana: la más cercana es la del primer bloque, que no tiene
+    // nada a su izquierda, y la barra aparecía con un hueco a un lado en vez de
+    // con las familias anteriores asomando. Después ya manda la cercanía, que es
+    // lo que hace que cerrar el bucle no dé la vuelta al mazo entero.
+    const objetivo = desdeElMedio ? copiaDelMedio(node, familia) : copiaCercana(node, familia)
     if (!objetivo) return
 
     const caja = objetivo.getBoundingClientRect()
@@ -168,12 +185,12 @@ function Carril({ familias, index, onSelect }: Omit<Props, 'navLabel'>) {
   useEffect(() => {
     const suave = montado.current
     montado.current = true
-    centrar(index, suave)
+    centrar(index, suave, !suave)
 
     // Al montar, las fotos todavía no tienen su tamaño y el centro cae donde no
     // es, así que la primera vez se repite en el fotograma siguiente.
     if (suave) return
-    const primero = requestAnimationFrame(() => centrar(index, false))
+    const primero = requestAnimationFrame(() => centrar(index, false, true))
     return () => cancelAnimationFrame(primero)
   }, [index, centrar])
 
@@ -185,6 +202,42 @@ function Carril({ familias, index, onSelect }: Omit<Props, 'navLabel'>) {
     [],
   )
 
+  /**
+   * El carril, atado al arrastre del mazo de productos.
+   *
+   * Mientras el dedo mueve las piezas, las miniaturas recorren la parte de paso
+   * que corresponda: las dos cosas se mueven juntas, que es lo que hace que la
+   * barra parezca el mando del catálogo y no un indicador que se actualiza
+   * después. Al soltar llega `null` y el carril se asienta solo —si el mazo se
+   * queda en la misma familia, volviendo a centrarla; si cambia, el efecto de
+   * arriba lo lleva a la nueva—.
+   */
+  const suelo = useRef<number | null>(null)
+  const salto = useRef(0)
+
+  useEffect(() => {
+    if (!arrastre) return
+
+    return arrastre((fraccion) => {
+      const node = rail.current
+      if (!node) return
+
+      if (fraccion === null) {
+        suelo.current = null
+        centrar(indice.current, true)
+        return
+      }
+
+      if (suelo.current === null) {
+        suelo.current = node.scrollLeft
+        salto.current = pasoDelCarril(node)
+      }
+
+      cancelAnimationFrame(marco.current)
+      node.scrollLeft = suelo.current - fraccion * salto.current
+    })
+  }, [arrastre, centrar])
+
   /** Devuelve el carril al bloque del medio. Instantáneo, y con el contenido
    *  repetido no hay nada que ver: la miniatura de destino es la misma. */
   const recolocar = (node: HTMLDivElement) => {
@@ -192,42 +245,6 @@ function Carril({ familias, index, onSelect }: Omit<Props, 'navLabel'>) {
     if (node.scrollLeft < bloque * 0.5) node.scrollLeft += bloque
     else if (node.scrollLeft > bloque * 1.5) node.scrollLeft -= bloque
   }
-
-  /**
-   * Mientras la flecha se mantenga pulsada, el carril corre hacia ese lado y va
-   * cogiendo velocidad. Devuelve la función que lo para.
-   *
-   * No cambia de familia en cada miniatura que pasa: eso sería una ráfaga de
-   * cambios y, en la tienda, una ráfaga de mazos deslizándose. Lo que se mueve es
-   * el carril, y la familia se decide al soltar, en `asentar` —igual que cuando se
-   * arrastra con el dedo—.
-   *
-   * La velocidad no arranca de golpe ni crece sin fin: sube de `EMPUJE_LENTO` a
-   * `EMPUJE_RAPIDO` en `EMPUJE_RAMPA` milisegundos, con la desaceleración larga
-   * del sistema. Y se lee `scrollLeft` en cada fotograma en vez de acumular desde
-   * un punto de partida, porque en medio puede haber una recolocación de bloque y
-   * el carril estar ya en otro sitio.
-   */
-  const empujar = useCallback((sentido: 1 | -1) => {
-    const node = rail.current
-    if (!node) return () => {}
-
-    cancelAnimationFrame(marco.current)
-    const arranque = performance.now()
-    let anterior = arranque
-
-    const paso = (ahora: number) => {
-      const dt = Math.min(32, ahora - anterior)
-      anterior = ahora
-      const rampa = Math.min(1, (ahora - arranque) / EMPUJE_RAMPA)
-      const v = EMPUJE_LENTO + (EMPUJE_RAPIDO - EMPUJE_LENTO) * (1 - (1 - rampa) ** 3)
-      node.scrollLeft += sentido * v * dt
-      marco.current = requestAnimationFrame(paso)
-    }
-
-    marco.current = requestAnimationFrame(paso)
-    return () => cancelAnimationFrame(marco.current)
-  }, [])
 
   /**
    * Al levantar el dedo: la familia que ha quedado en el centro pasa a ser la
@@ -245,54 +262,48 @@ function Carril({ familias, index, onSelect }: Omit<Props, 'navLabel'>) {
   }
 
   return (
-    <div className="flex items-center gap-1">
-      <Flecha hacia="atras" onPaso={() => onSelect(index - 1)} onEmpuje={empujar} />
+    <div
+      ref={rail}
+      className="thumb-flow"
+      onScroll={() => {
+        const node = rail.current
+        if (!node) return
 
-      <div
-        ref={rail}
-        className="thumb-flow min-w-0 flex-1"
-        onScroll={() => {
-          const node = rail.current
-          if (!node) return
+        // En el borde de verdad no se espera a que pare: ahí el arrastre se
+        // quedaría sin carril, y un tope sí se nota.
+        const margen = 24
+        if (
+          node.scrollLeft < margen ||
+          node.scrollLeft > node.scrollWidth - node.clientWidth - margen
+        ) {
+          recolocar(node)
+        }
 
-          // En el borde de verdad no se espera a que pare: ahí el arrastre se
-          // quedaría sin carril, y un tope sí se nota.
-          const margen = 24
-          if (
-            node.scrollLeft < margen ||
-            node.scrollLeft > node.scrollWidth - node.clientWidth - margen
-          ) {
-            recolocar(node)
-          }
+        window.clearTimeout(reposo.current)
+        reposo.current = window.setTimeout(() => asentar(node), REPOSO_MS)
+      }}
+    >
+      {copias.map((f, i) => {
+        const real = i % count
 
-          window.clearTimeout(reposo.current)
-          reposo.current = window.setTimeout(() => asentar(node), REPOSO_MS)
-        }}
-      >
-        {copias.map((f, i) => {
-          const real = i % count
-
-          return (
-            <button
-              key={`${f.key}-${i}`}
-              type="button"
-              data-familia={real}
-              aria-label={f.label}
-              aria-current={real === index ? 'true' : undefined}
-              onClick={() => onSelect(real)}
-              className={cn('thumb-flow-item', real === index && 'thumb-flow-open')}
-            >
-              <span className="thumb-flow-stage">
-                <span className="thumb-flow-card">
-                  <Media image={f.thumb} ratio="4 / 3" sizes="72px" />
-                </span>
+        return (
+          <button
+            key={`${f.key}-${i}`}
+            type="button"
+            data-familia={real}
+            aria-label={f.label}
+            aria-current={real === index ? 'true' : undefined}
+            onClick={() => onSelect(real)}
+            className={cn('thumb-flow-item', real === index && 'thumb-flow-open')}
+          >
+            <span className="thumb-flow-stage">
+              <span className="thumb-flow-card">
+                <Media image={f.thumb} ratio="4 / 3" sizes="72px" />
               </span>
-            </button>
-          )
-        })}
-      </div>
-
-      <Flecha hacia="adelante" onPaso={() => onSelect(index + 1)} onEmpuje={empujar} />
+            </span>
+          </button>
+        )
+      })}
     </div>
   )
 }
@@ -300,18 +311,23 @@ function Carril({ familias, index, onSelect }: Omit<Props, 'navLabel'>) {
 /** Lo que tarda el carril en llevar una familia al centro. */
 const DESLIZAR_MS = 520
 
-/** Velocidad del empuje de las flechas, en píxeles por milisegundo, y lo que
- *  tarda en pasar de la primera a la segunda. */
-const EMPUJE_LENTO = 0.14
-const EMPUJE_RAPIDO = 1.1
-const EMPUJE_RAMPA = 900
-
-/** Lo que hay que mantener pulsada una flecha para que empiece a correr. Por
- *  debajo de esto es un clic y avanza una familia. */
-const MANTENER_MS = 240
-
 /** Lo que se espera sin un solo evento de scroll para dar el carril por parado. */
 const REPOSO_MS = 140
+
+/** Lo que hay de un centro de miniatura al siguiente. Se mide en vez de leerse de
+ *  `--flow-step` para no tener el número en dos sitios. */
+function pasoDelCarril(node: HTMLElement): number {
+  const [uno, dos] = node.querySelectorAll<HTMLElement>('[data-familia]')
+  if (!uno || !dos) return 50
+  return dos.getBoundingClientRect().left - uno.getBoundingClientRect().left
+}
+
+/** La copia de esa familia que vive en el bloque del medio: la que deja un bloque
+ *  entero de familias a cada lado. */
+function copiaDelMedio(node: HTMLElement, index: number): HTMLElement | undefined {
+  const copias = node.querySelectorAll<HTMLElement>(`[data-familia="${index}"]`)
+  return copias[Math.floor(copias.length / 2)]
+}
 
 /** La copia de esa familia que ya esté más cerca del centro del carril. */
 function copiaCercana(node: HTMLElement, index: number): HTMLElement | undefined {
@@ -342,78 +358,6 @@ function familiaCentrada(node: HTMLElement): number | null {
   }, null)
 
   return cerca ? cerca.familia : null
-}
-
-/**
- * La flecha redonda. Un toque avanza una familia; mantenida pulsada, el carril
- * corre y va acelerando hasta que se suelta —y entonces se queda la familia que
- * haya quedado en el centro—.
- */
-function Flecha({
-  hacia,
-  onPaso,
-  onEmpuje,
-}: {
-  hacia: 'atras' | 'adelante'
-  onPaso: () => void
-  onEmpuje: (sentido: 1 | -1) => () => void
-}) {
-  const espera = useRef<number | undefined>(undefined)
-  const parar = useRef<(() => void) | null>(null)
-
-  const soltar = () => {
-    window.clearTimeout(espera.current)
-    const corriendo = parar.current
-    parar.current = null
-    if (corriendo) {
-      corriendo()
-      return
-    }
-    // No llegó a correr: era un toque.
-    onPaso()
-  }
-
-  useEffect(
-    () => () => {
-      window.clearTimeout(espera.current)
-      parar.current?.()
-    },
-    [],
-  )
-
-  return (
-    <button
-      type="button"
-      aria-label={hacia === 'atras' ? 'Familia anterior' : 'Familia siguiente'}
-      onPointerDown={(event) => {
-        // Sólo el botón principal, y sin arrastrar el foco por la página.
-        if (event.button !== 0) return
-        event.currentTarget.setPointerCapture(event.pointerId)
-        espera.current = window.setTimeout(() => {
-          parar.current = onEmpuje(hacia === 'atras' ? -1 : 1)
-        }, MANTENER_MS)
-      }}
-      onPointerUp={soltar}
-      onPointerCancel={soltar}
-      /* El teclado no mantiene: cada pulsación avanza una familia. */
-      onKeyDown={(event) => {
-        if (event.key !== 'Enter' && event.key !== ' ') return
-        event.preventDefault()
-        onPaso()
-      }}
-      className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-line bg-linen text-bark-soft shadow-[0_1px_0_color-mix(in_srgb,var(--color-bark)_8%,transparent),0_6px_14px_-10px_color-mix(in_srgb,var(--color-bark)_45%,transparent)] transition-[color,border-color,transform] duration-500 ease-(--ease-out-soft) hover:border-sage hover:text-sage-deep active:scale-95"
-    >
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden className="h-3.5 w-3.5">
-        <path
-          d={hacia === 'atras' ? 'M15 5 8 12l7 7' : 'M9 5l7 7-7 7'}
-          stroke="currentColor"
-          strokeWidth="1.4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </button>
-  )
 }
 
 function Chevron({ abierto }: { abierto: boolean }) {

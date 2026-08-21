@@ -11,3 +11,6 @@ next-env.d.ts
 # Originales: pesan mucho y no se sirven; sólo se procesan.
 fotos-originales/
 .git - copia/
+
+# Worktrees de trabajo: copias del repo con su propio .next dentro.
+.claude/worktrees/
