@@ -990,10 +990,23 @@
    Las cantidades son las mismas con las que el mazo ancla el scroll —la cabecera
    más la barra—, de ahí que se repitan a partir de `md`. */
 @utility shop-deck {
-  min-height: calc(100svh - 13rem);
+  /* El alto de una carta: lo que queda de pantalla bajo la cabecera y la barra de
+     familias. Es una variable y no sólo un `min-height` porque el mazo la lee
+     también desde JavaScript: mientras una familia se pliega, el bloque se
+     congela a esta medida para que lo que gira sea una pantalla y no una página
+     de cinco mil píxeles. Ver `motorDelMazo`. */
+  --carta: calc(100svh - 13rem);
+  min-height: var(--carta);
+  /* Fuera el anclaje de scroll del navegador. Cuando el bloque se congela a una
+     carta, Chrome ve que el contenido de arriba ha cambiado de tamaño y reajusta
+     el scroll por su cuenta para «no mover lo que se está leyendo»: eso son
+     saltos de más de doscientos píxeles en un fotograma —medidos— que no pasan
+     por ningún código nuestro, así que no hay forma de suavizarlos. Aquí el
+     desplazamiento lo lleva `motorDelMazo`, que lo hace con su propia rampa. */
+  overflow-anchor: none;
 
   @media (width >= 48rem) {
-    min-height: calc(100svh - 14rem);
+    --carta: calc(100svh - 14rem);
   }
 }
 

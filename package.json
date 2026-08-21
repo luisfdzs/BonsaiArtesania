@@ -13,10 +13,12 @@
     "check": "npm run typecheck && npm run lint && prettier --check .",
     "images": "node scripts/optimize-images.mjs",
     "icons": "node scripts/build-icons.mjs",
-    "db:setup": "node scripts/db-setup.mjs"
+    "db:setup": "node scripts/db-setup.mjs",
+    "push:keys": "node scripts/push-keys.mjs"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.11.3",
+    "@types/web-push": "^3.6.4",
     "mongodb": "^6.21.0",
     "next": "^16.2.11",
     "next-auth": "^5.0.0-beta.32",
@@ -24,6 +26,7 @@
     "pdf-lib": "^1.17.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "web-push": "^3.6.7",
     "zod": "^4.4.3"
   },
   "devDependencies": {

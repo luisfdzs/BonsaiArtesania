@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
-import { auth } from '@/auth'
+import { auth, googleEnabled } from '@/auth'
 import { EntrarTabs } from '@/components/entrar/EntrarTabs'
-import { isLocale, pick } from '@/lib/i18n/config'
+import { isLocale, pick, translator, type Locale } from '@/lib/i18n/config'
 import { path } from '@/lib/i18n/routes'
 
 const TITLE = { es: 'Entrar', gl: 'Entrar' }
@@ -31,7 +31,7 @@ export async function generateMetadata({
 
 type Props = {
   params: Promise<{ locale: string }>
-  searchParams: Promise<{ volver?: string; modo?: string }>
+  searchParams: Promise<{ volver?: string; modo?: string; error?: string }>
 }
 
 /**
@@ -42,17 +42,34 @@ type Props = {
  * a la derecha se empieza un alta que pasa por el buzón una única vez, la del día
  * en que se crea la cuenta.
  *
- * Se ha quitado el aviso de errores por la URL (`?error=...`) que ponía aquí
- * Auth.js: ya no hay ningún proveedor suyo que pueda fallar, y cada formulario
- * cuenta lo suyo en su propio sitio en vez de a través de un parámetro que se queda
+ * El `?error=...` de la URL sólo cuenta lo que le pasa a Google, que es lo único
+ * que falla fuera de esta página y vuelve sin sitio donde decirlo. Lo de cada
+ * formulario lo sigue diciendo el formulario, que no tiene por qué dejar el fallo
  * pegado al historial.
  */
+function googleError(code: string | undefined, locale: Locale): string | undefined {
+  if (!code) return undefined
+  const t = translator(locale)
+
+  if (code === 'AccessDenied') {
+    return t({
+      es: 'No se ha podido entrar con Google: o se ha cancelado, o esa cuenta tiene el correo sin confirmar. Puedes entrar con tu contraseña o crear la cuenta con tu correo.',
+      gl: 'Non se puido entrar con Google: ou se cancelou, ou esa conta ten o correo sen confirmar. Podes entrar co teu contrasinal ou crear a conta co teu correo.',
+    })
+  }
+
+  return t({
+    es: 'No se ha podido entrar con Google. Inténtalo otra vez, o entra con tu correo y tu contraseña.',
+    gl: 'Non se puido entrar con Google. Inténtao outra vez, ou entra co teu correo e o teu contrasinal.',
+  })
+}
+
 export default async function EntrarPage({ params, searchParams }: Props) {
   const { locale } = await params
   if (!isLocale(locale)) notFound()
 
   const session = await auth()
-  const { volver, modo } = await searchParams
+  const { volver, modo, error } = await searchParams
 
   const cuenta = path(locale, '/cuenta')
 
@@ -72,6 +89,8 @@ export default async function EntrarPage({ params, searchParams }: Props) {
           backTo={backTo}
           entrarHref={entrarHref}
           crearHref={crearHref}
+          google={googleEnabled}
+          error={googleError(error, locale)}
         />
       </div>
     </div>
