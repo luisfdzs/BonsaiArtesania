@@ -139,7 +139,8 @@ export async function changePassword(_prev: ActionState, formData: FormData): Pr
   }
 
   /**
-   * Una cuenta de antes de que hubiera contraseñas no tiene ninguna que comprobar.
+   * Una cuenta que entra con Google, o de antes de que hubiera contraseñas, no
+   * tiene ninguna que comprobar.
    * Aquí sí se le puede decir con todas las letras —ya ha demostrado quién es al
    * entrar— y se le manda al único sitio donde puede ponerse la primera, que es el
    * flujo del código por correo.
@@ -148,8 +149,8 @@ export async function changePassword(_prev: ActionState, formData: FormData): Pr
     return {
       errors: {
         form: t({
-          es: 'Tu cuenta es de cuando se entraba con un enlace y todavía no tiene contraseña. Sal y pon una desde «No recuerdo mi contraseña».',
-          gl: 'A túa conta é de cando se entraba cunha ligazón e aínda non ten contrasinal. Sae e pon un desde «Non lembro o meu contrasinal».',
+          es: 'Tu cuenta todavía no tiene contraseña: entras con Google o con un enlace de los de antes. Sal y pon una desde «No recuerdo mi contraseña».',
+          gl: 'A túa conta aínda non ten contrasinal: entras con Google ou cunha ligazón das de antes. Sae e pon un desde «Non lembro o meu contrasinal».',
         }),
       },
     }

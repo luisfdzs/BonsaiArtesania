@@ -38,8 +38,8 @@ export function PasswordForm({ hasPassword }: { hasPassword: boolean }) {
       <div className="panel text-left">
         <p className="text-bark-soft">
           {t({
-            es: 'Tu cuenta es de cuando se entraba con un enlace al correo y todavía no tiene contraseña. Para ponerle una, sal de la sesión y usa «No recuerdo mi contraseña» en la pantalla de entrada: te llegará un código y podrás elegirla.',
-            gl: 'A túa conta é de cando se entraba cunha ligazón ao correo e aínda non ten contrasinal. Para poñerlle un, sae da sesión e usa «Non lembro o meu contrasinal» na pantalla de entrada: chegarache un código e poderás escollelo.',
+            es: 'Tu cuenta todavía no tiene contraseña: entras con Google o con un enlace de los de antes. Para ponerle una, sal de la sesión y usa «No recuerdo mi contraseña» en la pantalla de entrada: te llegará un código y podrás elegirla. Google te seguirá sirviendo igual.',
+            gl: 'A túa conta aínda non ten contrasinal: entras con Google ou cunha ligazón das de antes. Para poñerlle un, sae da sesión e usa «Non lembro o meu contrasinal» na pantalla de entrada: chegarache un código e poderás escollelo. Google seguirache servindo igual.',
           })}
         </p>
       </div>

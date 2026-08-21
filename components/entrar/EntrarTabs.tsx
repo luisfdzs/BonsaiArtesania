@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useTransition } from 'react'
+import { GoogleButton } from '@/components/entrar/GoogleButton'
 import { LoginForm } from '@/components/entrar/LoginForm'
 import { RequestCodeForm } from '@/components/entrar/RequestCodeForm'
 import { FlowerLoader } from '@/components/ui/FlowerLoader'
@@ -14,9 +15,18 @@ type Props = {
   backTo: string
   entrarHref: string
   crearHref: string
+  google: boolean
+  error?: string
 }
 
-export function EntrarTabs({ creating: initial, backTo, entrarHref, crearHref }: Props) {
+export function EntrarTabs({
+  creating: initial,
+  backTo,
+  entrarHref,
+  crearHref,
+  google,
+  error,
+}: Props) {
   const [creating, setCreating] = useState(initial)
   const [pending, startTransition] = useTransition()
   const locale = useLocale()
@@ -69,6 +79,14 @@ export function EntrarTabs({ creating: initial, backTo, entrarHref, crearHref }:
                 gl: 'Entra co correo e o contrasinal da túa conta.',
               })}
         </p>
+
+        {error && (
+          <p className="field-error mt-6" role="alert">
+            {error}
+          </p>
+        )}
+
+        {google && <GoogleButton backTo={backTo} />}
 
         {creating ? (
           <RequestCodeForm purpose="alta" backTo={backTo} />

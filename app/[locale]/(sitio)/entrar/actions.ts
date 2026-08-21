@@ -2,6 +2,7 @@
 
 import { ObjectId } from 'mongodb'
 import { redirect } from 'next/navigation'
+import { signIn } from '@/auth'
 import { checkCode, dropCode, issueCode } from '@/lib/codes'
 import { sendAlreadyRegisteredEmail, sendCodeEmail, sendNoAccountEmail } from '@/lib/email'
 import { fakeVerify, hashPassword, verifyPassword } from '@/lib/password'
@@ -83,6 +84,11 @@ function sendError(
       gl: 'Non se puido enviar o correo. Inténtao outra vez nun momento.',
     }),
   }
+}
+
+export async function entrarConGoogle(formData: FormData): Promise<void> {
+  const locale = localeFrom(formData)
+  await signIn('google', { redirectTo: safeBackTo(formData.get('volver'), locale) })
 }
 
 /**
