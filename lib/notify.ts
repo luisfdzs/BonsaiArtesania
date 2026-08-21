@@ -1,5 +1,6 @@
 import { site } from '@/content/site'
 import { path } from '@/lib/i18n/routes'
+import { sendPush, type PushPayload } from '@/lib/push'
 import { type OrderDoc } from '@/lib/schema'
 
 /**
@@ -74,6 +75,34 @@ function cancelMessage(order: OrderDoc): string {
     .slice(0, MAX_LENGTH)
 }
 
+function pieces(order: OrderDoc): string {
+  return order.items
+    .map((item) => (item.qty > 1 ? `${item.name} × ${item.qty}` : item.name))
+    .join(', ')
+}
+
+function orderPush(order: OrderDoc): PushPayload {
+  const address = order.shipping.address
+
+  return {
+    title: `Nueva petición ${order.number}`,
+    body: `${address.recipient} — ${address.city}\n${pieces(order)}`,
+    url: path('es', `/gestion/pedidos/${order.number}`),
+    tag: `pedido-${order.number}`,
+  }
+}
+
+function cancelPush(order: OrderDoc): PushPayload {
+  const address = order.shipping.address
+
+  return {
+    title: `Pedido cancelado ${order.number}`,
+    body: `Lo ha cancelado ${address.recipient}. No lo prepares.`,
+    url: path('es', `/gestion/pedidos/${order.number}`),
+    tag: `cancelado-${order.number}`,
+  }
+}
+
 /**
  * Manda el aviso. Devuelve si salió, para poder registrarlo, pero nadie está
  * obligado a mirarlo.
@@ -122,9 +151,23 @@ async function send(text: string, asunto: string): Promise<boolean> {
 }
 
 export async function notifyNewOrder(order: OrderDoc): Promise<boolean> {
-  return send(orderMessage(order), `del pedido ${order.number}`)
+  const asunto = `del pedido ${order.number}`
+
+  const [telegram, dispositivos] = await Promise.all([
+    send(orderMessage(order), asunto),
+    sendPush(orderPush(order), asunto),
+  ])
+
+  return telegram || dispositivos > 0
 }
 
 export async function notifyCancelledOrder(order: OrderDoc): Promise<boolean> {
-  return send(cancelMessage(order), `de la cancelación del pedido ${order.number}`)
+  const asunto = `de la cancelación del pedido ${order.number}`
+
+  const [telegram, dispositivos] = await Promise.all([
+    send(cancelMessage(order), asunto),
+    sendPush(cancelPush(order), asunto),
+  ])
+
+  return telegram || dispositivos > 0
 }
