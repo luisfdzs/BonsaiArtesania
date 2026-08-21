@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Cormorant_Garamond, Jost } from 'next/font/google'
 import { notFound } from 'next/navigation'
+import { ServiceWorker } from '@/components/layout/ServiceWorker'
 import { site } from '@/content/site'
 import { isLocale, localeHtmlLang, localeOpenGraph, locales, pick } from '@/lib/i18n/config'
 import { alternates } from '@/lib/i18n/metadata'
@@ -56,6 +57,14 @@ export async function generateMetadata({
     // Los de la portada. Cada página que se quiere indexada declara los suyos
     // con la misma función y su propia ruta; ver `lib/i18n/metadata.ts`.
     alternates: alternates(locale, '/'),
+    icons: {
+      icon: [
+        { url: '/icons/app-192.png', sizes: '192x192', type: 'image/png' },
+        { url: '/icons/app-512.png', sizes: '512x512', type: 'image/png' },
+      ],
+      apple: '/icons/apple-touch-icon.png',
+    },
+    appleWebApp: { capable: true, title: site.nameFull, statusBarStyle: 'default' },
     openGraph: {
       type: 'website',
       siteName: site.nameFull,
@@ -110,7 +119,10 @@ export default async function RootLayout({
       data-scroll-behavior="smooth"
       className={`${serif.variable} ${sans.variable}`}
     >
-      <body className="flex min-h-svh flex-col">{children}</body>
+      <body className="flex min-h-svh flex-col">
+        {children}
+        <ServiceWorker />
+      </body>
     </html>
   )
 }

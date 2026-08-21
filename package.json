@@ -12,6 +12,7 @@
     "format": "prettier --write .",
     "check": "npm run typecheck && npm run lint && prettier --check .",
     "images": "node scripts/optimize-images.mjs",
+    "icons": "node scripts/build-icons.mjs",
     "db:setup": "node scripts/db-setup.mjs"
   },
   "dependencies": {

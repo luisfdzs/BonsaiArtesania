@@ -64,7 +64,6 @@ function Vitrina({ familias, locale, navLabel, verMas, personalizar, personaliza
           items={f.items}
           locale={locale}
           priority={i === 0}
-          className="grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3"
           trailing={
             libre > 0 && (
               <Reveal

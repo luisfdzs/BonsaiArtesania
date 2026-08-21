@@ -53,12 +53,11 @@
   --spacing-gutter: clamp(1.5rem, 5vw, 5rem);
   --spacing-section: clamp(5rem, 12vw, 12rem);
 
-  /* Alto de la barra de navegación inferior de móvil. Vive en el sistema porque
-     lo usan tres sitios que tienen que cuadrar al píxel: la barra, el panel que
-     se abre justo encima y el hueco que el <body> se reserva debajo del pie.
-     El `env()` es la franja del gesto de inicio del iPhone: sin sumarla, los
-     iconos caen debajo de la rayita del sistema. */
-  --spacing-nav-mobile: calc(4rem + env(safe-area-inset-bottom));
+  --spacing-nav-mobile-bar: 3rem;
+  --spacing-nav-mobile-air: 0.75rem;
+  --spacing-nav-mobile: calc(
+    var(--spacing-nav-mobile-bar) + var(--spacing-nav-mobile-air) * 2 + env(safe-area-inset-bottom)
+  );
 
   /* --- Movimiento --------------------------------------------------------
      Nada rebota, nada corre. Todo entra como se posa un pétalo: lento y con
