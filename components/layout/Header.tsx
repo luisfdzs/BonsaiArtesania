@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { NavPending } from '@/components/ui/NavPending'
-import { BackButton } from '@/components/layout/BackButton'
 import { cn } from '@/lib/cn'
 import { localeOf, path, routeOf } from '@/lib/i18n/routes'
 import { useTranslator } from '@/lib/i18n/useLocale'
@@ -77,8 +76,6 @@ export function Header({ shopOpen }: { shopOpen: boolean }) {
         </a>
 
         <div className="header-bar page-gutter relative flex h-20 items-center justify-center gap-6 md:h-24 md:justify-end">
-          <BackButton className="absolute left-(--spacing-gutter)" />
-
           <Link
             href={path(locale, '/')}
             aria-label="Bonsái Artesanía, inicio"
@@ -241,14 +238,13 @@ function DesktopMenuPanel({
   const t = useTranslator()
 
   return (
-    // `hidden` y no un `return` condicional: así el botón conserva
-    // `aria-controls` apuntando a un nodo que siempre existe. Y `max-md:hidden`
-    // en vez de `md:block`: cualquier utilidad de `display` a partir de `md`
-    // discutiría con el atributo, que es quien apaga el panel cerrado.
     <div
       id="menu-escritorio"
-      hidden={!open}
-      className="page-gutter fixed inset-x-0 top-24 bottom-0 z-40 overflow-y-auto bg-linen max-md:hidden"
+      inert={!open}
+      className={cn(
+        'page-gutter fixed inset-x-0 top-24 bottom-0 z-40 overflow-y-auto bg-linen transition-opacity duration-300 ease-out max-md:hidden',
+        open ? 'opacity-100' : 'opacity-0',
+      )}
     >
       {/* `min-h-full` en vez de `h-full`: con el menú centrado basta para llenar
           el panel, y si algún día las entradas no caben en pantallas bajas crece
