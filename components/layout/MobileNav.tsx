@@ -14,8 +14,8 @@ import { LocalePicker } from './LocalePicker'
 import { AccountIcon, CartIcon, CloseIcon, ContactIcon, HomeIcon, MenuIcon } from './NavIcons'
 
 /**
- * La navegación de móvil: una barra fija abajo, siempre a la vista, en cualquier
- * página y a cualquier altura del scroll.
+ * La navegación de móvil: un cilindro fijo abajo, flotando con aire alrededor,
+ * siempre a la vista, en cualquier página y a cualquier altura del scroll.
  *
  * Sustituye al botón «Menú» de la cabecera y a su panel a pantalla completa. El
  * motivo es el pulgar: en un teléfono en la mano, el borde inferior se alcanza sin
@@ -94,13 +94,17 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
       {/* El panel va antes que la barra en el DOM y ambos comparten z-index: así
           la barra queda por encima y su botón sigue pulsable para cerrar. Cubre
           la cabecera a propósito —es un menú a pantalla completa— y por eso lleva
-          fondo lino opaco y no translúcido. */}
+          fondo lino opaco y no translúcido.
+          Llega hasta el borde de abajo y no hasta el canto del cilindro: si se
+          cortara ahí, por el aire de alrededor se vería asomar la página de
+          debajo. El cilindro flota encima, y el `padding` de abajo es el que
+          impide que el menú se le meta por detrás. */}
       <div
         id="menu-movil"
         hidden={!open}
         // Sin utilidad de `display`: el atributo `hidden` es quien apaga el panel
         // y un `flex` aquí discutiría con él. El centrado lo pone el <nav>.
-        className="page-gutter fixed inset-x-0 top-0 bottom-(--spacing-nav-mobile) z-50 overflow-y-auto bg-linen md:hidden"
+        className="page-gutter fixed inset-0 z-50 overflow-y-auto bg-linen pb-(--spacing-nav-mobile) md:hidden"
       >
         <nav
           className="flex min-h-full flex-col items-center justify-center gap-7 py-12 text-center"
@@ -125,7 +129,7 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
 
       <nav
         aria-label="Principal"
-        className="fixed inset-x-0 bottom-0 z-50 flex h-(--spacing-nav-mobile) items-stretch border-t border-line bg-linen/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden"
+        className="fixed inset-x-(--spacing-nav-mobile-air) bottom-[calc(var(--spacing-nav-mobile-air)+env(safe-area-inset-bottom))] z-50 flex h-(--spacing-nav-mobile-bar) items-stretch rounded-full border border-line bg-linen/95 shadow-[0_2px_20px_rgba(60,54,46,0.10)] backdrop-blur-md md:hidden"
       >
         <NavSlot
           href={path(locale, '/')}
@@ -171,9 +175,7 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
             label={
               count
                 ? `${t({ es: 'Carrito', gl: 'Carro' })}, ${count} ${
-                    count === 1
-                      ? t({ es: 'pieza', gl: 'peza' })
-                      : t({ es: 'piezas', gl: 'pezas' })
+                    count === 1 ? t({ es: 'pieza', gl: 'peza' }) : t({ es: 'piezas', gl: 'pezas' })
                   }`
                 : t({ es: 'Carrito', gl: 'Carro' })
             }
@@ -216,7 +218,9 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
           }
           className={cn(slotClass, slotState(open || inPanel))}
         >
-          {open ? <CloseIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
+          <span className={slotMark(open || inPanel)}>
+            {open ? <CloseIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
+          </span>
         </button>
       </nav>
     </>
@@ -225,22 +229,26 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
 
 /**
  * El hueco de cada icono. Reparte el ancho a partes iguales y estira a todo el
- * alto de la barra —gracias al `items-stretch` del `<nav>`—, así que el propio
- * hueco ya mide la celda entera: no hace falta una pastilla aparte de tamaño
- * fijo.
+ * alto de la barra —gracias al `items-stretch` del `<nav>`—, así que la zona
+ * pulsable es la celda entera aunque la marca de activo sea más pequeña.
  *
  * El activo va en salvia —el verde con el que responden los botones del sitio— y
  * los demás en tinta al 55%. Con el color a secas no bastaba: a 24px y con trazo
  * de 1,5px, el salvia contra el gris de los apagados hay que buscarlo. Así que el
- * verde se dice también en el fondo, con un cuadrado del mismo salvia muy
- * rebajado que ocupa la celda entera —cuadrado y no redondo a propósito, para que
- * la sección activa se lea como un hueco de la barra y no como un botón suelto—.
+ * verde se dice también en el fondo, con un círculo del mismo salvia muy rebajado
+ * detrás del icono. Redondo y no a toda la celda: dentro de un cilindro, un
+ * rectángulo pelea con la curva, y el círculo repite su forma en pequeño.
  */
 const slotClass =
   'relative flex flex-1 flex-col items-center justify-center transition-colors duration-500'
 
-const slotState = (active: boolean) =>
-  active ? 'bg-sage-deep/12 text-sage-deep' : 'text-bark opacity-55'
+const slotState = (active: boolean) => (active ? 'text-sage-deep' : 'text-bark opacity-55')
+
+const slotMark = (active: boolean) =>
+  cn(
+    'flex h-full w-full items-center justify-center rounded-full transition-colors duration-500',
+    active && 'bg-sage-deep/12',
+  )
 
 function NavSlot({
   href,
@@ -263,7 +271,7 @@ function NavSlot({
       onClick={onClick}
       className={cn(slotClass, slotState(active))}
     >
-      {children}
+      <span className={slotMark(active)}>{children}</span>
     </Link>
   )
 }
