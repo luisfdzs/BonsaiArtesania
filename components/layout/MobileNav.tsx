@@ -5,9 +5,9 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { NavPending } from '@/components/ui/NavPending'
 import { cn } from '@/lib/cn'
+import type { Localized } from '@/lib/i18n/config'
 import { localeOf, path, routeOf } from '@/lib/i18n/routes'
 import { useTranslator } from '@/lib/i18n/useLocale'
-import { navigation } from '@/lib/navigation'
 import { onHome, useActiveSection } from '@/lib/useActiveSection'
 import { useCartCount } from './CartCount'
 import { AppMovil } from './AppMovil'
@@ -23,10 +23,14 @@ import { AccountIcon, CartIcon, CloseIcon, HomeIcon, MenuIcon, ShopIcon } from '
  * recolocar el aparato y la esquina superior derecha no. Arriba se queda sólo la
  * marca, que es identidad y no navegación.
  *
- * Cinco sitios, de izquierda a derecha: inicio, cuenta, carrito, tienda y el
- * resto del menú. Los cuatro primeros son destinos y el quinto abre un panel con
- * las secciones que no caben en la barra. Con la tienda cerrada el carrito no
- * aparece y quedan cuatro.
+ * Cinco sitios, de izquierda a derecha: inicio, tienda, carrito, cuenta y el
+ * resto del menú. Los cuatro primeros son destinos y el quinto abre el panel. Con
+ * la tienda cerrada el carrito no aparece y quedan cuatro.
+ *
+ * El orden va de fuera adentro: primero la casa, luego lo que se viene a ver
+ * —tienda—, luego lo que se lleva —carrito— y al final lo que es de uno —cuenta—.
+ * Tienda y cuenta estaban al revés, y eso ponía lo privado antes que el catálogo
+ * en el sitio más cómodo de la barra.
  *
  * Sólo iconos, sin rótulo: cinco palabras en versalitas a lo ancho de un móvil de
  * 360px o se cortan o se aprietan hasta ser ilegibles. El nombre accesible va en
@@ -73,22 +77,41 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
   const section = useActiveSection()
   const homeActive = onHome(pathname) && !section
 
-  // «Tienda» sale de la barra con su propio icono; las otras tres entradas del
-  // menú del sitio son las que se despliegan. Se derivan de `navigation` en vez
-  // de repetirse aquí.
-  const panelItems = navigation.filter((item) => item.route !== '/tienda')
+  /**
+   * LO QUE HAY EN EL PANEL, en este orden: inicio, carrito, tienda, contacto y mi
+   * cuenta.
+   *
+   * Ya no se deriva de `navigation` quitando lo que está en la barra. Eso lo hacía
+   * el complemento de la barra —«las secciones que no caben»— y por eso el panel
+   * era una lista corta y rara: Encargos, El taller y Contacto. Ahora es un menú
+   * completo, con los sitios a los que se va, repitiendo a propósito los que
+   * también están abajo en iconos: un menú abierto se lee, y quien lo abre está
+   * buscando un nombre escrito, no acordándose de qué dibujo era cada cosa.
+   *
+   * Escrito aquí y no en `lib/navigation.ts` porque no es el menú del sitio —el
+   * que comparten la cabecera y el pie— sino el de este panel, con dos entradas
+   * que no son secciones (el carrito y la cuenta) y sin las dos que viven dentro
+   * de la portada.
+   *
+   * El carrito, como en la barra, sólo con la tienda abierta.
+   */
+  const panelItems: { route: string; label: Localized }[] = [
+    { route: '/', label: { es: 'Inicio', gl: 'Inicio' } },
+    ...(shopOpen ? [{ route: '/carrito', label: { es: 'Carrito', gl: 'Carro' } }] : []),
+    { route: '/tienda', label: { es: 'Tienda', gl: 'Tenda' } },
+    { route: '/#contacto', label: { es: 'Contacto', gl: 'Contacto' } },
+    { route: '/cuenta', label: { es: 'Mi cuenta', gl: 'A miña conta' } },
+  ]
 
-  // Estando en Encargos, en El taller o en Contacto, ninguno de los cinco
-  // iconos diría dónde está: la sección vive detrás del menú. Así que el que la
-  // guarda se marca como activo, y la barra nunca queda sin señalar la página.
+  // Estando en Encargos, en El taller o en Contacto, ninguno de los cuatro
+  // destinos de la barra diría dónde está: son secciones de la portada y no
+  // páginas. Así que se marca el botón del menú, y la barra nunca queda sin
+  // señalar la página.
   //
-  // Se compara contra `route` —la ruta sin idioma— y no contra `pathname`: con
-  // el idioma delante, `/gl/tienda` no empieza por `/tienda`.
-  const inPanel =
-    panelItems.some((item) => !item.route.includes('#') && route.startsWith(item.route)) ||
-    section === 'encargos' ||
-    section === 'taller' ||
-    section === 'contacto'
+  // Antes esto miraba además las rutas del panel. Ya no puede: el panel repite los
+  // destinos que la barra tiene en iconos, así que en el carrito o en la tienda se
+  // encenderían dos huecos a la vez, el icono y el menú.
+  const inPanel = section === 'encargos' || section === 'taller' || section === 'contacto'
 
   return (
     <>
@@ -145,7 +168,11 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
               <Link
                 key={item.route}
                 href={path(locale, item.route)}
-                className="font-serif text-title"
+                /* En el verde de la casa, como el resto del menú —el filete y los
+                   cantos de las banderas—: el panel es lo único del sitio que se
+                   ve a pantalla completa sin nada más, y en tinta se leía como un
+                   índice de documento en vez de como la casa. */
+                className="font-serif text-title text-sage-deep"
                 onClick={close}
               >
                 {t(item.label)}
@@ -187,19 +214,13 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
           <HomeIcon className="h-6 w-6" />
         </NavSlot>
 
-        {/* «Entrar» cuenta como parte de Cuenta y no como una página aparte: es
-            el paso previo obligado sin sesión, y quien lo ve tiene que seguir
-            leyendo el mismo hueco encendido, no uno apagado de golpe. */}
         <NavSlot
-          href={path(locale, '/cuenta')}
-          label={t({ es: 'Cuenta', gl: 'Conta' })}
-          active={(route.startsWith('/cuenta') || route.startsWith('/entrar')) && !open}
+          href={path(locale, '/tienda')}
+          label={t({ es: 'Tienda', gl: 'Tenda' })}
+          active={route.startsWith('/tienda') && !open}
           onClick={close}
         >
-          <AccountIcon className="h-6 w-6" />
-          {/* Cuenta es el único hueco que espera de verdad: los demás llevan a
-              páginas ya generadas. Ver `NavPending`. */}
-          <NavPending label={t({ es: 'Abriendo tu cuenta', gl: 'Abrindo a túa conta' })} />
+          <ShopIcon className="h-6 w-6" />
         </NavSlot>
 
         {/* Sin tienda abierta no hay carrito que enseñar, como en la cabecera. */}
@@ -233,13 +254,19 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
           </NavSlot>
         )}
 
+        {/* «Entrar» cuenta como parte de Cuenta y no como una página aparte: es
+            el paso previo obligado sin sesión, y quien lo ve tiene que seguir
+            leyendo el mismo hueco encendido, no uno apagado de golpe. */}
         <NavSlot
-          href={path(locale, '/tienda')}
-          label={t({ es: 'Tienda', gl: 'Tenda' })}
-          active={route.startsWith('/tienda') && !open}
+          href={path(locale, '/cuenta')}
+          label={t({ es: 'Cuenta', gl: 'Conta' })}
+          active={(route.startsWith('/cuenta') || route.startsWith('/entrar')) && !open}
           onClick={close}
         >
-          <ShopIcon className="h-6 w-6" />
+          <AccountIcon className="h-6 w-6" />
+          {/* Cuenta es el único hueco que espera de verdad: los demás llevan a
+              páginas ya generadas. Ver `NavPending`. */}
+          <NavPending label={t({ es: 'Abriendo tu cuenta', gl: 'Abrindo a túa conta' })} />
         </NavSlot>
 
         <button

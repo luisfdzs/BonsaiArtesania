@@ -11,9 +11,9 @@ import { cn } from '@/lib/cn'
 /**
  * EL SELECTOR DE IDIOMA, al pie del menú desplegado.
  *
- * Va debajo de las tres secciones y separado de ellas por un filete, porque no es
- * una cuarta sección: no lleva a ningún sitio nuevo, cambia el idioma del sitio
- * en el que ya estás. El filete es lo que dice eso sin escribirlo.
+ * Va debajo de las secciones y separado de ellas por un filete, porque no es una
+ * sección más: no lleva a ningún sitio nuevo, cambia el idioma del sitio en el que
+ * ya estás. El filete es lo que dice eso sin escribirlo.
  *
  * **Son dos enlaces y no un desplegable.** Con dos idiomas, un `<select>` cuesta
  * dos gestos —abrir y elegir— para lo mismo que aquí cuesta uno, y además
@@ -34,7 +34,10 @@ export function LocalePicker({ onNavigate }: { onNavigate?: () => void }) {
   const current = localeOf(pathname)
 
   return (
-    <div className="mt-4 flex items-center justify-center gap-6 border-t border-line pt-8">
+    /* El filete en el verde de la casa, como los rótulos del menú y los cantos de
+       las banderas: el panel entero habla en salvia, y una línea gris en medio lo
+       partía en dos mitades de dos sitios distintos. */
+    <div className="mt-4 flex items-center justify-center gap-6 border-t border-sage-deep pt-8">
       {locales.map((option) => {
         const active = option === current
         const Flag = localeFlags[option]
@@ -50,11 +53,14 @@ export function LocalePicker({ onNavigate }: { onNavigate?: () => void }) {
             aria-label={localeNames[option]}
             aria-current={active ? 'true' : undefined}
             onClick={onNavigate}
+            /* Las dos banderas con el canto en salvia, también la que no está
+               puesta: lo que distingue a la activa no es el color del canto sino la
+               fuerza —la apagada va al 55%—, igual que los iconos de la barra. Con
+               el canto gris en la apagada, las dos banderas parecían de dos sitios
+               distintos en vez de dos estados de lo mismo. */
             className={cn(
-              'tap block overflow-hidden rounded-sm ring-1 transition-all duration-500',
-              active
-                ? 'ring-sage-deep opacity-100'
-                : 'ring-line opacity-55 hover:opacity-100',
+              'tap block overflow-hidden rounded-sm ring-1 ring-sage-deep transition-all duration-500',
+              active ? 'opacity-100' : 'opacity-55 hover:opacity-100',
             )}
           >
             <Flag className="block h-6 w-9" />

@@ -29,6 +29,26 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: '#faf7f2',
     lang: 'es-ES',
     categories: ['shopping', 'lifestyle'],
+    /**
+     * EL MANIFIESTO SE DECLARA A SÍ MISMO COMO APP RELACIONADA, y no es un enredo:
+     * es la única forma que tiene una pestaña de saber si esta misma web ya está
+     * instalada en el aparato. `navigator.getInstalledRelatedApps()` contesta con
+     * las entradas de esta lista que estén puestas, así que apuntándola aquí, si
+     * vuelve con la de `webapp`, la respuesta es «sí, ya está».
+     *
+     * Hace falta porque el evento del navegador no sirve para eso:
+     * `beforeinstallprompt` no se dispara cuando ya está instalada, pero tampoco
+     * se dispara en un navegador que no sabe instalar, y esos dos silencios son el
+     * mismo silencio. Sin poder distinguirlos, el menú ofrecía instalar a quien ya
+     * la tenía. Ver `AppMovil`.
+     *
+     * `prefer_related_applications` en `false` y escrito, aunque sea el valor por
+     * defecto: en `true` el navegador dejaría de ofrecer la instalación de la web
+     * —entendería que lo que se quiere es mandar a la app de una tienda—, y eso
+     * rompería justo el camino que esta lista viene a arreglar.
+     */
+    related_applications: [{ platform: 'webapp', url: `${site.url}/manifest.webmanifest` }],
+    prefer_related_applications: false,
     icons: [
       { src: '/icons/app-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
       { src: '/icons/app-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },

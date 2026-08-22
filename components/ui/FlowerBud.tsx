@@ -50,50 +50,7 @@ export function FlowerBud({
 
   return (
     <>
-      {/* Mismo dibujo que la flor grande, recortado a la corola y con su propio
-          sistema de coordenadas: 22×22 con el centro en (11,11). Cuadrado a
-          propósito —la grande es 40×60 porque lleva tallo—, que es lo que permite
-          que llene un hueco de icono en vez de quedarse como una raya vertical. */}
-      <svg
-        viewBox="0 0 22 22"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={1.5}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden
-        className={cn('flower-bud flower-wait shrink-0', className ?? 'h-4 w-4')}
-      >
-        {/* Los cinco pétalos, cada uno en su grupo girado y la animación sólo
-            sobre la elipse de dentro: el giro es un atributo del grupo y una
-            transformación en CSS sobre ese mismo nodo lo pisaría. El retardo va
-            inline, como en la flor grande: cada elipse es la única de su grupo,
-            así que `nth-of-type` no serviría. */}
-        {[0, 72, 144, 216, 288].map((angle, index) => (
-          <g key={angle} transform={`rotate(${angle} 11 11)`}>
-            <ellipse
-              className="flower-petal"
-              cx="11"
-              cy="5.6"
-              rx="2.9"
-              ry="4.6"
-              style={{ animationDelay: `${index * 45}ms` }}
-            />
-          </g>
-        ))}
-
-        {/* El corazón entra al final, cuando los cinco pétalos ya están abiertos:
-            es lo que remata el dibujo, igual que en la flor de la página. */}
-        <circle
-          className="flower-heart"
-          cx="11"
-          cy="11"
-          r="2.2"
-          fill="currentColor"
-          stroke="none"
-          style={{ animationDelay: '260ms' }}
-        />
-      </svg>
+      <FlowerBudIcon className={className} />
 
       {label && (
         <span role="status" className="sr-only">
@@ -101,5 +58,66 @@ export function FlowerBud({
         </span>
       )}
     </>
+  )
+}
+
+/**
+ * La flor sola, sin nada que decida cuándo se ve.
+ *
+ * `FlowerBud` la saca cuando el formulario que la contiene está enviando, y eso
+ * cubre casi todo: en esta web casi todas las esperas son un `action` de servidor.
+ * Pero no todas. Instalar la app es cosa del navegador y no pasa por ningún
+ * formulario, así que ahí no hay `useFormStatus` del que colgarse y hace falta la
+ * flor a secas, encendida por quien sabe si se está esperando. Ver `AppMovil`.
+ *
+ * Van en el mismo fichero a propósito: son el mismo dibujo, y separarlas sería
+ * tener la flor escrita dos veces.
+ */
+export function FlowerBudIcon({ className }: { className?: string }) {
+  /* Mismo dibujo que la flor grande, recortado a la corola y con su propio
+   sistema de coordenadas: 22×22 con el centro en (11,11). Cuadrado a
+   propósito —la grande es 40×60 porque lleva tallo—, que es lo que permite
+   que llene un hueco de icono en vez de quedarse como una raya vertical. */
+  return (
+    <svg
+      viewBox="0 0 22 22"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      className={cn('flower-bud flower-wait shrink-0', className ?? 'h-4 w-4')}
+    >
+      {/* Los cinco pétalos, cada uno en su grupo girado y la animación sólo
+            sobre la elipse de dentro: el giro es un atributo del grupo y una
+            transformación en CSS sobre ese mismo nodo lo pisaría. El retardo va
+            inline, como en la flor grande: cada elipse es la única de su grupo,
+            así que `nth-of-type` no serviría. */}
+      {[0, 72, 144, 216, 288].map((angle, index) => (
+        <g key={angle} transform={`rotate(${angle} 11 11)`}>
+          <ellipse
+            className="flower-petal"
+            cx="11"
+            cy="5.6"
+            rx="2.9"
+            ry="4.6"
+            style={{ animationDelay: `${index * 45}ms` }}
+          />
+        </g>
+      ))}
+
+      {/* El corazón entra al final, cuando los cinco pétalos ya están abiertos:
+            es lo que remata el dibujo, igual que en la flor de la página. */}
+      <circle
+        className="flower-heart"
+        cx="11"
+        cy="11"
+        r="2.2"
+        fill="currentColor"
+        stroke="none"
+        style={{ animationDelay: '260ms' }}
+      />
+    </svg>
   )
 }
