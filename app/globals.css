@@ -631,10 +631,11 @@
      filete que se corta antes del borde parte la pantalla en vez de dividirla. */
   margin-inline: calc(var(--spacing-gutter) * -1);
   border-bottom: 1px solid var(--color-line);
-  /* Translúcida como la cabecera: al pasar las fotos por debajo se nota que la
-     barra flota y no que el catálogo se corta. */
-  background: color-mix(in srgb, var(--color-linen) 90%, transparent);
-  backdrop-filter: blur(12px);
+  /* Lino macizo, igual que la cabecera con scroll: la barra queda pegada justo
+     debajo de ella y las dos tienen que leerse como un solo bloque. Translúcida
+     —como estaba— las fotos del catálogo se adivinaban al pasar por debajo y la
+     juntura entre la marca y sus familias se partía. */
+  background: var(--color-linen);
 
   @media (width >= 48rem) {
     top: 6rem;

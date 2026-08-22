@@ -137,3 +137,15 @@ export function CampanaIcon({ className }: IconProps) {
     </svg>
   )
 }
+
+/** La campana tachada: los avisos ya puestos, y el botón que los quita. */
+export function CampanaOffIcon({ className }: IconProps) {
+  return (
+    <svg {...common} aria-hidden className={className}>
+      <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+      <path d="M17 17H4s3-2 3-9a6 6 0 0 1 .26-1.74" />
+      <path d="M8.67 3.01A6 6 0 0 1 18 8c0 2.69.77 4.65 1.71 6.05" />
+      <path d="m2 2 20 20" />
+    </svg>
+  )
+}

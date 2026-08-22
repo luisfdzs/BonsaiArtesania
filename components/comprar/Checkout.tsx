@@ -39,7 +39,7 @@ export function Checkout({ addresses, token }: { addresses: AddressValues[]; tok
           abriría en la otra versión del sitio. */}
       <input type="hidden" name="idioma" value={locale} />
       {/* El envío del pedido es la escritura más larga del sitio: guarda el pedido,
-          manda el correo y avisa a Ana por Telegram.
+          manda el correo y avisa a Ana en el móvil.
           El botón apagado ya avisaba, pero es un rótulo de 13px para
           varios segundos de espera, y la página seguía viva detrás: se podía tocar
           «Añadir o editar direcciones» y salir de aquí a mitad de la escritura. La

@@ -73,7 +73,7 @@ async function devolverCarrito(userId: ObjectId, items: CartItem[]): Promise<voi
  *
  * ## Por qué hay tanta comprobación antes de llegar a crear nada
  *
- * Cada pedido dispara **dos correos desde el buzón de IONOS y un aviso a Telegram**.
+ * Cada pedido dispara **dos correos desde el buzón de IONOS y un aviso al móvil**.
  * Sin freno, eso es a la vez una forma de sepultar a Ana y una forma de quemar la
  * cuota de envío del buzón hasta que IONOS lo bloquee — y con él dejaría de salir
  * también el enlace de acceso, o sea que nadie podría ni entrar. Las capas, en el
@@ -124,7 +124,7 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
   // La cuenta del taller gestiona pedidos, no los hace (ver `lib/admin.ts`). No
   // debería poder llegar hasta aquí —ni tiene carrito ni ve la pantalla—, pero
   // esto es lo que lo cierra de verdad: crear un pedido reserva unidades de piezas
-  // únicas y dispara dos correos y un aviso a Telegram.
+  // únicas y dispara dos correos y un aviso al móvil.
   if (isAdminEmail(session.user.email)) {
     return {
       error: t({
@@ -316,9 +316,9 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
   await orderCollection.insertOne(order)
 
   // Después de guardar y a prueba de fallos: el pedido ya está registrado, así que
-  // ni un SMTP caído ni un Telegram que no responda pueden deshacerlo. Los dos
-  // avisos van a la vez porque son
-  // independientes: el correo es el registro, la notificación es la prisa.
+  // ni un SMTP caído ni un envío de push que no responda pueden deshacerlo. Los
+  // dos avisos van a la vez porque son independientes: el correo es el registro,
+  // la notificación es la prisa.
   await Promise.allSettled([
     session.user.email ? sendOrderEmails(order, session.user.email) : Promise.resolve(),
     notifyNewOrder(order),

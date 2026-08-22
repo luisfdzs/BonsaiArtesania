@@ -15,7 +15,7 @@ import { Wordmark } from './Wordmark'
 
 /**
  * Necesita JS por dos cosas: saber si se ha hecho scroll, para pasar de
- * transparente sobre el hero a fondo lino, y llevar el mismo menú de iconos que
+ * transparente sobre el hero a fondo lino macizo, y llevar el mismo menú de iconos que
  * `MobileNav` —inicio, cuenta, carrito, contacto y un botón de tres barras con
  * las secciones editoriales— para que el sitio se navegue igual en cualquier
  * tamaño.
@@ -65,7 +65,14 @@ export function Header({ shopOpen }: { shopOpen: boolean }) {
         data-top={!scrolled && !open}
         className={cn(
           'sticky top-0 z-50 transition-colors duration-700',
-          scrolled || open ? 'bg-linen/90 text-bark backdrop-blur-md' : 'bg-transparent',
+          // Lino macizo, sin translucidez ni desenfoque: en cuanto la barra deja
+          // de estar sobre el hero se junta con el carril de familias —que es
+          // `sticky` a su misma altura, ver `shop-nav`— y las dos se leen como una
+          // sola pieza. Con un 90% de opacidad las fotos del catálogo se
+          // adivinaban por debajo justo en la juntura y el bloque se partía en
+          // dos. Aquí manda que la marca y sus familias sean un bloque, no que
+          // flote nada.
+          scrolled || open ? 'bg-linen text-bark' : 'bg-transparent',
         )}
       >
         <a
@@ -100,10 +107,10 @@ export function Header({ shopOpen }: { shopOpen: boolean }) {
         </div>
       </header>
 
-      {/* El panel va FUERA del <header> a propósito: la barra usa
-          `backdrop-blur` con el menú abierto, y un filtro convierte al elemento
-          en bloque contenedor de sus descendientes `fixed` — dentro, el panel
-          calcularía su alto contra una barra de 96px y se abriría vacío. */}
+      {/* El panel va FUERA del <header> a propósito: cualquier filtro o
+          transformación en la barra la convertiría en bloque contenedor de sus
+          descendientes `fixed` — dentro, el panel calcularía su alto contra una
+          barra de 96px y se abriría vacío. */}
       <DesktopMenuPanel open={open} pathname={pathname} onClose={close} />
     </>
   )

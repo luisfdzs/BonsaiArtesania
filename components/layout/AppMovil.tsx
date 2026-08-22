@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { cn } from '@/lib/cn'
 import { useTranslator } from '@/lib/i18n/useLocale'
-import { CampanaIcon, CompartirIcon, InstalarIcon } from './NavIcons'
+import { CampanaIcon, CampanaOffIcon, CompartirIcon, InstalarIcon } from './NavIcons'
 
 /**
  * LA APP EN EL MÓVIL, lo primero del menú y centrado.
@@ -14,8 +14,13 @@ import { CampanaIcon, CompartirIcon, InstalarIcon } from './NavIcons'
  *
  * 1. **Sin instalar** → «Instalar la app».
  * 2. **Instalada y sin avisos** → «Activar los avisos».
- * 3. **Instalada y con los avisos puestos** → nada. Ya está todo hecho, y un botón
- *    que no cambia nada sólo estorba.
+ * 3. **Instalada y con los avisos puestos** → «Desactivar los avisos».
+ *
+ * El hueco no se queda nunca vacío: lo que cambia es lo que el botón hace, no si
+ * está. Antes el tercer momento no pintaba nada —ya estaba todo hecho—, y eso
+ * dejaba sin marcha atrás a quien había activado los avisos: para quitarlos había
+ * que entrar en los ajustes del teléfono. Un interruptor que sólo enciende no es un
+ * interruptor.
  *
  * Van en el mismo sitio y no uno debajo del otro a propósito: es un único camino
  * con dos pasos, y enseñar el segundo antes de acabar el primero sería ofrecer algo
@@ -67,8 +72,10 @@ type Instalable = Event & {
  * - `navegador`: había aviso, se usó y no se instaló. El aviso es de un solo uso, así
  *   que lo que queda es decir dónde está la opción en el menú del navegador.
  * - `avisos`: ya está instalada; lo que falta es dar permiso a las notificaciones.
+ * - `apagar`: instalada y con los avisos puestos en este dispositivo; el botón los
+ *   quita.
  */
-type Oferta = 'instalar' | 'ios' | 'navegador' | 'avisos' | null
+type Oferta = 'instalar' | 'ios' | 'navegador' | 'avisos' | 'apagar' | null
 
 function esApple(): boolean {
   return /iphone|ipad|ipod/i.test(navigator.userAgent)
@@ -185,9 +192,11 @@ export function AppMovil() {
       // Con el permiso ya dado puede que aún falte la suscripción: es de este
       // dispositivo y de este navegador, así que un teléfono nuevo la necesita
       // aunque el permiso venga de antes.
+      // Y si ya la tiene, lo que se ofrece es quitarla.
       if (Notification.permission === 'granted') {
         const suscripcion = await (await registro()).pushManager.getSubscription()
-        if (!vivo || suscripcion) return
+        if (!vivo) return
+        if (suscripcion) return setOfrecido('apagar')
       }
 
       setOfrecido('avisos')
@@ -244,8 +253,8 @@ export function AppMovil() {
       })
       if (!respuesta.ok) throw new Error('No se guardó la suscripción')
 
-      // Hecho: el hueco se queda vacío, que es el tercer momento.
-      setOfrecido(null)
+      // Hecho: el botón se da la vuelta y pasa a ser el que los quita.
+      setOfrecido('apagar')
     } catch {
       setFallo(true)
     } finally {
@@ -253,15 +262,57 @@ export function AppMovil() {
     }
   }, [])
 
-  const oferta: Oferta = ofrecido ?? (manual ? 'ios' : null)
+  /**
+   * La marcha atrás. Se da de baja en el servidor **y** en el navegador: sin lo
+   * primero se seguirían mandando avisos a un endpoint muerto, y sin lo segundo el
+   * navegador conservaría la suscripción y al volver a activar no habría nada nuevo
+   * que guardar.
+   *
+   * El permiso del navegador no se toca —no se puede revocar desde una página—, así
+   * que volver a activar no vuelve a preguntar. Es lo que se quiere: quitar los
+   * avisos no puede costar tener que ir a los ajustes del teléfono para recuperarlos.
+   */
+  const desactivarAvisos = useCallback(async () => {
+    setFallo(false)
+    setTrabajando(true)
+
+    try {
+      const suscripcion = await (await registro()).pushManager.getSubscription()
+
+      if (suscripcion) {
+        await fetch('/api/push/unsubscribe', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ endpoint: suscripcion.endpoint }),
+        })
+        await suscripcion.unsubscribe()
+      }
+
+      setOfrecido('avisos')
+    } catch {
+      setFallo(true)
+    } finally {
+      setTrabajando(false)
+    }
+  }, [])
+
+  /**
+   * Sin instalar, el hueco siempre ofrece instalar: con el aviso del navegador
+   * guardado se lanza, y sin él —un iPhone, o un Chrome que ya lo gastó— se enseña
+   * el camino a mano. Instalada, lo que toca lo decide el efecto de arriba; hasta
+   * que contesta no hay botón, que es lo que dura una petición.
+   */
+  const oferta: Oferta = instalado ? ofrecido : (ofrecido ?? (manual ? 'ios' : 'navegador'))
   if (!oferta) return null
 
   const rotulo =
     oferta === 'avisos'
       ? t({ es: 'Activar los avisos', gl: 'Activar os avisos' })
-      : oferta === 'ios'
-        ? t({ es: 'Añadir a la pantalla de inicio', gl: 'Engadir á pantalla de inicio' })
-        : t({ es: 'Instalar la app', gl: 'Instalar a app' })
+      : oferta === 'apagar'
+        ? t({ es: 'Desactivar los avisos', gl: 'Desactivar os avisos' })
+        : oferta === 'ios'
+          ? t({ es: 'Añadir a la pantalla de inicio', gl: 'Engadir á pantalla de inicio' })
+          : t({ es: 'Instalar la app', gl: 'Instalar a app' })
 
   const explicacion =
     oferta === 'ios'
@@ -276,11 +327,19 @@ export function AppMovil() {
 
   // Los avisos y la instalación se activan al pulsar; los otros dos casos son un
   // camino que se explica, y se despliega debajo en vez de abrir nada.
-  const pulsable = oferta === 'instalar' || oferta === 'avisos'
-  const Icono = oferta === 'avisos' ? CampanaIcon : oferta === 'ios' ? CompartirIcon : InstalarIcon
+  const pulsable = oferta === 'instalar' || oferta === 'avisos' || oferta === 'apagar'
+  const Icono =
+    oferta === 'avisos'
+      ? CampanaIcon
+      : oferta === 'apagar'
+        ? CampanaOffIcon
+        : oferta === 'ios'
+          ? CompartirIcon
+          : InstalarIcon
 
   const alPulsar = () => {
     if (oferta === 'avisos') return void activarAvisos()
+    if (oferta === 'apagar') return void desactivarAvisos()
     if (oferta === 'instalar') return void instalar()
     setAbierto((v) => !v)
   }
@@ -315,8 +374,8 @@ export function AppMovil() {
       {fallo && (
         <p className="max-w-[22rem] text-small leading-relaxed text-bark-faint">
           {t({
-            es: 'No se pudieron activar. Inténtalo otra vez.',
-            gl: 'Non se puideron activar. Téntao outra vez.',
+            es: 'No se pudo. Inténtalo otra vez.',
+            gl: 'Non se puido. Téntao outra vez.',
           })}
         </p>
       )}

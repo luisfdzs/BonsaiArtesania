@@ -1,8 +1,23 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { cn } from '@/lib/cn'
 import { useTranslator } from '@/lib/i18n/useLocale'
 
+/**
+ * El interruptor de los avisos de este dispositivo, en la cuenta del taller.
+ *
+ * Un botón y nada más. Antes lo acompañaba un párrafo por estado —qué son los
+ * avisos, que cada dispositivo va por su cuenta, que en iPhone hay que instalar
+ * antes—, y era leerse cuatro líneas para pulsar un botón que Ana pulsa una vez en
+ * la vida. El rótulo de la sección dice lo que es y el botón dice lo que hace.
+ *
+ * Los estados en los que no hay nada que hacer —sin claves en el servidor, un
+ * navegador que no admite avisos, un iPhone sin instalar, el permiso denegado en
+ * los ajustes— dejan el botón apagado en vez de quitarlo: el hueco no cambia de
+ * forma según el aparato desde el que se mire. El motivo va en el `title`, para
+ * quien lo busque, y no ocupando la pantalla.
+ */
 type Estado =
   'cargando' | 'sin-claves' | 'no-soportado' | 'instalar' | 'bloqueado' | 'apagado' | 'encendido'
 
@@ -38,7 +53,6 @@ export function AvisosMovil({ publicKey }: { publicKey: string | null }) {
   const t = useTranslator()
   const [estado, setEstado] = useState<Estado>('cargando')
   const [trabajando, setTrabajando] = useState(false)
-  const [aviso, setAviso] = useState<string | null>(null)
 
   useEffect(() => {
     let vivo = true
@@ -72,7 +86,6 @@ export function AvisosMovil({ publicKey }: { publicKey: string | null }) {
   const activar = useCallback(async () => {
     if (!publicKey) return
 
-    setAviso(null)
     setTrabajando(true)
 
     try {
@@ -99,26 +112,16 @@ export function AvisosMovil({ publicKey }: { publicKey: string | null }) {
       if (!respuesta.ok) throw new Error('No se guardó la suscripción')
 
       setEstado('encendido')
-      setAviso(
-        t({
-          es: 'Listo. Este dispositivo ya recibe los avisos.',
-          gl: 'Listo. Este dispositivo xa recibe os avisos.',
-        }),
-      )
     } catch {
-      setAviso(
-        t({
-          es: 'No se pudo activar. Inténtalo otra vez.',
-          gl: 'Non se puido activar. Téntao outra vez.',
-        }),
-      )
+      // El botón se queda como estaba: al volver a pulsar se reintenta, que es lo
+      // único que se puede hacer y lo que iba a decir el aviso que había aquí.
+      setEstado('apagado')
     } finally {
       setTrabajando(false)
     }
-  }, [publicKey, t])
+  }, [publicKey])
 
   const desactivar = useCallback(async () => {
-    setAviso(null)
     setTrabajando(true)
 
     try {
@@ -135,65 +138,50 @@ export function AvisosMovil({ publicKey }: { publicKey: string | null }) {
 
       setEstado('apagado')
     } catch {
-      setAviso(t({ es: 'No se pudo desactivar.', gl: 'Non se puido desactivar.' }))
+      setEstado('encendido')
     } finally {
       setTrabajando(false)
     }
-  }, [t])
+  }, [])
 
   if (estado === 'cargando') return null
 
-  const explicacion: Record<Exclude<Estado, 'cargando'>, string> = {
+  const encendido = estado === 'encendido'
+  const puede = encendido || estado === 'apagado'
+
+  /** Por qué el botón está apagado. No se pinta: va en el `title`. */
+  const motivo: Partial<Record<Estado, string>> = {
     'sin-claves': t({
       es: 'Falta configurar las claves del aviso en el servidor.',
       gl: 'Falta configurar as chaves do aviso no servidor.',
     }),
     'no-soportado': t({
-      es: 'Este navegador no admite avisos. Prueba desde el móvil.',
-      gl: 'Este navegador non admite avisos. Proba desde o móbil.',
+      es: 'Este navegador no admite avisos.',
+      gl: 'Este navegador non admite avisos.',
     }),
     instalar: t({
-      es: 'Antes hay que añadir la web a la pantalla de inicio y abrirla desde ese icono.',
-      gl: 'Antes hai que engadir a web á pantalla de inicio e abrila dese icono.',
+      es: 'Antes hay que añadir la web a la pantalla de inicio.',
+      gl: 'Antes hai que engadir a web á pantalla de inicio.',
     }),
     bloqueado: t({
-      es: 'Los avisos están bloqueados en los ajustes del móvil. Permítelos ahí y vuelve.',
-      gl: 'Os avisos están bloqueados nos axustes do móbil. Permíteos aí e volve.',
-    }),
-    apagado: t({
-      es: 'Los pedidos nuevos te sonarán en este dispositivo.',
-      gl: 'Os pedidos novos soaránche neste dispositivo.',
-    }),
-    encendido: t({
-      es: 'Este dispositivo ya recibe los avisos de pedido.',
-      gl: 'Este dispositivo xa recibe os avisos de pedido.',
+      es: 'Los avisos están bloqueados en los ajustes del móvil.',
+      gl: 'Os avisos están bloqueados nos axustes do móbil.',
     }),
   }
 
   return (
     <div className="text-center">
-      <p className="mx-auto max-w-md text-bark-soft">{explicacion[estado]}</p>
-
-      {(estado === 'apagado' || estado === 'encendido') && (
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
-          {estado === 'apagado' ? (
-            <button type="button" onClick={activar} disabled={trabajando} className="btn btn-sm">
-              {t({ es: 'Activar avisos aquí', gl: 'Activar avisos aquí' })}
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={desactivar}
-              disabled={trabajando}
-              className="btn btn-quiet btn-sm"
-            >
-              {t({ es: 'Desactivar', gl: 'Desactivar' })}
-            </button>
-          )}
-        </div>
-      )}
-
-      {aviso && <p className="mt-4 text-small text-bark-faint">{aviso}</p>}
+      <button
+        type="button"
+        onClick={encendido ? desactivar : activar}
+        disabled={!puede || trabajando}
+        title={motivo[estado]}
+        className={cn('btn btn-sm', encendido && 'btn-quiet')}
+      >
+        {encendido
+          ? t({ es: 'Desactivar avisos', gl: 'Desactivar avisos' })
+          : t({ es: 'Activar avisos', gl: 'Activar avisos' })}
+      </button>
     </div>
   )
 }

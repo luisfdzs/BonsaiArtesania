@@ -94,12 +94,7 @@ export default async function GestionCuentaPage({ params }: Params) {
       </div>
 
       <div className="mt-16">
-        <SectionIntro title={t({ es: 'Avisos en el móvil', gl: 'Avisos no móbil' })}>
-          {t({
-            es: 'Cada dispositivo se activa por separado, desde la app añadida a la pantalla de inicio.',
-            gl: 'Cada dispositivo actívase por separado, desde a app engadida á pantalla de inicio.',
-          })}
-        </SectionIntro>
+        <SectionIntro title={t({ es: 'Avisos en el móvil', gl: 'Avisos no móbil' })} />
 
         <div className="mt-12">
           <AvisosMovil publicKey={pushPublicKey()} />
