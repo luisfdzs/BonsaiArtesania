@@ -553,11 +553,14 @@ export function crearMotorDelMazo(
       aterrizando = familia
       cancelAnimationFrame(marco)
 
-      void aviso.preparar(familia).then((sigue) => {
-        if (mio !== espera) return
-        aterrizando = null
-        if (sigue) aterrizar(familia)
-      })
+      void aviso
+        .preparar(familia)
+        .catch(() => true)
+        .then((sigue) => {
+          if (mio !== espera) return
+          aterrizando = null
+          if (sigue) aterrizar(familia)
+        })
     },
 
     destruir() {
