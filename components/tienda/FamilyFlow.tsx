@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Media } from '@/components/ui/Media'
 import { cn } from '@/lib/cn'
 import type { Seguir } from '@/components/tienda/ShopDeck'
@@ -50,7 +50,13 @@ export function FamilyFlow({ familias, index, onSelect, navLabel, arrastre }: Pr
 
   return (
     <div className="relative">
-      <nav aria-label={navLabel}>
+      {/* El ancho del carril se mide en familias, no en pantallas: ver
+          `thumb-flow-frame` en globals.css. */}
+      <nav
+        aria-label={navLabel}
+        className="thumb-flow-frame"
+        style={{ '--flow-count': familias.length } as CSSProperties}
+      >
         <Carril familias={familias} index={index} onSelect={onSelect} arrastre={arrastre} />
       </nav>
 
@@ -96,9 +102,11 @@ export function FamilyFlow({ familias, index, onSelect, navLabel, arrastre }: Pr
  *    familia que ya esté más cerca, no la de la copia central. Si siempre se
  *    fuera a la central, cerrar el bucle —de la última a la primera— obligaba a
  *    recorrer el mazo entero de vuelta: eso era el salto raro.
- * 3. **La recolocación, en reposo.** El salto de un bloque entero que devuelve el
- *    carril al centro se hace sólo cuando ya no se mueve nada. Hacerlo a media
- *    animación la cortaba, y ése era el otro tirón.
+ * 3. **La recolocación, en reposo y medida.** El salto de un bloque entero que
+ *    devuelve el carril al centro se hace cuando ya no se mueve nada —a media
+ *    animación la cortaba, y ése era el otro tirón— o en el borde de verdad, y
+ *    entonces el punto de partida del arrastre se mueve con él. Y el bloque se
+ *    mide de las miniaturas: ver `bloqueDelCarril`.
  */
 function Carril({ familias, index, onSelect, arrastre }: Omit<Props, 'navLabel'>) {
   const rail = useRef<HTMLDivElement>(null)
@@ -106,7 +114,7 @@ function Carril({ familias, index, onSelect, arrastre }: Omit<Props, 'navLabel'>
   const reposo = useRef<number | undefined>(undefined)
   const marco = useRef(0)
   const count = familias.length
-  const copias = [...familias, ...familias, ...familias]
+  const copias = Array.from({ length: COPIAS }, () => familias).flat()
 
   /** El índice de ahora mismo, para las devoluciones de llamada que viven fuera
    *  del ciclo de render —el arrastre del mazo—. Se pone al día en un efecto y no
@@ -238,12 +246,25 @@ function Carril({ familias, index, onSelect, arrastre }: Omit<Props, 'navLabel'>
     })
   }, [arrastre, centrar])
 
-  /** Devuelve el carril al bloque del medio. Instantáneo, y con el contenido
-   *  repetido no hay nada que ver: la miniatura de destino es la misma. */
+  /**
+   * Devuelve el carril al bloque del medio, y dice cuánto lo ha movido.
+   *
+   * Se mira qué miniatura ha quedado centrada y en qué bloque vive, en vez de
+   * comparar el desplazamiento con fracciones del ancho total. Un bloque se salta
+   * entero, así que la miniatura que queda centrada después es la copia de la
+   * misma familia: no hay nada que ver, y no hay forma de que la recolocación
+   * cambie de familia por su cuenta.
+   */
   const recolocar = (node: HTMLDivElement) => {
-    const bloque = node.scrollWidth / 3
-    if (node.scrollLeft < bloque * 0.5) node.scrollLeft += bloque
-    else if (node.scrollLeft > bloque * 1.5) node.scrollLeft -= bloque
+    const bloque = bloqueDelCarril(node)
+    const centrada = itemCentrado(node)
+    if (!bloque || !centrada) return 0
+
+    const movido =
+      centrada.orden < count ? bloque : centrada.orden >= count * COPIAS - count ? -bloque : 0
+
+    if (movido) node.scrollLeft += movido
+    return movido
   }
 
   /**
@@ -255,10 +276,10 @@ function Carril({ familias, index, onSelect, arrastre }: Omit<Props, 'navLabel'>
    */
   const asentar = (node: HTMLDivElement) => {
     recolocar(node)
-    const centrada = familiaCentrada(node)
-    if (centrada === null) return
-    if (centrada === index) centrar(index, true)
-    else onSelect(centrada)
+    const centrada = itemCentrado(node)
+    if (!centrada) return
+    if (centrada.familia === index) centrar(index, true)
+    else onSelect(centrada.familia)
   }
 
   return (
@@ -276,8 +297,17 @@ function Carril({ familias, index, onSelect, arrastre }: Omit<Props, 'navLabel'>
           node.scrollLeft < margen ||
           node.scrollLeft > node.scrollWidth - node.clientWidth - margen
         ) {
-          recolocar(node)
+          const movido = recolocar(node)
+          // Y si el dedo está en el mazo, su punto de partida se mueve con el
+          // carril: sin esto, el fotograma siguiente lo escribe desde el sitio de
+          // antes y deshace la recolocación.
+          if (movido && suelo.current !== null) suelo.current += movido
         }
+
+        // Mientras el dedo lleva el mazo el carril es suyo, así que aquí no se
+        // asienta nada: bastaba con detener el gesto un momento para que este
+        // temporizador saltara a media pasada y le peleara el sitio al dedo.
+        if (suelo.current !== null) return
 
         window.clearTimeout(reposo.current)
         reposo.current = window.setTimeout(() => asentar(node), REPOSO_MS)
@@ -307,6 +337,11 @@ function Carril({ familias, index, onSelect, arrastre }: Omit<Props, 'navLabel'>
     </div>
   )
 }
+
+/** Las veces que se repiten las familias para que el carril no tenga principio ni
+ *  fin. Impar, porque el carril vive en el bloque del medio y necesita otro
+ *  entero a cada lado; tres es lo justo. */
+const COPIAS = 3
 
 /** Lo que tarda el carril en llevar una familia al centro. */
 const DESLIZAR_MS = 520
@@ -343,21 +378,45 @@ function copiaCercana(node: HTMLElement, index: number): HTMLElement | undefined
   }, null)?.el
 }
 
-/** Qué familia ha quedado en el centro del carril. */
-function familiaCentrada(node: HTMLElement): number | null {
+/**
+ * Lo que mide un bloque de familias: de una miniatura a la de su misma familia en
+ * el bloque siguiente.
+ *
+ * Se mide de las propias miniaturas, y no como un tercio del ancho desplazable,
+ * que es lo que se hacía antes y era el fallo. El carril lleva a los lados un
+ * relleno de media pantalla —el `padding-inline` de `thumb-flow`, que es lo que
+ * permite centrar también la primera y la última—, y ese relleno cuenta en el
+ * `scrollWidth`. Así que un tercio del total no es un bloque, sino un bloque más
+ * un tercio del relleno: en un móvil de 294 px sobraban 74 px, o sea familia y
+ * media. Con esa medida, recolocar el carril lo dejaba donde había centrada otra
+ * familia, y el asentado la abría acto seguido; eso era el tirón con cambio de
+ * familia por su cuenta al pasar por segunda vez.
+ */
+function bloqueDelCarril(node: HTMLElement): number {
+  const items = node.querySelectorAll<HTMLElement>('[data-familia]')
+  const uno = items[0]
+  const dos = items[items.length / COPIAS]
+  if (!uno || !dos) return 0
+  // `offsetLeft` y no la caja en pantalla: es medida de maquetación, así que no
+  // la mueven ni el desplazamiento del carril ni el giro de las tarjetas.
+  return dos.offsetLeft - uno.offsetLeft
+}
+
+/** Qué miniatura ha quedado en el centro del carril: su sitio en la fila de
+ *  copias —que es lo que dice en qué bloque está— y de qué familia es. */
+function itemCentrado(node: HTMLElement): { orden: number; familia: number } | null {
   const medio = node.getBoundingClientRect().left + node.clientWidth / 2
 
-  const cerca = [...node.querySelectorAll<HTMLElement>('[data-familia]')].reduce<{
+  return [...node.querySelectorAll<HTMLElement>('[data-familia]')].reduce<{
+    orden: number
     familia: number
     d: number
-  } | null>((mejor, el) => {
+  } | null>((mejor, el, orden) => {
     const caja = el.getBoundingClientRect()
     const d = Math.abs(caja.left + caja.width / 2 - medio)
-    const familia = Number(el.dataset.familia)
-    return !mejor || d < mejor.d ? { familia, d } : mejor
+    if (mejor && d >= mejor.d) return mejor
+    return { orden, familia: Number(el.dataset.familia), d }
   }, null)
-
-  return cerca ? cerca.familia : null
 }
 
 function Chevron({ abierto }: { abierto: boolean }) {

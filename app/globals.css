@@ -848,12 +848,33 @@
    los fotogramas. `--flow-step` es la distancia entre centros y es menor que la
    miniatura a propósito: las tarjetas se solapan, que es lo que hace que parezca
    un mazo y no una fila. */
-@utility thumb-flow {
+/* El marco del carril: pone las medidas y, sobre todo, le pone tope al ancho.
+
+   El tope se mide en pasos de miniatura y no en píxeles: huecos para una familia
+   menos de las que hay, y así la copia siguiente no llega nunca a asomar por los
+   lados. Sin él el carril medía lo que la pantalla, y en escritorio —1.905 px
+   para siete familias de 3,1 rem— las tres copias cabían de sobra: la misma
+   familia aparecía tres veces seguidas. Y con ellas se iba el efecto, porque el
+   giro lo reparte `animation-timeline: view()` a lo largo del carril y con el
+   carril del ancho de la pantalla no llegaba a girar nada; quedaba una cinta
+   plana de miniaturas.
+
+   Va en un contenedor aparte y no en `thumb-flow` porque el relleno lateral del
+   carril es un 50 %, y los porcentajes de relleno se miden sobre el contenedor y
+   no sobre el elemento: con el tope puesto en el propio carril, ese 50 % seguiría
+   siendo medio ancho de pantalla y el centrado se iría al garete. `--flow-count`
+   lo pone `FamilyFlow`, que es quien sabe cuántas familias hay. */
+@utility thumb-flow-frame {
   --flow-card: 4.5rem;
   --flow-step: 3.1rem;
   --flow-turn: 52deg;
   --flow-depth: 2.25rem;
   --flow-dim: 0.45;
+  max-width: calc(var(--flow-step) * (var(--flow-count) - 1));
+  margin-inline: auto;
+}
+
+@utility thumb-flow {
   position: relative;
   display: flex;
   align-items: center;
