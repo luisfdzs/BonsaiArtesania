@@ -31,18 +31,28 @@ type Props = {
 /**
  * LA BARRA DE FAMILIAS. La misma en la tienda y en el escaparate de la portada.
  *
- * Es un cover flow en miniatura: la familia abierta va de frente en el centro y
- * las vecinas giran sobre su eje y se van hacia atrás. El giro, el velo y la
- * profundidad los hace CSS con `animation-timeline: view()` —ver `thumb-flow` en
- * globals.css—, así que el movimiento va pegado al dedo: no hay un fotograma de
- * JavaScript por medio, lo que se mueve es el scroll del carril y el resto es
- * consecuencia. Donde no haya timelines de scroll el carril se queda plano, que
- * se lee igual de bien.
+ * Arriba, en todas las pantallas, el cover flow: la familia abierta va de frente
+ * en el centro y las vecinas giran sobre su eje y se van hacia atrás. El giro, el
+ * velo y la profundidad los hace CSS con `animation-timeline: view()` —ver
+ * `thumb-flow` en globals.css—, así que el movimiento va pegado al dedo: no hay un
+ * fotograma de JavaScript por medio, lo que se mueve es el scroll del carril y el
+ * resto es consecuencia. Donde no haya timelines de scroll el carril se queda
+ * plano, que se lee igual de bien.
  *
- * Debajo, el nombre de la familia abierta con un chevrón; al pulsarlo se
- * despliega la lista entera flotando sobre el catálogo, sin empujarlo. No hay
- * flechas a los lados: el catálogo se cambia con el dedo o desde esa lista, y dos
- * botones fijos sobre las miniaturas sólo tapaban mazo.
+ * Debajo, lo que sirve para elegir una familia por su nombre, y ahí sí cambia
+ * según la pantalla:
+ *
+ * - **En el teléfono, el desplegable del sistema.** Un `select` de los de
+ *   siempre: la lista la abre y la pinta el móvil —la rueda de iOS, la lista a
+ *   pantalla de Android—, con el tamaño de letra que el visitante tenga puesto y
+ *   donde su pulgar ya sabe buscarla. No hay nada que aprender.
+ * - **En el escritorio, el rótulo con chevrón.** Al pulsarlo se despliega la
+ *   lista entera flotando sobre el catálogo, sin empujarlo; con ratón y sitio de
+ *   sobra, ver las siete de un vistazo gana a abrir un desplegable del sistema.
+ *
+ * Los dos se pintan siempre y se reparten con `md:`, no con una media query leída
+ * en JavaScript: así el HTML que llega del servidor ya es el bueno y no hay un
+ * primer pintado con la barra que no toca.
  */
 export function FamilyFlow({ familias, index, onSelect, navLabel, arrastre }: Props) {
   const [desplegado, setDesplegado] = useState(false)
@@ -60,7 +70,21 @@ export function FamilyFlow({ familias, index, onSelect, navLabel, arrastre }: Pr
         <Carril familias={familias} index={index} onSelect={onSelect} arrastre={arrastre} />
       </nav>
 
-      <div className="relative">
+      <div className="family-select md:hidden">
+        <select
+          aria-label={navLabel}
+          value={index}
+          onChange={(event) => onSelect(Number(event.target.value))}
+        >
+          {familias.map((f, i) => (
+            <option key={f.key} value={i}>
+              {f.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="relative hidden md:block">
         <button
           type="button"
           onClick={() => setDesplegado((v) => !v)}

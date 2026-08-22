@@ -836,6 +836,40 @@
   }
 }
 
+/* EL SELECTOR DE FAMILIAS EN EL TELÉFONO · el desplegable del sistema.
+
+   Va debajo del carrusel y en lugar del rótulo con chevrón, que se queda para el
+   escritorio: en un móvil la lista la abre y la pinta el teléfono —la rueda de
+   iOS, la lista a pantalla de Android—, con el tamaño de letra que el visitante
+   tenga puesto y donde su pulgar ya sabe buscarla. El carrusel sigue arriba, que
+   es con lo que se pasean las familias; esto es para ir a una por su nombre.
+
+   El relleno es el mismo que llevaba el rótulo —más apretado arriba que abajo—,
+   así que la barra mide lo que medía y el mazo sigue reservándole lo mismo. Ver
+   `shop-deck`.
+
+   Del resto sólo se le da la tipografía y el color de la barra. A propósito **no**
+   se le quita el `appearance`: la flecha y el modo de abrirse son los del sistema,
+   y eso es justo lo que se quiere. Tampoco se le pinta fondo ni marco: en la barra
+   de lino, un cuadro con borde parecería un formulario. */
+@utility family-select {
+  display: flex;
+  justify-content: center;
+  padding-block: 0.625rem 1rem;
+
+  & select {
+    max-width: 100%;
+    padding-inline: 0.25rem;
+    border: 0;
+    background: transparent;
+    color: var(--color-sage-deep);
+    font-family: var(--font-serif);
+    font-size: var(--text-lead);
+    line-height: 1;
+    text-align: center;
+  }
+}
+
 /* CARRUSEL DE FAMILIAS · las miniaturas en perspectiva de la barra de la tienda.
    Es un cover flow en miniatura: la familia abierta va de frente en el centro y
    las vecinas se giran sobre su eje y se van hacia atrás, así que la barra dice
