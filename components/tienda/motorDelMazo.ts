@@ -186,6 +186,12 @@ export function crearMotorDelMazo(
   }
 
   function pintar() {
+    // El alto de la carta, una vez por fotograma y no una vez por panel: leer
+    // `clientHeight` después de haber escrito estilos obliga al navegador a
+    // recalcular la maquetación, y hacerlo dos veces por fotograma es pagarlo dos
+    // veces por nada.
+    const mitad = Math.round(vista.clientHeight / 2)
+
     for (let i = 0; i < capa.children.length; i++) {
       const nodo = capa.children[i] as HTMLElement
       const d = vuelta(i - pos, count)
