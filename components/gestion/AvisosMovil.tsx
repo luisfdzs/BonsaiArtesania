@@ -101,8 +101,8 @@ export function AvisosMovil({ publicKey }: { publicKey: string | null }) {
       setEstado('encendido')
       setAviso(
         t({
-          es: 'Listo. Prueba el aviso para comprobarlo.',
-          gl: 'Listo. Proba o aviso para comprobalo.',
+          es: 'Listo. Este dispositivo ya recibe los avisos.',
+          gl: 'Listo. Este dispositivo xa recibe os avisos.',
         }),
       )
     } catch {
@@ -136,32 +136,6 @@ export function AvisosMovil({ publicKey }: { publicKey: string | null }) {
       setEstado('apagado')
     } catch {
       setAviso(t({ es: 'No se pudo desactivar.', gl: 'Non se puido desactivar.' }))
-    } finally {
-      setTrabajando(false)
-    }
-  }, [t])
-
-  const probar = useCallback(async () => {
-    setAviso(null)
-    setTrabajando(true)
-
-    try {
-      const respuesta = await fetch('/api/push/test', { method: 'POST' })
-      const datos = (await respuesta.json()) as { ok?: boolean; sent?: number }
-
-      setAviso(
-        datos.ok
-          ? t({
-              es: 'Aviso enviado. Debería sonar en un momento.',
-              gl: 'Aviso enviado. Debería soar nun momento.',
-            })
-          : t({
-              es: 'No se envió a ningún dispositivo.',
-              gl: 'Non se enviou a ningún dispositivo.',
-            }),
-      )
-    } catch {
-      setAviso(t({ es: 'No se pudo enviar la prueba.', gl: 'Non se puido enviar a proba.' }))
     } finally {
       setTrabajando(false)
     }
@@ -207,19 +181,14 @@ export function AvisosMovil({ publicKey }: { publicKey: string | null }) {
               {t({ es: 'Activar avisos aquí', gl: 'Activar avisos aquí' })}
             </button>
           ) : (
-            <>
-              <button type="button" onClick={probar} disabled={trabajando} className="btn btn-sm">
-                {t({ es: 'Probar el aviso', gl: 'Probar o aviso' })}
-              </button>
-              <button
-                type="button"
-                onClick={desactivar}
-                disabled={trabajando}
-                className="btn btn-quiet btn-sm"
-              >
-                {t({ es: 'Desactivar', gl: 'Desactivar' })}
-              </button>
-            </>
+            <button
+              type="button"
+              onClick={desactivar}
+              disabled={trabajando}
+              className="btn btn-quiet btn-sm"
+            >
+              {t({ es: 'Desactivar', gl: 'Desactivar' })}
+            </button>
           )}
         </div>
       )}
