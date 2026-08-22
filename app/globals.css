@@ -815,6 +815,15 @@
   display: flex;
   margin-inline: calc(var(--auth-pad) * -1);
   border-bottom: 1px solid var(--color-line);
+
+  /* Menos relleno lateral que en la barra de la tienda: allí las familias van
+     seguidas en un carril que scrollea y el relleno es lo que las separa; aquí
+     son dos y cada una tiene media tarjeta, así que el relleno sólo le quita
+     sitio al rótulo. Con 0.5rem, «Iniciar sesión» cabe sin recortarse hasta en
+     una pantalla de 320px, que es la más estrecha que se ve. */
+  & > a {
+    padding-inline: 0.5rem;
+  }
 }
 
 /* El contenido de la pestaña, entrando desde el lado por el que ha venido el dedo.
