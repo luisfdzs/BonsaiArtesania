@@ -57,12 +57,11 @@ export type AjustesMazo = {
   radio: number
   /** Distancia del ojo a la escena, en anchos de pantalla. Menos, más fuga. */
   perspectiva: number
-  /** La frecuencia del resorte que remata el viaje. Más alto, más seco. */
-  rigidez: number
-  /** 1 = sin rebote; por debajo, rebota. */
-  amortiguacion: number
-  /** Cuánto del impulso queda en cada milisegundo: lo que rueda un manotazo. */
-  friccion: number
+  /**
+   * Lo que tarda el gesto en acabar de poner la familia, en milisegundos, una vez
+   * levantado el dedo. Ver `aterrizar`.
+   */
+  aterrizaje: number
   /** Cuánto cuenta la velocidad al soltar para elegir familia. */
   proyeccion: number
   /** Parte de pantalla que hay que arrastrar para pasar de familia sin lanzar. */
@@ -92,9 +91,7 @@ export const MAZO: AjustesMazo = {
   velo: 0.5,
   radio: 22,
   perspectiva: 2.2,
-  rigidez: 150,
-  amortiguacion: 1,
-  friccion: 0.99,
+  aterrizaje: 180,
   proyeccion: 100,
   umbral: 0.32,
   // De una en una: por muy fuerte que sea el manotazo, el catálogo avanza una
@@ -104,21 +101,6 @@ export const MAZO: AjustesMazo = {
   desenfoque: 6,
   desvanecido: 0.25,
 }
-
-/**
- * Cuándo se da el viaje por terminado: a dos píxeles y medio del destino y sin
- * velocidad que valga la pena.
- *
- * No se espera a que el resorte llegue de verdad. Un amortiguado se acerca por una
- * exponencial, así que la última milésima del camino cuesta tanto tiempo como el
- * primer noventa por ciento: con el paso abierto de un salto de tres familias eso
- * eran 2,2 s con el bloque congelado y el rótulo apagado, cuando a ojo el catálogo
- * había llegado a los 1,2 s —medido en el navegador, fotograma a fotograma—. Seis
- * milésimas de familia son dos píxeles y medio en un móvil: ahí ya no queda nada
- * que ver, así que se remata y se suelta el bloque.
- */
-const QUIETO_POS = 0.006
-const QUIETO_VEL = 0.0002
 
 /** El índice dentro del rango: de la última familia a la primera. */
 export function bucle(n: number, count: number): number {
@@ -153,6 +135,22 @@ type Aviso = {
    *  aterrizado. Se pasa por parámetro y no se lee de fuera porque quien la sabe
    *  con certeza en ese instante es el motor. */
   asentado: (familia: number) => void
+  /**
+   * Que se vayan bajando las fotos de estas familias, sin esperarlas. Se avisa en
+   * cuanto el gesto se declara horizontal: a partir de ahí una de las dos vecinas
+   * va a ser la que llegue, y quedan los cientos de milisegundos del arrastre para
+   * tenerla lista. Es lo que hace que al levantar el dedo no haya nada que cargar.
+   */
+  acercar: (familias: number[]) => void
+  /**
+   * Deja lista la familia en la que va a aterrizar el gesto —sus fotos cargadas, y
+   * la flor si tardan— y dice si sigue siendo la que toca: `false` cuando mientras
+   * se cargaba se ha pedido otra, y entonces este aterrizaje se queda en el camino.
+   *
+   * Es el mismo trámite que al elegir una familia por su nombre, a propósito: las
+   * dos formas de cambiar de familia enseñan la nueva hecha y no haciéndose.
+   */
+  preparar: (familia: number) => Promise<boolean>
 }
 
 export type MotorDelMazo = ReturnType<typeof crearMotorDelMazo>
@@ -170,8 +168,15 @@ export function crearMotorDelMazo(
   let arrastrando = false
   let plegado = false
   let marco = 0
-  let reloj = 0
   let familiaVista = 0
+  /**
+   * La familia en la que el gesto va a aterrizar, mientras se están cargando sus
+   * fotos. El dedo ya se ha levantado y el destino está elegido, así que en ese
+   * rato no se empieza otro gesto: ver `empezar`.
+   */
+  let aterrizando: number | null = null
+  /** Para que un aterrizaje que llegue tarde no se ponga por encima de otro. */
+  let espera = 0
   /**
    * El viaje en curso: de dónde salió y a qué paso va.
    *
@@ -339,38 +344,72 @@ export function crearMotorDelMazo(
     aviso.asentado(bucle(Math.round(pos), count))
   }
 
-  function correr() {
+  /** Nada de movimiento: quien ha pedido no ver animaciones, y la pestaña que no
+   *  se está pintando —ahí el navegador no da fotogramas, y una animación se
+   *  quedaría a medias con el bloque congelado—. */
+  function quieto() {
+    return (
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+      document.visibilityState !== 'visible'
+    )
+  }
+
+  /**
+   * El bucle del arrastre: un fotograma por refresco de pantalla mientras el dedo
+   * lleva el mazo, y no uno por cada evento de toque —que llegan a rachas—.
+   */
+  function seguir() {
     cancelAnimationFrame(marco)
-    reloj = performance.now()
+    const paso = () => {
+      pintar()
+      if (arrastrando) marco = requestAnimationFrame(paso)
+    }
+    marco = requestAnimationFrame(paso)
+  }
+
+  /**
+   * El remate del gesto: lo que queda de camino, de un tirón corto y medido.
+   *
+   * Antes esto lo hacía un resorte amortiguado que heredaba la velocidad del dedo.
+   * Sonaba bien y se sentía mal: un amortiguado se acerca por una exponencial, así
+   * que el último medio píxel cuesta tanto como el primer noventa por ciento del
+   * camino —medio segundo largo de bloque congelado y flor apagada, medido—, y
+   * justo en ese rato el navegador estaba además pintando las fotos de la familia
+   * que llegaba. Eso era el tirón, y por eso arrastrar se sentía más lento que
+   * elegir la familia en la lista, que llega de una pieza.
+   *
+   * Ahora es un tramo fijo y corto con la curva de la casa: se sabe cuándo acaba y
+   * no hay cola exponencial a la que esperar con el bloque congelado. La
+   * velocidad del dedo sigue contando, pero donde tiene sentido —para elegir a qué
+   * familia se va, en `terminar`—, no para dosificar los últimos píxeles.
+   */
+  function aterrizar(familia: number) {
+    cancelAnimationFrame(marco)
+    const desde = pos
+    const tramo = vuelta(familia - pos, count)
+    destino = pos + tramo
+    vel = 0
+
+    if (Math.abs(tramo) < 0.001 || quieto()) {
+      pos = destino
+      pintar()
+      asentar()
+      return
+    }
+
+    const arranque = performance.now()
 
     const paso = (ahora: number) => {
-      const dt = Math.min(32, ahora - reloj)
-      reloj = ahora
-
-      if (!arrastrando) {
-        // Un integrador y nada más: resorte amortiguado que tira hacia el destino
-        // y conserva la velocidad que traía el gesto, así que un manotazo rueda y
-        // un toque va directo. `omega` es la frecuencia propia en radianes por
-        // milisegundo —de ahí el /10000—, que es lo que hace que las cuentas sean
-        // estables con `dt` en milisegundos.
-        const omega = a.rigidez / 10000
-        const rozamiento = 2 * a.amortiguacion * omega
-        vel += ((destino - pos) * omega * omega - vel * rozamiento) * dt
-        vel *= a.friccion ** dt
-        pos += vel * dt
-      }
-
+      const avance = Math.min(1, (ahora - arranque) / Math.max(1, a.aterrizaje))
+      pos = desde + tramo * (1 - (1 - avance) ** 3)
       pintar()
-
-      if (!arrastrando && Math.abs(vel) < QUIETO_VEL && Math.abs(destino - pos) < QUIETO_POS) {
-        pos = destino
-        vel = 0
-        pintar()
-        asentar()
+      if (avance < 1) {
+        marco = requestAnimationFrame(paso)
         return
       }
-
-      marco = requestAnimationFrame(paso)
+      pos = destino
+      pintar()
+      asentar()
     }
 
     marco = requestAnimationFrame(paso)
@@ -426,6 +465,11 @@ export function crearMotorDelMazo(
     },
 
     empezar(x: number, y: number) {
+      // Mientras se cargan las fotos de la familia en la que va a aterrizar el gesto
+      // anterior no se empieza otro: el destino ya está elegido y la flor puesta. Con
+      // las vecinas pedidas al empezar a arrastrar esto no espera nada, así que es un
+      // seguro para la foto que no llega y no algo que se note.
+      if (aterrizando !== null) return
       gesto.x = x
       gesto.y = y
       gesto.base = pos
@@ -452,7 +496,12 @@ export function crearMotorDelMazo(
         arrastrando = true
         viaje = { base: gesto.base }
         plegar()
-        correr()
+        // Las dos vecinas, porque el dedo puede acabar en cualquiera de ellas —o
+        // volver a la de partida—. Son sólo las fotos de su primera pantalla, y las
+        // que ya estén no se piden dos veces: ver `cargar` en `ShopDeck`.
+        const aqui = Math.round(pos)
+        aviso.acercar([bucle(aqui - 1, count), bucle(aqui + 1, count)])
+        seguir()
       }
 
       const ancho = vista.clientWidth || 1
@@ -474,9 +523,9 @@ export function crearMotorDelMazo(
       gesto.vivo = false
       if (!arrastrando) return
       arrastrando = false
-      // Aquí no se manda `null`: el viaje sigue vivo hasta que el resorte se para,
-      // y lo que queda de camino lo tiene que recorrer el carril con el mazo y no
-      // por su cuenta. La señal de fin la da `asentar`.
+      // Aquí no se manda `null`: el viaje sigue vivo hasta que la familia está
+      // puesta, y lo que queda de camino lo tiene que recorrer el carril con el
+      // mazo y no por su cuenta. La señal de fin la da `asentar`.
 
       // A dónde llegaría el impulso, con tope. Si el gesto fue corto y sin
       // fuerza, decide el recorrido: pasado el umbral cambia, y si no, vuelve.
@@ -495,11 +544,27 @@ export function crearMotorDelMazo(
       const salida = Math.round(gesto.base)
       destino = Math.max(salida - 1, Math.min(salida + 1, bruto))
 
-      correr()
+      // Y de aquí en adelante, lo mismo que al elegir la familia en la lista:
+      // primero se deja lista y después se pone. Mientras se carga no se pinta nada
+      // —el mazo se queda donde lo dejó el dedo— porque mover el catálogo con las
+      // fotos aún llegando es exactamente lo que se veía como un tirón.
+      const familia = bucle(destino, count)
+      const mio = ++espera
+      aterrizando = familia
+      cancelAnimationFrame(marco)
+
+      void aviso.preparar(familia).then((sigue) => {
+        if (mio !== espera) return
+        aterrizando = null
+        if (sigue) aterrizar(familia)
+      })
     },
 
     destruir() {
       cancelAnimationFrame(marco)
+      // Y el aterrizaje que estuviera cargando no se pone: los nodos ya no están.
+      espera++
+      aterrizando = null
     },
   }
 }

@@ -103,28 +103,13 @@ export function Panel() {
       <p className="eyebrow mt-10 text-bark-faint">El tacto</p>
       <div className="mt-4 grid gap-5">
         <Dial
-          etiqueta="Rigidez"
-          valor={ajustes.rigidez}
-          min={60}
-          max={340}
-          paso={5}
-          onChange={(rigidez) => cambia({ rigidez })}
-        />
-        <Dial
-          etiqueta="Amortiguación"
-          valor={ajustes.amortiguacion}
-          min={0.5}
-          max={1.4}
-          paso={0.02}
-          onChange={(amortiguacion) => cambia({ amortiguacion })}
-        />
-        <Dial
-          etiqueta="Fricción"
-          valor={ajustes.friccion}
-          min={0.985}
-          max={0.999}
-          paso={0.0005}
-          onChange={(friccion) => cambia({ friccion })}
+          etiqueta="Aterrizaje"
+          unidad=" ms"
+          valor={ajustes.aterrizaje}
+          min={0}
+          max={600}
+          paso={10}
+          onChange={(aterrizaje) => cambia({ aterrizaje })}
         />
         <Dial
           etiqueta="Proyección del impulso"

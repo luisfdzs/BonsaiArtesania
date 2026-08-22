@@ -45,6 +45,18 @@ const ESPERA_MAXIMA_MS = 5000
 /** Lo que tarda en aparecer la familia que se abre. Ver `fundir`. */
 const APARECER_MS = 420
 
+/**
+ * Lo que se espera antes de dar la carga por lenta y poner la flor.
+ *
+ * No se pone desde el primer instante porque la flor va sobre un desenfoque de
+ * fondo, y eso se paga en el fotograma en que se pone: en el caso normal —las
+ * fotos ya pedidas mientras el dedo arrastraba, así que no hay nada que esperar—
+ * era pagarlo justo al arrancar el aterrizaje, o sea un tirón donde no había
+ * espera. Y encima `FlowerLoader` no se ve durante sus primeros 180 ms, así que
+ * hasta que la espera no es de verdad no se ve nada.
+ */
+const FLOR_MS = 120
+
 type Deck = {
   index: number
   count: number
@@ -56,6 +68,8 @@ type Deck = {
   /** Se apunta a lo que se mueve con el arrastre del mazo. Ver `Seguir`. */
   seguir: Seguir
   avisar: (fraccion: number | null) => void
+  /** Deja lista una familia antes de enseñarla. Ver `preparar`. */
+  preparar: (familia: number) => Promise<boolean>
 }
 
 /**
@@ -116,6 +130,30 @@ export function ShopDeckProvider({
   const [abriendo, setAbriendo] = useState(false)
 
   /**
+   * Deja lista una familia y, mientras tarda, enseña la flor. Devuelve si sigue
+   * siendo la que toca: `false` cuando mientras se cargaba se ha pedido otra, y
+   * entonces ésta se queda en el camino —ni se enseña ni apaga la flor, que ya es
+   * de la otra—.
+   *
+   * Lo usan los dos caminos, el nombre y el dedo: es lo que hace que arrastrar se
+   * sienta igual de rápido que elegir en la lista, porque las dos formas esperan lo
+   * mismo —nada, con las fotos ya pedidas— y enseñan la familia hecha.
+   */
+  const preparar = useCallback(async (familia: number) => {
+    const v = vista.current
+    if (!v) return true
+    const mio = ++pedido.current
+    const tarda = window.setTimeout(() => {
+      if (pedido.current === mio) setAbriendo(true)
+    }, FLOR_MS)
+    await v.cargar(familia)
+    window.clearTimeout(tarda)
+    if (pedido.current !== mio) return false
+    setAbriendo(false)
+    return true
+  }, [])
+
+  /**
    * A otra familia. Primero se carga y después se enseña, no al revés: es lo que
    * quita el salto de la familia que llega poniéndose por partes. Ver `cargar`.
    */
@@ -126,17 +164,11 @@ export function ShopDeckProvider({
       const v = vista.current
       if (!v) return settle(next)
 
-      const mio = ++pedido.current
-      setAbriendo(true)
-      void v.cargar(next).then(() => {
-        // Si mientras se cargaba se ha pedido otra familia, ésta se queda en el
-        // camino: ni se enseña ni apaga la flor, que sigue siendo de la otra.
-        if (pedido.current !== mio) return
-        setAbriendo(false)
-        vista.current?.irA(next)
+      void preparar(next).then((sigue) => {
+        if (sigue) vista.current?.irA(next)
       })
     },
-    [index, count, settle],
+    [index, count, settle, preparar],
   )
 
   const apuntados = useRef(new Set<(fraccion: number | null) => void>())
@@ -151,8 +183,8 @@ export function ShopDeckProvider({
   }, [])
 
   const deck = useMemo(
-    () => ({ index, count, abriendo, go, settle, attach, seguir, avisar }),
-    [index, count, abriendo, go, settle, attach, seguir, avisar],
+    () => ({ index, count, abriendo, go, settle, attach, seguir, avisar, preparar }),
+    [index, count, abriendo, go, settle, attach, seguir, avisar, preparar],
   )
 
   return <DeckContext.Provider value={deck}>{children}</DeckContext.Provider>
@@ -196,7 +228,7 @@ export function ShopDeck({
 
   const montado = useSyncExternalStore(sinCambios, enElNavegador, enElServidor)
 
-  const { count, attach, settle, avisar, index, abriendo } = deck
+  const { count, attach, settle, avisar, preparar, index, abriendo } = deck
 
   /** La familia de partida. Se lee una vez: después manda el motor. */
   const arranque = useRef(index)
@@ -413,6 +445,10 @@ export function ShopDeck({
       arrastre: avisar,
       plegar,
       asentado,
+      // Sin esperar: lo que se quiere es que el navegador empiece a bajarlas
+      // mientras el dedo sigue arrastrando. Ver `acercar` en `motorDelMazo`.
+      acercar: (familias) => familias.forEach((f) => void cargar(f)),
+      preparar,
     })
 
     motor.current = m
@@ -434,7 +470,7 @@ export function ShopDeck({
       m.destruir()
       motor.current = null
     }
-  }, [count, attach, settle, avisar, cargar, fundir, plegar, asentado, medirFamilia])
+  }, [count, attach, settle, avisar, preparar, cargar, fundir, plegar, asentado, medirFamilia])
 
   // El alto sólo depende del ancho, así que se vuelve a medir cuando cambia.
   useEffect(() => {
