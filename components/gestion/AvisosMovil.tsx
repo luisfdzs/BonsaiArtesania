@@ -1,156 +1,48 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useState } from 'react'
+import { FlowerBudIcon } from '@/components/ui/FlowerBud'
+import {
+  CampanaIcon,
+  CampanaOffIcon,
+  CompartirIcon,
+  InstalarIcon,
+} from '@/components/layout/NavIcons'
 import { cn } from '@/lib/cn'
 import { useTranslator } from '@/lib/i18n/useLocale'
+import { useAppMovil } from '@/lib/useAppMovil'
 
 /**
- * El interruptor de los avisos de este dispositivo, en la cuenta del taller.
+ * El botón de la app y los avisos, en la cuenta del taller.
  *
- * Un botón y nada más. Antes lo acompañaba un párrafo por estado —qué son los
- * avisos, que cada dispositivo va por su cuenta, que en iPhone hay que instalar
- * antes—, y era leerse cuatro líneas para pulsar un botón que Ana pulsa una vez en
- * la vida. El rótulo de la sección dice lo que es y el botón dice lo que hace.
+ * Es el mismo camino de tres pasos que el del menú de la tienda —instalar, activar
+ * los avisos, quitarlos— y por eso comparten la máquina de estados: `useAppMovil`.
+ * Antes esto sólo sabía encender y apagar, y en un teléfono nuevo eso dejaba a Ana
+ * atascada en el primer paso: el botón salía apagado diciendo «antes hay que añadir
+ * la web a la pantalla de inicio» y el botón que la añade estaba en la barra de la
+ * tienda —que la cuenta del taller no tiene, ver `lib/admin.ts`—. Así que el único
+ * sitio de la web donde ella puede instalar la app es éste.
  *
- * Los estados en los que no hay nada que hacer —sin claves en el servidor, un
- * navegador que no admite avisos, un iPhone sin instalar, el permiso denegado en
- * los ajustes— dejan el botón apagado en vez de quitarlo: el hueco no cambia de
- * forma según el aparato desde el que se mire. El motivo va en el `title`, para
- * quien lo busque, y no ocupando la pantalla.
+ * Lo que no comparte con el menú es qué hacer cuando no hay nada que ofrecer. Allí el
+ * hueco se queda vacío; aquí no puede, porque esto vive bajo un rótulo que dice
+ * «Avisos en el móvil» y un rótulo con nada debajo se lee como una avería. El botón
+ * se queda apagado y el motivo va en el `title`, para quien lo busque, y no ocupando
+ * la pantalla: son estados en los que no hay nada que pulsar —sin claves en el
+ * servidor, un navegador que no admite avisos, el permiso denegado en los ajustes—.
  */
-type Estado =
-  'cargando' | 'sin-claves' | 'no-soportado' | 'instalar' | 'bloqueado' | 'apagado' | 'encendido'
-
-function claveBinaria(clave: string): Uint8Array<ArrayBuffer> {
-  const relleno = '='.repeat((4 - (clave.length % 4)) % 4)
-  const base64 = (clave + relleno).replace(/-/g, '+').replace(/_/g, '/')
-  const crudo = atob(base64)
-  const bytes = new Uint8Array(new ArrayBuffer(crudo.length))
-  for (let i = 0; i < crudo.length; i += 1) bytes[i] = crudo.charCodeAt(i)
-
-  return bytes
-}
-
-function esApple(): boolean {
-  return /iphone|ipad|ipod/i.test(navigator.userAgent)
-}
-
-function instalada(): boolean {
-  return (
-    window.matchMedia('(display-mode: standalone)').matches ||
-    (navigator as Navigator & { standalone?: boolean }).standalone === true
-  )
-}
-
-async function registro(): Promise<ServiceWorkerRegistration> {
-  const existente = await navigator.serviceWorker.getRegistration('/')
-  if (existente) return existente
-
-  return navigator.serviceWorker.register('/sw.js', { scope: '/' })
-}
-
-export function AvisosMovil({ publicKey }: { publicKey: string | null }) {
+export function AvisosMovil() {
   const t = useTranslator()
-  const [estado, setEstado] = useState<Estado>('cargando')
-  const [trabajando, setTrabajando] = useState(false)
+  const { oferta, impedimento, instalando, trabajando, fallo, pulsable, pulsar } = useAppMovil()
+  const [abierto, setAbierto] = useState(false)
 
-  useEffect(() => {
-    let vivo = true
-
-    const mirar = async () => {
-      if (!publicKey) return setEstado('sin-claves')
-
-      if (!('serviceWorker' in navigator) || !('Notification' in window)) {
-        return setEstado(esApple() && !instalada() ? 'instalar' : 'no-soportado')
-      }
-
-      if (!('PushManager' in window)) {
-        return setEstado(instalada() ? 'no-soportado' : 'instalar')
-      }
-
-      if (Notification.permission === 'denied') return setEstado('bloqueado')
-
-      const suscripcion = await (await registro()).pushManager.getSubscription()
-      if (!vivo) return
-
-      setEstado(suscripcion ? 'encendido' : 'apagado')
-    }
-
-    void mirar().catch(() => setEstado('no-soportado'))
-
-    return () => {
-      vivo = false
-    }
-  }, [publicKey])
-
-  const activar = useCallback(async () => {
-    if (!publicKey) return
-
-    setTrabajando(true)
-
-    try {
-      const permiso = await Notification.requestPermission()
-      if (permiso !== 'granted') {
-        setEstado('bloqueado')
-        return
-      }
-
-      const reg = await registro()
-      const suscripcion =
-        (await reg.pushManager.getSubscription()) ??
-        (await reg.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: claveBinaria(publicKey),
-        }))
-
-      const respuesta = await fetch('/api/push/subscribe', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(suscripcion.toJSON()),
-      })
-
-      if (!respuesta.ok) throw new Error('No se guardó la suscripción')
-
-      setEstado('encendido')
-    } catch {
-      // El botón se queda como estaba: al volver a pulsar se reintenta, que es lo
-      // único que se puede hacer y lo que iba a decir el aviso que había aquí.
-      setEstado('apagado')
-    } finally {
-      setTrabajando(false)
-    }
-  }, [publicKey])
-
-  const desactivar = useCallback(async () => {
-    setTrabajando(true)
-
-    try {
-      const suscripcion = await (await registro()).pushManager.getSubscription()
-
-      if (suscripcion) {
-        await fetch('/api/push/unsubscribe', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ endpoint: suscripcion.endpoint }),
-        })
-        await suscripcion.unsubscribe()
-      }
-
-      setEstado('apagado')
-    } catch {
-      setEstado('encendido')
-    } finally {
-      setTrabajando(false)
-    }
-  }, [])
-
-  if (estado === 'cargando') return null
-
-  const encendido = estado === 'encendido'
-  const puede = encendido || estado === 'apagado'
-
-  /** Por qué el botón está apagado. No se pinta: va en el `title`. */
-  const motivo: Partial<Record<Estado, string>> = {
+  /**
+   * Por qué el botón está apagado. No se pinta: va en el `title`.
+   *
+   * `sin-sesion` no está y no puede estar: esta página vive detrás del guarda del
+   * panel, así que quien la ve ha entrado. Y sin oferta ni impedimento —el navegador
+   * aún no ha dicho si se puede instalar— lo que falta es justo eso, instalar.
+   */
+  const motivo: Record<string, string> = {
     'sin-claves': t({
       es: 'Falta configurar las claves del aviso en el servidor.',
       gl: 'Falta configurar as chaves do aviso no servidor.',
@@ -159,29 +51,83 @@ export function AvisosMovil({ publicKey }: { publicKey: string | null }) {
       es: 'Este navegador no admite avisos.',
       gl: 'Este navegador non admite avisos.',
     }),
-    instalar: t({
-      es: 'Antes hay que añadir la web a la pantalla de inicio.',
-      gl: 'Antes hai que engadir a web á pantalla de inicio.',
-    }),
     bloqueado: t({
       es: 'Los avisos están bloqueados en los ajustes del móvil.',
       gl: 'Os avisos están bloqueados nos axustes do móbil.',
     }),
+    instalar: t({
+      es: 'Antes hay que añadir la web a la pantalla de inicio.',
+      gl: 'Antes hai que engadir a web á pantalla de inicio.',
+    }),
   }
+
+  const rotulo = instalando
+    ? t({ es: 'Instalando la app…', gl: 'Instalando a app…' })
+    : oferta === 'avisos'
+      ? t({ es: 'Activar avisos', gl: 'Activar avisos' })
+      : oferta === 'apagar'
+        ? t({ es: 'Desactivar avisos', gl: 'Desactivar avisos' })
+        : oferta === 'ios'
+          ? t({ es: 'Añadir a la pantalla de inicio', gl: 'Engadir á pantalla de inicio' })
+          : t({ es: 'Instalar la app', gl: 'Instalar a app' })
+
+  const Icono =
+    oferta === 'avisos'
+      ? CampanaIcon
+      : oferta === 'apagar'
+        ? CampanaOffIcon
+        : oferta === 'ios'
+          ? CompartirIcon
+          : InstalarIcon
+
+  const explicacion =
+    oferta === 'ios'
+      ? t({
+          es: 'Pulsa Compartir, abajo en Safari, y luego «Añadir a pantalla de inicio».',
+          gl: 'Preme Compartir, abaixo en Safari, e logo «Engadir á pantalla de inicio».',
+        })
+      : t({
+          es: 'En el menú del navegador, arriba a la derecha: «Instalar app».',
+          gl: 'No menú do navegador, arriba á dereita: «Instalar app».',
+        })
+
+  // Sin oferta y sin impedimento el navegador todavía no ha dicho si se puede
+  // instalar: el botón dice el paso que falta —instalar— y está apagado, porque
+  // pulsarlo no haría nada.
+  const explicable = !instalando && (oferta === 'ios' || oferta === 'navegador')
+  const apagado = !pulsable && !explicable
 
   return (
     <div className="text-center">
       <button
         type="button"
-        onClick={encendido ? desactivar : activar}
-        disabled={!puede || trabajando}
-        title={motivo[estado]}
-        className={cn('btn btn-sm', encendido && 'btn-quiet')}
+        onClick={() => (pulsable ? pulsar() : setAbierto((v) => !v))}
+        disabled={apagado || trabajando || instalando}
+        title={apagado ? (motivo[impedimento ?? 'instalar'] ?? motivo.instalar) : undefined}
+        aria-expanded={explicable ? abierto : undefined}
+        className={cn('btn btn-sm', oferta === 'apagar' && 'btn-quiet')}
       >
-        {encendido
-          ? t({ es: 'Desactivar avisos', gl: 'Desactivar avisos' })
-          : t({ es: 'Activar avisos', gl: 'Activar avisos' })}
+        {/* La flor ocupa el sitio del icono mientras se instala, igual que en el
+            menú: el botón no cambia de tamaño y la sección no se mueve. El rótulo
+            ya dice «Instalando la app…», así que va sin `role="status"`. */}
+        {instalando ? <FlowerBudIcon className="h-5 w-5" /> : <Icono className="h-5 w-5" />}
+        {rotulo}
       </button>
+
+      {explicable && abierto && (
+        <p className="mx-auto mt-4 max-w-[22rem] text-small leading-relaxed text-bark-faint">
+          {explicacion}
+        </p>
+      )}
+
+      {fallo && (
+        <p className="mx-auto mt-4 max-w-[22rem] text-small leading-relaxed text-bark-faint">
+          {t({
+            es: 'No se pudo. Inténtalo otra vez.',
+            gl: 'Non se puido. Téntao outra vez.',
+          })}
+        </p>
+      )}
     </div>
   )
 }

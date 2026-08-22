@@ -15,3 +15,6 @@ fotos-originales/
 
 # Worktrees de trabajo: copias del repo con su propio .next dentro.
 .claude/worktrees/
+
+# Copias de la base que deja scripts/db-reset.mjs: llevan datos personales.
+db-backup-*.json

@@ -44,8 +44,8 @@ export const INSTAGRAM = '@san.bonsai_'
 /** El mismo buzón que `content/site.ts`: el papel y la web dicen lo mismo. */
 export const EMAIL = 'bonsai@bonsaiartesania.com'
 /** Agrupado de tres en dos en dos, como se lee un móvil español en voz alta.
- *  Ojo: NO es el número de `content/site.ts` (`34658170562`), que es el que usa
- *  el botón de WhatsApp de la web. Los dos son intencionados y distintos. */
+ *  Es el mismo que `content/site.ts` (`34660269872`), que es el que usa el
+ *  botón de WhatsApp de la web: el papel y la web dicen lo mismo. */
 export const WHATSAPP = '+34 660 26 98 72'
 
 const b64 = (file) => readFileSync(`${DIR}/${file}`).toString('base64')
