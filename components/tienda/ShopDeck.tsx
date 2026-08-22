@@ -396,7 +396,9 @@ export function ShopDeck({
         })
       }
       // Y ahora, no antes, el bloque toma el alto de la familia que ha quedado.
-      setAlto(medirFamilia(familia))
+      const nuevo = medirFamilia(familia)
+      nodo.style.height = nuevo === null ? '' : `${nuevo}px`
+      setAlto(nuevo)
     },
     [medirFamilia],
   )
