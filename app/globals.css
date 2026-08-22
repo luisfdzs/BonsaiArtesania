@@ -769,6 +769,68 @@
     background-color 0.6s var(--ease-out-soft);
 }
 
+/* La tarjeta de la pantalla de acceso: entrar y crear cuenta viven dentro de ella,
+   con las dos pestañas en el borde de arriba.
+
+   Es `panel` con el filete en verde en vez del gris del sistema. No hereda de
+   `panel` —una utilidad de Tailwind no se puede extender desde otra— y de ahí que
+   repita las cuatro declaraciones; lo que no repite es el `transition`, porque esta
+   tarjeta no cambia de color al pasar por encima: no es pulsable, es el sitio donde
+   se escribe.
+
+   El relleno de arriba lo pone a 0: la fila de pestañas tiene que llegar al filete
+   de la tarjeta para que se lean como parte de ella y no como dos rótulos flotando
+   dentro. El hueco de arriba lo dan las propias pestañas con su `padding-block`.
+
+   `overflow: hidden` es lo que recorta el deslizamiento del móvil: el contenido
+   entra desde un lado y sin esto asomaría por fuera del filete antes de asentarse.
+   Y recorta también el lavado verde de la pestaña activa contra la esquina
+   redondeada, que si no sobresale por el vértice. */
+@utility auth-card {
+  /* El relleno va en una variable porque la fila de pestañas necesita salirse de
+     él exactamente, y un `clamp` escrito dos veces es un `clamp` que un día
+     cambia en un sitio y no en el otro. */
+  --auth-pad: clamp(1.5rem, 4vw, 2.25rem);
+  border: 1px solid var(--color-sage-deep);
+  border-radius: 1.25rem;
+  background: color-mix(in srgb, var(--color-linen-deep) 45%, transparent);
+  padding: var(--auth-pad);
+  padding-top: 0;
+  overflow: hidden;
+  /* El gesto de cambiar de pestaña es horizontal, así que el navegador se queda
+     sólo con el vertical: sin esto, un arrastre en diagonal se lo lleva el scroll
+     de la página y el `touchend` llega con un recorrido que ya no es el del dedo. */
+  touch-action: pan-y pinch-zoom;
+}
+
+/* La fila de las dos pestañas, a sangre contra el filete de la tarjeta: se sale
+   del relleno con un margen negativo del mismo valor. Un filete que se corta
+   antes del borde parte la tarjeta en vez de dividirla, igual que en `shop-nav`.
+
+   Las pestañas de dentro son `shop-tab`, las mismas que la barra de familias de
+   la tienda y las de la portada: verde por rótulo, fondo y filete cuando están
+   abiertas. Aquí van a mitad y mitad —`flex-1` en el JSX— porque son dos y
+   reparten el ancho de la tarjeta. */
+@utility auth-tabs {
+  display: flex;
+  margin-inline: calc(var(--auth-pad) * -1);
+  border-bottom: 1px solid var(--color-line);
+}
+
+/* El contenido de la pestaña, entrando desde el lado por el que ha venido el dedo.
+   El signo lo pone el componente en `--auth-from`, que es lo único que cambia entre
+   venir de la izquierda y venir de la derecha.
+
+   Sólo se mueve al cambiar de pestaña, no al cargar la página: el bloque lleva
+   `key`, y en el primer pintado no hay dirección que animar —el componente arranca
+   con `--auth-from` a 0—, así que la animación existe pero no desplaza nada.
+
+   Con `prefers-reduced-motion` la regla de base la deja en un fotograma: el
+   contenido aparece en su sitio y sin recorrido. */
+@utility auth-panel {
+  animation: auth-slide 420ms var(--ease-out-soft) both;
+}
+
 /* Cuando la tarjeta es un enlace, al pasar por encima se calienta un poco. */
 @utility panel-link {
   &:hover {
@@ -891,6 +953,20 @@
 /* El nombre de la familia que entra: aparece y sube un pelo. La subida es de tres
    milímetros y está para que el cambio tenga dirección —el nombre llega, no se
    enciende—; el resto lo hace la opacidad. */
+/* El cambio de pestaña de la pantalla de acceso. Entra desplazado y translúcido;
+   el desplazamiento es corto —un 12% del ancho de la tarjeta— porque lo que tiene
+   que contar es de qué lado viene, no recorrer la pantalla. */
+@keyframes auth-slide {
+  from {
+    opacity: 0;
+    transform: translateX(calc(var(--auth-from, 0) * 12%));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @keyframes family-label {
   from {
     opacity: 0;

@@ -83,7 +83,10 @@ export default async function EntrarPage({ params, searchParams }: Props) {
 
   return (
     <div className="page-gutter flex min-h-[70vh] items-center pt-16 pb-(--spacing-section) md:pt-24">
-      <div className="mx-auto w-full max-w-sm text-center">
+      {/* Un paso más ancha que antes —`max-w-sm`—: la tarjeta se lleva un relleno
+          a cada lado, y sin ese paso la columna de dentro salía más estrecha de lo
+          que era cuando el formulario iba suelto sobre el lino. */}
+      <div className="mx-auto w-full max-w-md text-center">
         <EntrarTabs
           creating={creating}
           backTo={backTo}
