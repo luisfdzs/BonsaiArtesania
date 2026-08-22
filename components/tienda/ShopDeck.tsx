@@ -234,6 +234,11 @@ export function ShopDeck({
     nodoCapa.querySelectorAll<HTMLElement>(':scope > div').forEach((panel) => {
       panel.style.height = carta
       panel.style.overflow = 'hidden'
+      // Y aislado: con `contain` el navegador sabe que dentro de cada familia no
+      // hay nada que pueda afectar al resto de la página, así que ni recalcula
+      // maquetación fuera ni repinta más allá del recorte. Es gratis aquí, porque
+      // recortadas ya no influyen en nada.
+      panel.style.contain = 'layout paint'
     })
 
     if (recorrido > 0) window.scrollBy({ top: -recorrido, behavior: 'instant' })
