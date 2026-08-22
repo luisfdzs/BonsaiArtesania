@@ -10,6 +10,7 @@ import { useTranslator } from '@/lib/i18n/useLocale'
 import { navigation } from '@/lib/navigation'
 import { onHome, useActiveSection } from '@/lib/useActiveSection'
 import { useCartCount } from './CartCount'
+import { AppMovil } from './AppMovil'
 import { LocalePicker } from './LocalePicker'
 import { AccountIcon, CartIcon, CloseIcon, HomeIcon, MenuIcon, ShopIcon } from './NavIcons'
 
@@ -107,30 +108,64 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
           open ? 'opacity-100' : 'opacity-0',
         )}
       >
+        {/* Tres partes de alto: un hueco, las secciones y otro hueco. Los dos huecos
+            son **exactamente iguales** —`flex-1 basis-0 min-h-12` los dos, las tres
+            cosas—, y de ahí sale todo lo demás: las secciones quedan en el medio de
+            la pantalla y el botón de la app, centrado en el hueco de arriba, a la
+            misma distancia del tope que del menú.
+
+            Que sean iguales *hasta en la base* es el arreglo de un bug, no una
+            floritura. Con `flex-1` a secas, cada hueco crece a partir de su
+            contenido: el de arriba partía del alto del botón y el de abajo de cero,
+            así que las secciones caían 21 px más abajo cuando el botón estaba que
+            cuando no —medido—. Y como el botón aparece un instante después de cargar
+            —el navegador tarda en avisar de que la web es instalable, ver
+            `AppMovil`—, el menú se recolocaba solo delante de quien lo tenía
+            abierto. Con `basis-0` los dos huecos miden lo mismo pase lo que pase
+            dentro, y el menú ya no depende de lo que haya en él.
+
+            El `gap` va en el grupo del medio y no en el `nav`: puesto en el `nav`
+            sumaba su hueco por debajo del botón y rompía la simetría. Y el relleno
+            de arriba no está por lo mismo. El `min-h-12` es para que en una pantalla
+            corta el botón no se pegue al canto. */}
         <nav
-          className="flex min-h-full flex-col items-center justify-center gap-7 py-12 text-center"
+          className="flex min-h-full flex-col items-center pb-12 text-center"
           aria-label={t({ es: 'Secciones', gl: 'Seccións' })}
         >
-          {panelItems.map((item) => (
-            <Link
-              key={item.route}
-              href={path(locale, item.route)}
-              className="font-serif text-title"
-              onClick={close}
-            >
-              {t(item.label)}
-            </Link>
-          ))}
+          {/* Instalar la web, arriba. Es lo único del menú que no está en ninguna
+              otra parte del sitio: a las secciones se llega también por la barra y
+              por el pie. Y lo que ofrece depende de por dónde se haya quedado
+              —instalar, activar los avisos, o nada—: ver `AppMovil` —y entonces este hueco queda vacío y todo sigue centrado—. */}
+          <div className="flex min-h-12 flex-1 basis-0 items-center">
+            <AppMovil />
+          </div>
 
-          {/* El idioma, debajo de las tres secciones y detrás de un filete. Ver
+          <div className="flex flex-col items-center gap-7">
+            {panelItems.map((item) => (
+              <Link
+                key={item.route}
+                href={path(locale, item.route)}
+                className="font-serif text-title"
+                onClick={close}
+              >
+                {t(item.label)}
+              </Link>
+            ))}
+
+            {/* El idioma, debajo de las tres secciones y detrás de un filete. Ver
               `LocalePicker`. */}
-          <LocalePicker onNavigate={close} />
+            <LocalePicker onNavigate={close} />
+          </div>
+
+          {/* El mismo hueco de arriba, y las mismas tres clases: si aquí faltara
+              alguna, los dos huecos volverían a medir distinto. */}
+          <div className="min-h-12 flex-1 basis-0" aria-hidden />
         </nav>
       </div>
 
       <nav
         aria-label="Principal"
-        className="fixed inset-x-(--spacing-nav-mobile-air) bottom-[calc(var(--spacing-nav-mobile-air)+env(safe-area-inset-bottom))] z-50 flex h-(--spacing-nav-mobile-bar) items-stretch rounded-full border border-line bg-linen/95 shadow-[0_2px_20px_rgba(60,54,46,0.10)] backdrop-blur-md md:hidden"
+        className="fixed inset-x-(--spacing-nav-mobile-air) bottom-[calc(var(--spacing-nav-mobile-air)+env(safe-area-inset-bottom))] z-50 flex h-(--spacing-nav-mobile-bar) items-stretch rounded-full border border-sage-deep bg-linen/95 shadow-[0_2px_20px_rgba(60,54,46,0.10)] backdrop-blur-md md:hidden"
       >
         <NavSlot
           href={path(locale, '/')}
@@ -243,7 +278,11 @@ export function MobileNav({ shopOpen }: { shopOpen: boolean }) {
 const slotClass =
   'relative flex flex-1 flex-col items-center justify-center transition-colors duration-500'
 
-const slotState = (active: boolean) => (active ? 'text-sage-deep' : 'text-bark opacity-55')
+/* Todos los iconos en el verde de la casa, también el filete del cilindro: la
+   barra es de la casa, no un mueble del sistema. Lo que distingue al activo ya no
+   es el color sino la fuerza —el apagado va al 55%— y el círculo salvia de detrás,
+   que es lo que de verdad se ve a 24px. */
+const slotState = (active: boolean) => (active ? 'text-sage-deep' : 'text-sage-deep opacity-55')
 
 const slotMark = (active: boolean) =>
   cn(

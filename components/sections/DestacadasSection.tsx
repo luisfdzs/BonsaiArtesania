@@ -52,17 +52,24 @@ export function DestacadasSection({ locale }: { locale: Locale }) {
   })
 
   return (
-    /* El `pt` no es decoración: sin él la sección arrancaba pegada al borde del
-       hero. Mientras la portada era aire y titular se disimulaba, pero contra un
-       vídeo a sangre el filete de «Piezas destacadas» parece parte del hero en
-       vez del principio de lo siguiente.
-
-       Pero tampoco el `--spacing-section` entero, que es lo que había: ese aire
-       es el que separa dos secciones de texto, y aquí lo de arriba es un vídeo a
-       sangre que ya termina en un borde limpio. Doce rem de lino en blanco entre
-       el hero y la primera pieza dejaban la portada como si le faltara algo justo
-       ahí. Con dos tercios, la sección sigue empezando y no cuelga del hero. */
-    <section className="page-gutter pt-[clamp(3.5rem,8vw,8rem)]">
+    /* El aire de arriba, corto a propósito.
+       
+       Aquí hubo primero un `--spacing-section` entero —doce rem de lino en blanco
+       entre el vídeo y la primera pieza, que dejaban la portada como si le faltara
+       algo— y después dos tercios de eso. Sigue siendo demasiado para lo que hay
+       encima: al llegar al catálogo desde el «Catálogo» del hero, el carril de
+       familias caía tres rem por debajo de la cabecera y la marca se quedaba sola
+       flotando sobre el lino.
+       
+       Ahora es una rem, y fija: el carril sube a encontrarse con la marca, y la
+       cabecera y el carrusel se leen como una sola pieza —el nombre del taller y sus
+       familias—, que es lo que se quiere ver al aterrizar aquí.
+       
+       Fija y no un `clamp` porque el ancla de `page.tsx` la descuenta para que el
+       aterrizaje caiga justo donde el carril se queda pegado a la cabecera: con un
+       relleno que cambia con el ancho, ese descuento sólo sería exacto en un tamaño
+       de pantalla. Si cambia este número, cambia allí. */
+    <section className="page-gutter pt-4">
       <Escaparate
         familias={familias}
         locale={locale}

@@ -80,8 +80,14 @@ export function Hero({ locale }: { locale: Locale }) {
         className="absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgb(44_40_35/0.94)_0,rgb(44_40_35/0.8)_14rem,rgb(44_40_35/0.32)_26rem,rgb(44_40_35/0.45)_100%)]"
       />
 
-      {/* `animate-bloom` como antes: la portada se asienta, no aparece de golpe. */}
-      <div className="page-gutter animate-bloom relative pt-32 pb-20 md:pb-28">
+      {/* `animate-bloom` como antes: la portada se asienta, no aparece de golpe.
+
+          El aire de abajo es corto —y no las cinco o siete rem de antes— para que el
+          «Catálogo» quede pegado al canto de la primera pantalla. Ahí es donde tiene
+          sentido: es el pie de esta pantalla y la puerta de la siguiente, y bajarlo
+          hasta el borde hace que un solo gesto deje el catálogo cuadrado debajo de la
+          cabecera. Ver el `pt` de `DestacadasSection`, que es la otra mitad de esto. */}
+      <div className="page-gutter animate-bloom relative pt-32 pb-8 md:pb-10">
         <p className="eyebrow text-linen/75">
           {t({ es: 'Hecho a mano en', gl: 'Feito a man en' })} {site.location}
         </p>
@@ -108,7 +114,7 @@ export function Hero({ locale }: { locale: Locale }) {
         </h1>
         <p className="mt-8 max-w-md text-linen/85">{t(site.intro)}</p>
 
-        <div className="mt-12 flex justify-center">
+        <div className="mt-14 flex justify-center md:mt-16">
           <a
             href="#catalogo"
             className="tap flex flex-col items-center gap-2 text-linen/75 transition-colors duration-700 hover:text-linen"

@@ -5,8 +5,11 @@ import { cn } from '@/lib/cn'
 import { useTranslator } from '@/lib/i18n/useLocale'
 
 /**
- * El botón de volver arriba. Sale en toda la web, abajo y centrado, y sólo cuando
- * hay algo por encima a lo que volver.
+ * El botón de volver arriba. **Sólo en el panel del taller**: en la web pública se
+ * quitó, porque encima de la barra de móvil hacía tres cosas a la vez —tapaba la
+ * primera fila de piezas al bajar, se solapaba con la barra y repetía un gesto que
+ * el propio teléfono ya tiene, la barra de estado—. En el panel se queda: las listas
+ * de pedidos son largas y ahí no hay barra debajo con la que pelearse.
  *
  * Hacía falta porque las páginas de aquí son largas de verdad: la portada baja por
  * el escaparate, los encargos y el contacto, y una familia de la tienda son
@@ -23,9 +26,9 @@ import { useTranslator } from '@/lib/i18n/useLocale'
  * está apagado no se puede pulsar ni recibe el foco, que es lo que lo dejaría
  * tabulable siendo invisible.
  *
- * Va después de la barra de móvil en el orden de lectura, y por encima de ella en
- * la pantalla: en móvil se coloca justo sobre la barra, contando su alto y el hueco
- * de la rayita del sistema (`--spacing-nav-mobile`).
+ * Se coloca abajo contando el alto de la barra de móvil y el hueco de la rayita del
+ * sistema (`--spacing-nav-mobile`). En el panel no hay barra, pero la medida no
+ * estorba: son unos milímetros de aire sobre el borde.
  */
 export function ScrollTop() {
   const t = useTranslator()

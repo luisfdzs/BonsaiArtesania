@@ -266,6 +266,10 @@ const indexes = {
 
   push_subscriptions: [
     { keys: { endpoint: 1 }, options: { unique: true, name: 'endpoint_unico' } },
+    // Por correo, que es como se busca al mandar un aviso: los dispositivos del
+    // taller para un pedido nuevo, los de una persona para su cambio de estado.
+    // Ver `sendPush`.
+    { keys: { email: 1 }, options: { name: 'email' } },
   ],
 }
 

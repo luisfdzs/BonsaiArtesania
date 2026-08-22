@@ -4,8 +4,9 @@ import { revalidatePath } from 'next/cache'
 import { adminSession } from '@/lib/admin'
 import { locales } from '@/lib/i18n/config'
 import { path } from '@/lib/i18n/routes'
+import { notifyOrderStatus } from '@/lib/notify'
 import { NOTE_MAX_LENGTH, ORDER_STATUS_FLOW } from '@/lib/order-status'
-import { orders, type OrderStatus } from '@/lib/schema'
+import { orders, users, type OrderStatus } from '@/lib/schema'
 
 /**
  * Acciones del panel. Todas empiezan comprobando que quien las llama es
@@ -44,6 +45,25 @@ export async function updateOrderStatus(formData: FormData): Promise<void> {
       $push: { history: { status, at: now, note: note || undefined } },
     },
   )
+
+  // Y le suena en el móvil a quien espera el pedido, si tiene la web instalada y
+  // los avisos puestos. Después de guardar y nunca antes: el estado es lo que hay
+  // que dejar a salvo, y un aviso que no sale no puede dejarlo a medias —de eso se
+  // encarga `notifyOrderStatus`, que no lanza—.
+  //
+  // El correo se busca por la cuenta del pedido y no se saca de la dirección de
+  // envío: la dirección puede ser de un regalo para otra persona, y el aviso es
+  // para quien hizo el pedido.
+  if (status !== order.status) {
+    try {
+      const cuenta = await (
+        await users()
+      ).findOne({ _id: order.userId }, { projection: { email: 1 } })
+      if (cuenta?.email) await notifyOrderStatus(order, status, cuenta.email)
+    } catch (error) {
+      console.error(`[gestion] No se pudo avisar del estado del pedido ${number}:`, error)
+    }
+  }
 
   // En los dos idiomas: el panel lo puede tener Ana abierto en cualquiera de
   // ellos, y la lista del cliente existe en los dos.

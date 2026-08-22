@@ -64,6 +64,10 @@ export async function generateMetadata({
       ],
       apple: '/icons/apple-touch-icon.png',
     },
+    // En la pantalla de inicio, aparte de Safari y con la barra de estado en su
+    // color. Va con el manifiesto de `app/manifest.ts`: en iOS es esto y no el
+    // manifiesto lo que abre la web como una app.
+    appleWebApp: { capable: true, title: site.nameFull, statusBarStyle: 'default' },
     openGraph: {
       type: 'website',
       siteName: site.nameFull,

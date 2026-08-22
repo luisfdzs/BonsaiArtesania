@@ -7,7 +7,6 @@ import { GestionPendingProvider, GestionPendingSlot } from '@/components/gestion
 import { Wordmark } from '@/components/layout/Wordmark'
 import { FormPending } from '@/components/ui/FormPending'
 import { ScrollTop } from '@/components/ui/ScrollTop'
-import { site } from '@/content/site'
 import { adminSession } from '@/lib/admin'
 import { isLocale, pick, translator } from '@/lib/i18n/config'
 import { path } from '@/lib/i18n/routes'
@@ -21,10 +20,6 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   return {
     title: isLocale(locale) ? pick(TITLE, locale) : TITLE.es,
     robots: { index: false, follow: false },
-    // Sólo aquí. Es lo que hace la web instalable, y eso es cosa del panel y no de
-    // la tienda: ver `app/gestion.webmanifest/route.ts`.
-    manifest: '/gestion.webmanifest',
-    appleWebApp: { capable: true, title: `${site.nameFull} · Gestión`, statusBarStyle: 'default' },
   }
 }
 

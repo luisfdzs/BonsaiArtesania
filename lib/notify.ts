@@ -1,7 +1,10 @@
 import { site } from '@/content/site'
+import { adminEmails } from '@/lib/admin'
+import { pick } from '@/lib/i18n/config'
 import { path } from '@/lib/i18n/routes'
+import { orderStatusLabel } from '@/lib/order-status'
 import { sendPush, type PushPayload } from '@/lib/push'
-import { type OrderDoc } from '@/lib/schema'
+import { type OrderDoc, type OrderStatus } from '@/lib/schema'
 
 /**
  * El aviso que le suena a Ana en el móvil, por un bot de Telegram.
@@ -104,6 +107,33 @@ function cancelPush(order: OrderDoc): PushPayload {
 }
 
 /**
+ * El aviso al cliente cuando su pedido cambia de estado.
+ *
+ * Va **en el idioma del pedido** y no en el del panel: lo dispara Ana desde el
+ * taller, días o semanas después, y el idioma del panel es el suyo, no el de quien
+ * va a leerlo. Es la misma razón por la que el pedido guarda su `locale`.
+ *
+ * Y con las palabras del cliente, no con las del taller: `orderStatusLabel` dice
+ * «Ana está creando tus joyas bonsái» donde el panel dice «En el taller». Ver
+ * `lib/order-status.ts`, que es donde están los dos vocabularios.
+ *
+ * Sólo push, sin Telegram: Telegram es el canal del taller, con un único chat.
+ */
+function statusPush(order: OrderDoc, status: OrderStatus): PushPayload {
+  const locale = order.locale ?? 'es'
+
+  return {
+    title: pick({ es: 'Tu pedido', gl: 'O teu pedido' }, locale) + ` ${order.number}`,
+    body: orderStatusLabel(status, locale),
+    url: path(locale, '/cuenta/pedidos'),
+    // Con el número dentro: dos cambios del mismo pedido se sustituyen en la
+    // pantalla de bloqueo —lo que importa es el último—, pero el aviso de un pedido
+    // no tapa el de otro.
+    tag: `estado-${order.number}`,
+  }
+}
+
+/**
  * Manda el aviso. Devuelve si salió, para poder registrarlo, pero nadie está
  * obligado a mirarlo.
  */
@@ -155,7 +185,7 @@ export async function notifyNewOrder(order: OrderDoc): Promise<boolean> {
 
   const [telegram, dispositivos] = await Promise.all([
     send(orderMessage(order), asunto),
-    sendPush(orderPush(order), asunto),
+    sendPush(orderPush(order), asunto, adminEmails()),
   ])
 
   return telegram || dispositivos > 0
@@ -166,8 +196,24 @@ export async function notifyCancelledOrder(order: OrderDoc): Promise<boolean> {
 
   const [telegram, dispositivos] = await Promise.all([
     send(cancelMessage(order), asunto),
-    sendPush(cancelPush(order), asunto),
+    sendPush(cancelPush(order), asunto, adminEmails()),
   ])
 
   return telegram || dispositivos > 0
+}
+
+/**
+ * Avisa al cliente de que su pedido ha cambiado de estado.
+ *
+ * El correo se le pide a quien lo lee, y no se saca del pedido: el pedido guarda
+ * una copia de la dirección de envío, no la cuenta. Lo busca quien llama, que ya
+ * tiene el `userId` a mano.
+ */
+export async function notifyOrderStatus(
+  order: OrderDoc,
+  status: OrderStatus,
+  email: string,
+): Promise<boolean> {
+  const asunto = `del estado del pedido ${order.number}`
+  return (await sendPush(statusPush(order, status), asunto, [email])) > 0
 }

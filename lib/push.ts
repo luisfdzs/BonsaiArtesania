@@ -65,16 +65,42 @@ export async function hasSubscription(endpoint: string): Promise<boolean> {
   return (await collection.countDocuments({ endpoint }, { limit: 1 })) > 0
 }
 
-export async function sendPush(payload: PushPayload, asunto: string): Promise<number> {
+/**
+ * Manda un aviso a los dispositivos de esas personas. Devuelve a cuántos llegó.
+ *
+ * **Los destinatarios son obligatorios y van por correo.** Antes no los había: se
+ * leía la colección entera y el aviso salía a todos los dispositivos dados de alta.
+ * Eso funcionaba mientras el único que podía darse de alta era el taller, y dejó de
+ * valer en cuanto los clientes también reciben avisos: sin filtro, «nueva petición
+ * de Marta, calle tal» le habría sonado a cualquiera que tuviera la web instalada.
+ * Así que quien manda un aviso dice a quién, y esta función no tiene forma de
+ * mandarlo a todo el mundo por descuido.
+ *
+ * **Nunca lanza.** Se llama con el pedido ya guardado: un servicio de push caído no
+ * puede deshacer un pedido ni dejar a medias un cambio de estado.
+ */
+export async function sendPush(
+  payload: PushPayload,
+  asunto: string,
+  destinatarios: string[],
+): Promise<number> {
   const keys = credentials()
   if (!keys) {
     console.warn(`[push] Sin claves VAPID: nadie recibe en la app el aviso ${asunto}.`)
     return 0
   }
 
+  const correos = [...new Set(destinatarios.map((email) => email.trim().toLowerCase()))].filter(
+    Boolean,
+  )
+  if (correos.length === 0) {
+    console.warn(`[push] El aviso ${asunto} no tiene destinatario.`)
+    return 0
+  }
+
   let targets
   try {
-    targets = await (await pushSubscriptions()).find({}).toArray()
+    targets = await (await pushSubscriptions()).find({ email: { $in: correos } }).toArray()
   } catch (error) {
     console.error(`[push] No se pudo leer los dispositivos para el aviso ${asunto}:`, error)
     return 0

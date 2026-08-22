@@ -93,3 +93,47 @@ export function ShopIcon({ className }: IconProps) {
     </svg>
   )
 }
+
+/**
+ * Instalar. Una flecha que baja a la bandeja del aparato.
+ *
+ * No lleva el distintivo de Google Play a propósito: la web no está en esa tienda
+ * —se instala desde el propio navegador— y ese logo prometería una ficha que no
+ * existe. Ver `AppMovil`.
+ */
+export function InstalarIcon({ className }: IconProps) {
+  return (
+    <svg {...common} aria-hidden className={className}>
+      <path d="M12 3v10" />
+      <path d="m8 11 4 4 4-4" />
+      <path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
+    </svg>
+  )
+}
+
+/**
+ * El «Compartir» de iOS: el cuadrado con la flecha saliendo por arriba.
+ *
+ * En un iPhone no hay nada que pulsar en la web —Safari no ofrece instalar—, así
+ * que lo único que se puede hacer es enseñar el camino. Y el camino empieza en
+ * esta tecla, así que el icono es la propia tecla: se reconoce sin leer nada.
+ */
+export function CompartirIcon({ className }: IconProps) {
+  return (
+    <svg {...common} aria-hidden className={className}>
+      <path d="M12 15V3" />
+      <path d="m8 7 4-4 4 4" />
+      <path d="M7 11H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-1" />
+    </svg>
+  )
+}
+
+/** Los avisos. Una campana, que es lo que dice «te sonará» sin escribirlo. */
+export function CampanaIcon({ className }: IconProps) {
+  return (
+    <svg {...common} aria-hidden className={className}>
+      <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+    </svg>
+  )
+}

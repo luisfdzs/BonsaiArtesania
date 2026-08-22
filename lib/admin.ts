@@ -38,7 +38,12 @@ import { auth, getSession } from '@/auth'
  * las páginas de `/carrito` y `/comprar`, y el layout de `/cuenta`. Esconder un
  * botón no cierra nada, porque una acción de servidor es un endpoint público.
  */
-function adminEmails(): string[] {
+/**
+ * Los correos del taller. Se exporta porque los avisos al móvil necesitan saber a
+ * quién van: un aviso de pedido nuevo es para el taller y para nadie más. Ver
+ * `sendPush`.
+ */
+export function adminEmails(): string[] {
   return (process.env.ADMIN_EMAILS ?? '')
     .split(',')
     .map((email) => email.trim().toLowerCase())
