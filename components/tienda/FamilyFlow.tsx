@@ -70,19 +70,7 @@ export function FamilyFlow({ familias, index, onSelect, navLabel, arrastre }: Pr
         <Carril familias={familias} index={index} onSelect={onSelect} arrastre={arrastre} />
       </nav>
 
-      <div className="family-select md:hidden">
-        <select
-          aria-label={navLabel}
-          value={index}
-          onChange={(event) => onSelect(Number(event.target.value))}
-        >
-          {familias.map((f, i) => (
-            <option key={f.key} value={i}>
-              {f.label}
-            </option>
-          ))}
-        </select>
-      </div>
+      <Desplegable familias={familias} index={index} onSelect={onSelect} navLabel={navLabel} />
 
       <div className="relative hidden md:block">
         <button
@@ -108,6 +96,46 @@ export function FamilyFlow({ familias, index, onSelect, navLabel, arrastre }: Pr
           }}
         />
       </div>
+    </div>
+  )
+}
+
+/**
+ * EL DESPLEGABLE DEL TELÉFONO. El `select` del sistema, y encima de él el rótulo
+ * que se ve.
+ *
+ * El nombre no se cambia de golpe: se funde. Y con un solo mecanismo, el `key`,
+ * porque desde que elegir una familia la pone sin recorrer el anillo ya no hay
+ * nombres de paso que encadenen fundidos —el gesto no se salta familias, y un
+ * destino aparece directamente—.
+ */
+function Desplegable({
+  familias,
+  index,
+  onSelect,
+  navLabel,
+}: Pick<Props, 'familias' | 'index' | 'onSelect' | 'navLabel'>) {
+  return (
+    <div className="family-select md:hidden">
+      {/* El `key` es el fundido: al cambiar de familia React monta otro rótulo y con
+          él arranca `family-label`. Y `aria-hidden` porque el nombre ya lo dice el
+          `select`, que es el control de verdad; sin esto un lector de pantalla
+          leería la familia dos veces. */}
+      <span key={index} aria-hidden>
+        {familias[index]?.label}
+      </span>
+
+      <select
+        aria-label={navLabel}
+        value={index}
+        onChange={(event) => onSelect(Number(event.target.value))}
+      >
+        {familias.map((f, i) => (
+          <option key={f.key} value={i}>
+            {f.label}
+          </option>
+        ))}
+      </select>
     </div>
   )
 }
@@ -148,6 +176,12 @@ function Carril({ familias, index, onSelect, arrastre }: Omit<Props, 'navLabel'>
   useEffect(() => {
     indice.current = index
   }, [index])
+
+  /** Dónde estaba el carril cuando el mazo empezó a moverse, y lo que hay de una
+   *  miniatura a la siguiente. Mientras `suelo` no sea nulo, el carril lo lleva el
+   *  mazo y este componente no le toca el sitio a nadie. */
+  const suelo = useRef<number | null>(null)
+  const salto = useRef(0)
 
   /**
    * Lleva al centro la copia más cercana de una familia.
@@ -217,6 +251,10 @@ function Carril({ familias, index, onSelect, arrastre }: Omit<Props, 'navLabel'>
   useEffect(() => {
     const suave = montado.current
     montado.current = true
+    // Mientras el dedo lleva el mazo, aquí no se centra nada: es el mazo quien mueve
+    // el carril fotograma a fotograma, y centrar sería arrancar una segunda animación
+    // encima de la suya. El remate lo da el `null` del final del gesto.
+    if (suelo.current !== null) return
     centrar(index, suave, !suave)
 
     // Al montar, las fotos todavía no tienen su tamaño y el centro cae donde no
@@ -235,18 +273,19 @@ function Carril({ familias, index, onSelect, arrastre }: Omit<Props, 'navLabel'>
   )
 
   /**
-   * El carril, atado al arrastre del mazo de productos.
+   * El carril, atado al viaje del mazo de productos.
    *
-   * Mientras el dedo mueve las piezas, las miniaturas recorren la parte de paso
-   * que corresponda: las dos cosas se mueven juntas, que es lo que hace que la
-   * barra parezca el mando del catálogo y no un indicador que se actualiza
-   * después. Al soltar llega `null` y el carril se asienta solo —si el mazo se
-   * queda en la misma familia, volviendo a centrarla; si cambia, el efecto de
-   * arriba lo lleva a la nueva—.
+   * El mazo cuenta lo que lleva recorrido en cada fotograma —del primer toque al
+   * último, y también en los saltos que se le piden— y el carril recorre la parte
+   * de paso que le toca. Las dos cosas se mueven juntas y con el mismo reloj, que
+   * es lo que hace que la barra parezca el mando del catálogo y no un indicador que
+   * se actualiza después. Al pararse el mazo llega `null` y el carril remata el
+   * centrado, que a esas alturas es cosa de un par de píxeles.
+   *
+   * Sólo lo hay cuando el dedo está en el mazo: elegir una familia por su nombre la
+   * pone sin recorrer nada, y entonces el carril se centra por su cuenta con el
+   * efecto de arriba.
    */
-  const suelo = useRef<number | null>(null)
-  const salto = useRef(0)
-
   useEffect(() => {
     if (!arrastre) return
 
@@ -302,8 +341,8 @@ function Carril({ familias, index, onSelect, arrastre }: Omit<Props, 'navLabel'>
     recolocar(node)
     const centrada = itemCentrado(node)
     if (!centrada) return
-    if (centrada.familia === index) centrar(index, true)
-    else onSelect(centrada.familia)
+    if (centrada.familia === index) return centrar(index, true)
+    onSelect(centrada.familia)
   }
 
   return (

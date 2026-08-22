@@ -27,11 +27,29 @@ export { bucle, vuelta } from '@/components/tienda/motorDelMazo'
 type Vista = {
   irA: (index: number) => void
   colocar: (index: number) => void
+  /** Deja lista la familia para que se pueda enseñar de una pieza. Ver `cargar`. */
+  cargar: (index: number) => Promise<void>
 }
+
+/**
+ * Lo más que se espera a que carguen las fotos de la familia que se abre.
+ *
+ * Cinco segundos son muchos, y a propósito: la familia no se enseña a medias, y
+ * mientras se carga se ve la flor —así que esperar no es quedarse a oscuras
+ * preguntándose si el toque ha entrado—. Esto es sólo el seguro para una foto que
+ * no llega nunca; pasado el tope se enseña la familia como esté, que es peor que
+ * enseñarla hecha pero mucho mejor que no enseñarla.
+ */
+const ESPERA_MAXIMA_MS = 5000
+
+/** Lo que tarda en aparecer la familia que se abre. Ver `fundir`. */
+const APARECER_MS = 420
 
 type Deck = {
   index: number
   count: number
+  /** Se está cargando la familia que se ha pedido, antes de enseñarla. */
+  abriendo: boolean
   go: (index: number) => void
   settle: (index: number) => void
   attach: (vista: Vista | null) => void
@@ -92,13 +110,31 @@ export function ShopDeckProvider({
     vista.current = next
   }, [])
 
+  /** El último cambio pedido. Si mientras se cargaba una familia se pide otra, la
+   *  primera se queda en el camino: manda la última que se ha pedido. */
+  const pedido = useRef(0)
+  const [abriendo, setAbriendo] = useState(false)
+
+  /**
+   * A otra familia. Primero se carga y después se enseña, no al revés: es lo que
+   * quita el salto de la familia que llega poniéndose por partes. Ver `cargar`.
+   */
   const go = useCallback(
     (next: number) => {
       if (next === index || next < 0 || next >= count) return
-      // Ya no hay «vecina» y «lejana»: el motor va a cualquier familia por el
-      // camino corto del anillo con el mismo movimiento.
-      if (vista.current) vista.current.irA(next)
-      else settle(next)
+
+      const v = vista.current
+      if (!v) return settle(next)
+
+      const mio = ++pedido.current
+      setAbriendo(true)
+      void v.cargar(next).then(() => {
+        // Si mientras se cargaba se ha pedido otra familia, ésta se queda en el
+        // camino: ni se enseña ni apaga la flor, que sigue siendo de la otra.
+        if (pedido.current !== mio) return
+        setAbriendo(false)
+        vista.current?.irA(next)
+      })
     },
     [index, count, settle],
   )
@@ -115,8 +151,8 @@ export function ShopDeckProvider({
   }, [])
 
   const deck = useMemo(
-    () => ({ index, count, go, settle, attach, seguir, avisar }),
-    [index, count, go, settle, attach, seguir, avisar],
+    () => ({ index, count, abriendo, go, settle, attach, seguir, avisar }),
+    [index, count, abriendo, go, settle, attach, seguir, avisar],
   )
 
   return <DeckContext.Provider value={deck}>{children}</DeckContext.Provider>
@@ -160,7 +196,7 @@ export function ShopDeck({
 
   const montado = useSyncExternalStore(sinCambios, enElNavegador, enElServidor)
 
-  const { count, attach, settle, avisar, index } = deck
+  const { count, attach, settle, avisar, index, abriendo } = deck
 
   /** La familia de partida. Se lee una vez: después manda el motor. */
   const arranque = useRef(index)
@@ -194,6 +230,96 @@ export function ShopDeck({
     panel.style.removeProperty('height')
     panel.style.removeProperty('overflow')
     return panel.scrollHeight || null
+  }, [])
+
+  /**
+   * Las fotos de la familia a la que se va, cargadas antes de enseñarla.
+   *
+   * Las del catálogo son perezosas, que es lo que hace que la tienda abra rápido: el
+   * navegador no baja una foto hasta que se acerca a la pantalla. Pero un panel del
+   * mazo se pinta apartado a un ancho de pantalla, así que para el navegador nunca
+   * se acerca, y las fotos de la familia que llega no arrancaban hasta que el panel
+   * entraba de verdad. Se cambiaba de familia y la pantalla se iba poniendo por
+   * partes: el tirón.
+   *
+   * Así que primero se le pide al navegador que las baje —`eager`— y luego se espera
+   * a tenerlas. La familia aparece hecha, no se hace a la vista.
+   *
+   * Sólo las de la primera pantalla, y no las de la familia entera. Es lo que hay
+   * que tener para que no se vea ningún hueco, y es la diferencia entre esperar dos
+   * fotos y esperar cuarenta y cuatro: la de Pendientes son 5.676 px de catálogo, y
+   * pararse a bajarlos todos para enseñar los primeros 716 sería cambiar un tirón
+   * por una espera.
+   *
+   * Y con tope, porque una foto que no llega no puede dejar la tienda parada: pasado
+   * el tope se enseña igual. Con las fotos ya en caché esto no espera nada, que es
+   * el caso normal al volver a una familia.
+   */
+  const cargar = useCallback(async (familia: number) => {
+    const nodoCapa = capa.current
+    if (!nodoCapa) return
+    const panel = nodoCapa.querySelectorAll<HTMLElement>(':scope > div')[familia]
+    if (!panel) return
+
+    // La pantalla se mide del navegador y **no** de `--carta`. Leer una propiedad
+    // personalizada sin registrar devuelve su texto tal cual —`calc(100svh -
+    // 13rem)`—, no un número: `parseFloat` de eso es `NaN`, el umbral se quedaba en
+    // cero y no se esperaba ni una foto. La espera no hacía nada en absoluto.
+    const pantalla = window.innerHeight
+    const arriba = panel.getBoundingClientRect().top
+
+    const fotos = [...panel.querySelectorAll<HTMLImageElement>('img')].filter((img) => {
+      if (img.complete) return false
+      // Lo que cae dentro de la primera pantalla del panel, medido desde su propio
+      // borde de arriba: el panel está apartado de lado, pero en vertical está
+      // donde va a estar.
+      return img.getBoundingClientRect().top - arriba < pantalla
+    })
+
+    if (!fotos.length) return
+
+    fotos.forEach((img) => {
+      img.loading = 'eager'
+    })
+
+    await Promise.race([
+      Promise.all(
+        fotos.map(
+          (img) =>
+            new Promise<void>((listo) => {
+              if (img.complete) return listo()
+              img.addEventListener('load', () => listo(), { once: true })
+              img.addEventListener('error', () => listo(), { once: true })
+            }),
+        ),
+      ),
+      new Promise<void>((listo) => window.setTimeout(listo, ESPERA_MAXIMA_MS)),
+    ])
+  }, [])
+
+  /**
+   * La familia que se abre, apareciendo.
+   *
+   * Desde que un destino se pone sin recorrer el anillo, el cambio era un corte
+   * seco: una pantalla de fotos sustituida por otra en un fotograma. Así que la que
+   * llega entra con opacidad, que es lo único que hace falta —no se mueve nada, no
+   * se escala nada— y con la curva de la casa.
+   *
+   * Va con `animate` y no con una clase de CSS porque a estos paneles el motor les
+   * escribe estilos en línea fotograma a fotograma: una animación del navegador se
+   * pone por encima y no le pelea la propiedad a nadie. Y sólo la arranca el camino
+   * de elegir familia, no el del dedo: cuando la arrastra la mano, el movimiento ya
+   * lo explica el gesto.
+   */
+  const fundir = useCallback((familia: number) => {
+    const nodoCapa = capa.current
+    if (!nodoCapa) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const panel = nodoCapa.querySelectorAll<HTMLElement>(':scope > div')[familia]
+    panel?.animate(
+      { opacity: [0, 1] },
+      { duration: APARECER_MS, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' },
+    )
   }, [])
 
   /**
@@ -258,9 +384,14 @@ export function ShopDeck({
       const nodoCapa = capa.current
       if (nodoCapa) {
         nodoCapa.style.transform = ''
+        // El recorte se le quita a una sola familia, la que queda abierta, y se lo
+        // quita `medirFamilia` al ir a medirla. A las otras seis se les deja
+        // puesto: están invisibles, así que recortadas no se ven distintas, y
+        // devolverles el alto natural obligaba al navegador a maquetar de golpe
+        // veinte mil píxeles de catálogo que nadie está mirando. Aquí eso no se
+        // notaba —el peor fotograma de la llegada, 34 ms— pero es trabajo que en un
+        // teléfono se paga y no compra nada.
         nodoCapa.querySelectorAll<HTMLElement>(':scope > div').forEach((panel) => {
-          panel.style.removeProperty('height')
-          panel.style.removeProperty('overflow')
           panel.style.removeProperty('will-change')
         })
       }
@@ -285,14 +416,23 @@ export function ShopDeck({
     motor.current = m
     setAlto(medirFamilia(arranque.current))
     m.colocar(arranque.current)
-    attach({ irA: (i) => m.irA(i), colocar: (i) => m.colocar(i) })
+    attach({
+      // `irA` es el camino de elegir familia por su nombre, así que es aquí donde va
+      // el fundido: el del dedo pasa por `terminar` y no por aquí.
+      irA: (i) => {
+        m.irA(i)
+        fundir(i)
+      },
+      colocar: (i) => m.colocar(i),
+      cargar,
+    })
 
     return () => {
       attach(null)
       m.destruir()
       motor.current = null
     }
-  }, [count, attach, settle, avisar, plegar, asentado, medirFamilia])
+  }, [count, attach, settle, avisar, cargar, fundir, plegar, asentado, medirFamilia])
 
   // El alto sólo depende del ancho, así que se vuelve a medir cuando cambia.
   useEffect(() => {
@@ -322,6 +462,21 @@ export function ShopDeck({
       onTouchEnd={() => motor.current?.terminar()}
       onTouchCancel={() => motor.current?.terminar()}
     >
+      {/* La flor mientras se carga la familia que se ha pedido.
+
+          Va sólo en la primera pantalla —`--carta`— y no sobre el bloque entero: con
+          una familia de cinco mil píxeles, centrada en el bloque caería muy por
+          debajo de donde está mirando nadie.
+
+          Y no hace falta retrasarla a mano: `FlowerLoader` no se ve durante sus
+          primeros 180 ms, así que una carga corta —lo normal, con las fotos ya en
+          caché— no la asoma. Ver `flower-wait` en globals.css. */}
+      {abriendo && (
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-(--carta) bg-[color-mix(in_srgb,var(--color-linen)_72%,transparent)] backdrop-blur-sm">
+          <Espera />
+        </div>
+      )}
+
       {/* La perspectiva va aquí, en la capa: es la que hace que el giro de las
           familias vecinas se vea como una carta que se aparta y no como un
           aplastado. Se mide en anchos de pantalla para que el efecto sea el mismo

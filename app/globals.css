@@ -844,29 +844,62 @@
    tenga puesto y donde su pulgar ya sabe buscarla. El carrusel sigue arriba, que
    es con lo que se pasean las familias; esto es para ir a una por su nombre.
 
-   El relleno es el mismo que llevaba el rótulo —más apretado arriba que abajo—,
-   así que la barra mide lo que medía y el mazo sigue reservándole lo mismo. Ver
-   `shop-deck`.
+   **El `select` va encima y transparente, y lo que se ve es el rótulo de debajo.**
+   Suena raro y es la única manera de tener las dos cosas. El texto que pinta un
+   `select` lo dibuja el sistema: no se puede fundir al cambiar de familia, no se
+   le puede cambiar la tipografía, y la flecha no se le quita sin quitarle también
+   el `appearance`, que es justo lo que hace que abra la lista del sistema. Así que
+   el desplegable se queda con lo suyo —abrirse, y ser lo que se toca— y el rótulo
+   con lo que se mira: sin flecha, sin marco y sin nada que se encienda al elegir.
 
-   Del resto sólo se le da la tipografía y el color de la barra. A propósito **no**
-   se le quita el `appearance`: la flecha y el modo de abrirse son los del sistema,
-   y eso es justo lo que se quiere. Tampoco se le pinta fondo ni marco: en la barra
-   de lino, un cuadro con borde parecería un formulario. */
+   El fundido lo arranca `Desplegable` volviendo a montar el rótulo al cambiar de
+   familia; aquí sólo está la entrada.
+
+   El relleno es el mismo que llevaba el rótulo con chevrón —más apretado arriba
+   que abajo—, así que la barra mide lo que medía y el mazo sigue reservándole lo
+   mismo. Ver `shop-deck`. */
 @utility family-select {
+  position: relative;
   display: flex;
   justify-content: center;
   padding-block: 0.625rem 1rem;
 
-  & select {
+  & > span {
     max-width: 100%;
-    padding-inline: 0.25rem;
-    border: 0;
-    background: transparent;
     color: var(--color-sage-deep);
     font-family: var(--font-serif);
     font-size: var(--text-lead);
     line-height: 1;
-    text-align: center;
+    animation: family-label 380ms var(--ease-out-soft) both;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  & select {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    /* Invisible, no ausente: es lo que recibe el toque y lo que abre la lista.
+       Y con 1rem de letra aunque no se lea ni una: por debajo de 16 px, iOS hace
+       zoom sobre la página en cuanto se enfoca un desplegable. */
+    opacity: 0;
+    font-size: 1rem;
+  }
+}
+
+/* El nombre de la familia que entra: aparece y sube un pelo. La subida es de tres
+   milímetros y está para que el cambio tenga dirección —el nombre llega, no se
+   enciende—; el resto lo hace la opacidad. */
+@keyframes family-label {
+  from {
+    opacity: 0;
+    transform: translateY(0.2rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -931,6 +964,25 @@
   }
 }
 
+/* Cada miniatura, y con ella el orden en que se pintan.
+
+   El orden importa porque se solapan: la que está más cerca del centro está
+   delante y tiene que tapar a la de al lado, no al revés. Sin `z-index` manda el
+   orden del documento, y eso sólo acierta en la mitad izquierda: allí cada
+   miniatura viene después de la que tiene a su izquierda, que es la que está más
+   lejos, así que la tapa y sale bien. A la derecha del centro pasa lo contrario
+   —cada una viene después de la que tiene delante— y se veía una miniatura lejana
+   tapando a una que estaba por delante suya, que es imposible.
+
+   El `z-index` no puede ser fijo, porque cuál está delante depende de dónde esté
+   el carril. Así que lo lleva la misma línea de tiempo que el giro: sube hasta el
+   centro y baja al pasarlo, con lo que el reparto sale solo y sin JavaScript. Los
+   `z-index` sí se pueden animar —son enteros—, y el `100` del medio deja de sobra
+   para que tres miniaturas a cada lado caigan en escalones distintos.
+
+   Va en la miniatura y no en la tarjeta de dentro porque el apilado se decide
+   entre hermanas: dentro de la miniatura no hay con quién competir. Y no necesita
+   `position` porque son hijas de un flex, que ya respetan el `z-index`. */
 @utility thumb-flow-item {
   flex: 0 0 var(--flow-card);
   /* El solape: media miniatura menos medio paso a cada lado. */
@@ -940,7 +992,22 @@
     @media (prefers-reduced-motion: no-preference) {
       view-timeline-name: --thumb-flow;
       view-timeline-axis: inline;
+      animation: thumb-flow-stack linear both;
+      animation-timeline: --thumb-flow;
+      animation-range: cover 12% cover 88%;
     }
+  }
+}
+
+/* El orden de pintado del carril: la del centro, delante de todas. Ver
+   `thumb-flow-item`. */
+@keyframes thumb-flow-stack {
+  0%,
+  100% {
+    z-index: 0;
+  }
+  50% {
+    z-index: 100;
   }
 }
 

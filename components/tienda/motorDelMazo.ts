@@ -105,6 +105,21 @@ export const MAZO: AjustesMazo = {
   desvanecido: 0.25,
 }
 
+/**
+ * Cuándo se da el viaje por terminado: a dos píxeles y medio del destino y sin
+ * velocidad que valga la pena.
+ *
+ * No se espera a que el resorte llegue de verdad. Un amortiguado se acerca por una
+ * exponencial, así que la última milésima del camino cuesta tanto tiempo como el
+ * primer noventa por ciento: con el paso abierto de un salto de tres familias eso
+ * eran 2,2 s con el bloque congelado y el rótulo apagado, cuando a ojo el catálogo
+ * había llegado a los 1,2 s —medido en el navegador, fotograma a fotograma—. Seis
+ * milésimas de familia son dos píxeles y medio en un móvil: ahí ya no queda nada
+ * que ver, así que se remata y se suelta el bloque.
+ */
+const QUIETO_POS = 0.006
+const QUIETO_VEL = 0.0002
+
 /** El índice dentro del rango: de la última familia a la primera. */
 export function bucle(n: number, count: number): number {
   return ((n % count) + count) % count
@@ -157,6 +172,20 @@ export function crearMotorDelMazo(
   let marco = 0
   let reloj = 0
   let familiaVista = 0
+  /**
+   * El viaje en curso: de dónde salió y a qué paso va.
+   *
+   * Sólo hay viaje cuando lo lleva el dedo: elegir una familia por su nombre la
+   * pone sin recorrer nada —ver `irA`—. `base` es el punto desde el que se cuenta
+   * lo recorrido, que es lo que se le cuenta a quien esté apuntado, o sea a la
+   * barra de familias.
+   *
+   * Antes sólo se contaba mientras el dedo estaba encima: al soltar se mandaba
+   * `null` y el carril remataba el último tramo con una animación propia. Eran dos
+   * relojes para un solo movimiento, y se veía. Ahora se cuenta del primer
+   * fotograma al último y el carril no hace más que seguir.
+   */
+  let viaje: { base: number } | null = null
   /**
    * La familia que estaba abierta al empezar el viaje y lo que había bajado el
    * ojo dentro de ella.
@@ -276,6 +305,11 @@ export function crearMotorDelMazo(
       if (velo) velo.style.opacity = String(velado)
     }
 
+    // Lo recorrido del viaje, una vez por fotograma y desde aquí: así lo que
+    // sigue al mazo lo sigue con su mismo reloj, sea el dedo quien lo mueva, el
+    // impulso al soltar o un salto pedido desde la barra.
+    if (viaje) aviso.arrastre(-(pos - viaje.base))
+
     const centrada = bucle(Math.round(pos), count)
     if (centrada !== familiaVista) {
       familiaVista = centrada
@@ -292,6 +326,13 @@ export function crearMotorDelMazo(
   }
 
   function asentar() {
+    // El `null` va antes de comprobar el plegado y fuera de él: es la señal de que
+    // el viaje ha terminado, y quien la espera —la barra— la necesita aunque el
+    // bloque no estuviera plegado.
+    if (viaje) {
+      viaje = null
+      aviso.arrastre(null)
+    }
     if (!plegado) return
     plegado = false
     compensa = null
@@ -321,7 +362,7 @@ export function crearMotorDelMazo(
 
       pintar()
 
-      if (!arrastrando && Math.abs(vel) < 0.00006 && Math.abs(destino - pos) < 0.001) {
+      if (!arrastrando && Math.abs(vel) < QUIETO_VEL && Math.abs(destino - pos) < QUIETO_POS) {
         pos = destino
         vel = 0
         pintar()
@@ -350,6 +391,7 @@ export function crearMotorDelMazo(
     /** Coloca el anillo sin animar. Al montar. */
     colocar(familia: number) {
       cancelAnimationFrame(marco)
+      viaje = null
       pos = familia
       destino = familia
       vel = 0
@@ -357,13 +399,30 @@ export function crearMotorDelMazo(
       pintar()
     },
 
-    /** A una familia concreta, por el camino corto del anillo. */
+    /**
+     * A una familia concreta: aparece, y se acabó.
+     *
+     * No recorre el anillo. Da igual si estaba a tres familias o a dos hacia atrás:
+     * lo único que importa es a cuál se va. Recorrerlo obligaba a mirar pasar
+     * catálogos que nadie ha pedido, y cuanto más lejos peor: había que abrir la
+     * mano con el reloj para que no fuera un latigazo, y entonces se hacía largo.
+     * Elegir una familia no es un viaje, es abrir otra página.
+     *
+     * El plegado se hace igual, y no por costumbre: es lo que deja el catálogo
+     * empezado por su primera fila en vez de por donde estuviera el ojo en la
+     * familia de antes, y lo que le da el alto nuevo al bloque. Lo que se ha ido es
+     * la animación de por medio.
+     */
     irA(familia: number) {
       const salto = vuelta(familia - pos, count)
       if (Math.abs(salto) < 0.001) return
-      destino = pos + salto
+      cancelAnimationFrame(marco)
       plegar()
-      correr()
+      pos += salto
+      destino = pos
+      vel = 0
+      pintar()
+      asentar()
     },
 
     empezar(x: number, y: number) {
@@ -391,6 +450,7 @@ export function crearMotorDelMazo(
           return
         }
         arrastrando = true
+        viaje = { base: gesto.base }
         plegar()
         correr()
       }
@@ -407,7 +467,6 @@ export function crearMotorDelMazo(
       const suelta = (pos - antes) / Math.max(4, ahora - gesto.t)
       vel = vel * 0.7 + suelta * 0.3
       gesto.t = ahora
-      aviso.arrastre(-(pos - gesto.base))
     },
 
     terminar() {
@@ -415,7 +474,9 @@ export function crearMotorDelMazo(
       gesto.vivo = false
       if (!arrastrando) return
       arrastrando = false
-      aviso.arrastre(null)
+      // Aquí no se manda `null`: el viaje sigue vivo hasta que el resorte se para,
+      // y lo que queda de camino lo tiene que recorrer el carril con el mazo y no
+      // por su cuenta. La señal de fin la da `asentar`.
 
       // A dónde llegaría el impulso, con tope. Si el gesto fue corto y sin
       // fuerza, decide el recorrido: pasado el umbral cambia, y si no, vuelve.
