@@ -1,6 +1,10 @@
-const CACHE = 'bonsai-v1'
+const CACHE = 'bonsai-v2'
 const SIN_CONEXION = { es: '/es/sin-conexion', gl: '/gl/sin-conexion' }
-const PRECARGA = [...Object.values(SIN_CONEXION), '/icons/app-192.png']
+const PRECARGA = [
+  ...Object.values(SIN_CONEXION),
+  '/icons/app-192.png',
+  '/icons/aviso-insignia.png',
+]
 
 const esEstatico = (url) =>
   url.pathname.startsWith('/_next/static/') || url.pathname.startsWith('/icons/')
@@ -67,7 +71,9 @@ self.addEventListener('push', (event) => {
   const opciones = {
     body: aviso.body || '',
     icon: '/icons/app-192.png',
-    badge: '/icons/app-192.png',
+    // Android recorta el «badge» a su silueta y lo pinta de blanco: si le damos
+    // el icono opaco de la app sale un cuadrado blanco. Éste va en transparente.
+    badge: '/icons/aviso-insignia.png',
     tag: aviso.tag || 'bonsai-aviso',
     renotify: true,
     data: { url: aviso.url || '/es/gestion' },

@@ -26,6 +26,18 @@ const lienzo = (
   </g>
 </svg>`
 
+/* El «badge» es el icono chiquito de la barra de estado en Android: el sistema
+ * lo pinta de blanco y sólo respeta la transparencia. Un PNG opaco —como los
+ * demás iconos, con su fondo lino— sale por tanto como un cuadrado blanco. Así
+ * que aquí el fondo se deja vacío y el trazo se engorda para que el bonsái
+ * siga leyéndose a 24dp. */
+const insignia = (
+  escala,
+) => `<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
+  <g transform="translate(48 48) scale(${escala}) translate(-16 -20)" fill="none" stroke="#ffffff" stroke-width="1.9">${TRAZOS}
+  </g>
+</svg>`
+
 const ICONOS = [
   { file: 'app-512.png', size: 512, escala: 9 },
   { file: 'app-192.png', size: 192, escala: 9 },
@@ -42,3 +54,6 @@ for (const { file, size, escala } of ICONOS) {
     .toFile(path.join(OUT, file))
   console.log(`${file}  ${size}×${size}`)
 }
+
+await sharp(Buffer.from(insignia(2.5))).png().toFile(path.join(OUT, 'aviso-insignia.png'))
+console.log('aviso-insignia.png  96×96')
