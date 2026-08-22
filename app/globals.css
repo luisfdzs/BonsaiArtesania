@@ -427,7 +427,7 @@
   gap: 0.6rem;
   min-height: 2.75rem;
   padding: 0.9rem 2rem;
-  border: 1px solid var(--color-line);
+  border: 1px solid var(--color-sage-deep);
   border-radius: 999px;
   font-size: var(--text-small);
   letter-spacing: 0.1em;
@@ -435,7 +435,7 @@
   text-align: center;
   text-decoration: none;
   white-space: nowrap;
-  color: var(--color-bark);
+  color: var(--color-sage-deep);
   background: transparent;
   cursor: pointer;
   transition:
@@ -454,8 +454,8 @@
     opacity: 0.4;
     cursor: not-allowed;
     background: transparent;
-    border-color: var(--color-line);
-    color: var(--color-bark);
+    border-color: var(--color-sage-deep);
+    color: var(--color-sage-deep);
   }
 }
 
@@ -588,19 +588,17 @@
   }
 }
 
-/* La variante silenciosa se diferencia sólo en reposo —filete verde en vez del
-   gris del sistema, y tinta secundaria—; al pasar por encima responde igual que
-   el botón principal, para que dos botones juntos no se comporten de dos maneras
-   distintas. El hover lo pone `btn` y aquí no se toca: `.btn:hover` gana por
-   especificidad.
-   El filete iba en `transparent` y dejaba estos botones sin contorno: se leían
-   como un enlace suelto y no como algo pulsable. Ahora llevan el mismo grosor
-   que `btn` —1px, el borde lo declara `btn` y aquí sólo se cambia el color— en
-   el verde del acento, que es además el color al que va el botón al pasar por
-   encima. */
+/* La variante silenciosa ya no se distingue de `btn`: el filete verde y la tinta
+   verde que la caracterizaban son ahora los del botón de base, para que todos los
+   botones claros de la web se lean igual —contorno, rótulo e icono en el verde del
+   acento— y no haya dos maneras de dibujar lo mismo.
+   Se conserva la clase, con los mismos valores que `btn`, para no tener que tocar
+   la veintena de sitios que la escriben y para que siga marcando en el JSX cuál es
+   la acción secundaria: el día que vuelvan a diferenciarse, el sitio donde
+   cambiarlo es éste. */
 @utility btn-quiet {
   border-color: var(--color-sage-deep);
-  color: var(--color-bark-soft);
+  color: var(--color-sage-deep);
 }
 
 /* El mismo botón a media voz: acciones de dentro de una tarjeta —editar una

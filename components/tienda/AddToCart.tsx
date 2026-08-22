@@ -3,6 +3,7 @@
 import { type AnimationEvent, type CSSProperties, useState } from 'react'
 import { addToCart } from '@/app/[locale]/(sitio)/carrito/actions'
 import { CartPing } from '@/components/layout/CartCount'
+import { CartPlusIcon } from '@/components/ui/CartIcons'
 import { LocaleField } from '@/components/ui/LocaleField'
 import { useTranslator } from '@/lib/i18n/useLocale'
 
@@ -19,14 +20,17 @@ import { useTranslator } from '@/lib/i18n/useLocale'
  * build para pasar a renderizarse en cada visita. Cambiar el botón no compensa eso;
  * quien quiera ver lo que lleva tiene el contador de la barra de móvil.
  *
- * Lleva rótulo escrito, «Añadir al carrito», en vez del icono de la bolsa con el
- * «+»: la acción principal de la ficha se lee sin tener que descifrar un dibujo,
- * y el nombre accesible pasa a ser el propio texto, así que ya no hacen falta
- * `aria-label` ni `title`. El botón sigue sin ocupar la columna entera —el
- * formulario es `w-fit`—, que era lo que motivó quitar el rótulo en su día; con
- * el ancho ajustado al texto no le come protagonismo a la pieza.
+ * Va sin rótulo dentro: sólo el carrito con el «+», redondo, del tamaño de la
+ * acción principal de una página —el mismo `btn-icon-lg` que el avioncito de
+ * continuar del carrito y el de enviar el pedido—. Los tres pasos de la compra se
+ * piden así, con un botón redondo y un dibujo, y que se parezcan es lo que hace
+ * que el siguiente no sorprenda.
  *
- * Y con el ancho ajustado, `mx-auto` lo centra en el hueco que le queda. Desde
+ * Lo que un carrito solo no dice se va a `aria-label` y `title`: lo que oye quien
+ * usa lector de pantalla y lo que sale al pasar el ratón. Sin ellos el botón no
+ * tendría nombre accesible, porque el SVG va `aria-hidden`.
+ *
+ * `mx-auto` lo centra en el hueco que le queda —el formulario es `w-fit`—. Desde
  * que es lo único que hay ahí —antes lo acompañaban los iconos de contacto—,
  * pegado a la izquierda se quedaba descolgado bajo una columna de texto que sí
  * llega al borde.
@@ -55,6 +59,7 @@ export function AddToCart({ slug }: { slug: string }) {
   // sigue siendo el mismo. Vuelve a 0 cuando el grupo acaba de desvanecerse.
   const [burst, setBurst] = useState(0)
   const t = useTranslator()
+  const label = t({ es: 'Añadir al carrito', gl: 'Engadir ao carro' })
 
   // Los pétalos también animan, y su `animationend` burbujea hasta el grupo: sin
   // comprobar el objetivo se desmontaría todo con el primero que termine,
@@ -70,8 +75,14 @@ export function AddToCart({ slug }: { slug: string }) {
       {/* Avisa al contador de la barra de móvil cuando la pieza ya está dentro.
           No pinta nada y no toca el envío, que sigue funcionando sin JS. */}
       <CartPing />
-      <button type="submit" onClick={() => setBurst((n) => n + 1)} className="btn">
-        {t({ es: 'Añadir al carrito', gl: 'Engadir ao carro' })}
+      <button
+        type="submit"
+        onClick={() => setBurst((n) => n + 1)}
+        aria-label={label}
+        title={label}
+        className="btn btn-icon btn-icon-lg"
+      >
+        <CartPlusIcon className="h-5 w-5" />
       </button>
 
       {burst > 0 ? (
