@@ -7,14 +7,20 @@ import { useEffect } from 'react'
  * LAS TRES COSAS QUE SE LE PUEDEN HACER A UNA PIEZA
  *
  * La foto de la tarjeta es el botón: al pincharla se cubre con un velo y salen
- * tres círculos en abanico —ver, editar, borrar— alrededor de una equis que
- * cierra. Es el mismo gesto que en milabarber.vercel.app, traído al lenguaje de
- * aquí: círculos de lino con filete de 1px en vez de botones sólidos.
+ * cuatro círculos repartidos alrededor del centro —ver a la izquierda, editar
+ * arriba, borrar a la derecha y cerrar abajo—. Es el mismo gesto que en
+ * milabarber.vercel.app, traído al lenguaje de aquí: círculos de lino con filete
+ * de 1px en vez de botones sólidos.
  *
- * Por qué un abanico y no un menú desplegable: en una rejilla de fotos, un menú
- * tapa las tarjetas de al lado y hay que leerlo; tres iconos alrededor del dedo
- * se reconocen por su sitio —arriba, izquierda, derecha— y no tapan nada más que
- * la foto que se ha pinchado.
+ * **En el centro de la tarjeta no hay ningún botón, hay hueco.** Los cuatro se
+ * apartan de él por igual, así que el punto que se pinchó para abrir queda libre:
+ * ningún dedo cae encima de algo que no ha elegido, y ninguna de las cuatro cosas
+ * hereda el sitio privilegiado de estar justo donde estaba el dedo. Antes la equis
+ * ocupaba ese centro y era la única a la que se llegaba sin moverse.
+ *
+ * Por qué esto y no un menú desplegable: en una rejilla de fotos, un menú tapa las
+ * tarjetas de al lado y hay que leerlo; cuatro iconos alrededor del dedo se
+ * reconocen por su sitio y no tapan nada más que la foto que se ha pinchado.
  *
  * Sólo hay un abanico abierto a la vez, y lo decide quien pinta las tarjetas: si
  * se pudieran abrir dos, «cerrar» dejaría de tener un significado único.
@@ -30,14 +36,22 @@ type Props = {
   nombre: string
 }
 
-/** El radio del abanico y lo que tarda en abrirse cada círculo. */
-const RADIO = 62
+/**
+ * El radio del anillo y lo que tarda en salir cada círculo.
+ *
+ * 54 y no más: en un móvil la tarjeta mide unos 168px de ancho, y con el radio más
+ * el medio círculo —22px— quedan ocho de margen. Más lejos, los de los lados se
+ * saldrían de la foto.
+ */
+const RADIO = 54
 const CURVA = 'cubic-bezier(0.22, 1, 0.36, 1)'
 
+/** Izquierda, arriba, derecha y abajo. En ese orden salen, en abanico. */
 const SITIOS = [
-  { x: -54, y: -31, retraso: 0 },
+  { x: -RADIO, y: 0, retraso: 0 },
   { x: 0, y: -RADIO, retraso: 45 },
-  { x: 54, y: -31, retraso: 90 },
+  { x: RADIO, y: 0, retraso: 90 },
+  { x: 0, y: RADIO, retraso: 135 },
 ] as const
 
 export function AccionesDeFoto({
@@ -154,13 +168,16 @@ export function AccionesDeFoto({
           </svg>
         </button>
 
-        {/* La equis del centro: el mismo sitio que se pinchó para abrir. */}
+        {/* Cerrar, abajo. Es el único de los cuatro en verde macizo: los otros tres
+            llevan a algún sitio y éste deshace, así que se distingue por el color y
+            no por el tamaño, que lo dejaría desparejado en el anillo. */}
         <button
           type="button"
           onClick={onCerrar}
           aria-label="Cerrar las opciones"
           tabIndex={abierto ? undefined : -1}
-          className="absolute flex size-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-sage-deep text-linen shadow-[0_6px_18px_rgba(44,40,35,0.22)]"
+          className="absolute flex size-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-sage-deep text-linen shadow-[0_6px_18px_rgba(44,40,35,0.22)]"
+          style={estilo(3)}
         >
           <svg
             viewBox="0 0 24 24"

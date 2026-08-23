@@ -6,7 +6,6 @@ import { GestionNav } from '@/components/gestion/GestionNav'
 import { GestionPendingProvider, GestionPendingSlot } from '@/components/gestion/GestionPending'
 import { Wordmark } from '@/components/layout/Wordmark'
 import { FormPending } from '@/components/ui/FormPending'
-import { ScrollTop } from '@/components/ui/ScrollTop'
 import { adminSession } from '@/lib/admin'
 import { isLocale, pick, translator } from '@/lib/i18n/config'
 import { path } from '@/lib/i18n/routes'
@@ -40,7 +39,12 @@ export default async function GestionLayout({
 
   return (
     <GestionPendingProvider>
-      <header className="sticky top-0 z-50 border-b border-line bg-linen/90 text-bark backdrop-blur-md">
+      {/* El desenfoque del fondo, sólo donde sale gratis.
+          Una cabecera pegajosa y traslúcida obliga a rehacer el borroso en cada
+          fotograma de cada desplazamiento, y en un teléfono eso se nota en el dedo:
+          la página entera va a tirones. Con puntero grueso se cambia por lino
+          macizo, que ya era el 90% de lo que se veía. */}
+      <header className="sticky top-0 z-50 border-b border-line bg-linen/90 text-bark backdrop-blur-md pointer-coarse:bg-linen pointer-coarse:backdrop-blur-none">
         <div className="page-gutter relative flex h-20 items-center justify-center md:h-24">
           <Wordmark className="h-7 md:h-9" />
         </div>
@@ -78,8 +82,6 @@ export default async function GestionLayout({
             </button>
           </form>
         </div>
-
-        <ScrollTop />
       </main>
     </GestionPendingProvider>
   )

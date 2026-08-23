@@ -11,11 +11,13 @@ import {
 } from '@/app/[locale]/gestion/catalogo/actions'
 import { BotonAtras } from '@/components/gestion/BotonAtras'
 import { Confirmar, type Peticion } from '@/components/gestion/Confirmar'
+import { ElegirFotos } from '@/components/gestion/ElegirFotos'
 import { EncuadreFotos } from '@/components/gestion/EncuadreFotos'
 import { VeloDeSoltar } from '@/components/gestion/VeloDeSoltar'
 import type { PiezaPanel } from '@/lib/catalogo-panel'
 import type { Locale, Localized } from '@/lib/i18n/config'
 import { path } from '@/lib/i18n/routes'
+import { usePunteroGrueso } from '@/lib/usePunteroGrueso'
 import { useSoltarFotos, type Soltada } from '@/lib/useSoltarFotos'
 
 /**
@@ -112,6 +114,12 @@ export function PiezaEditor({ locale, volverA, pieza, familias }: Props) {
 
   const { arrastrando, sobre } = useSoltarFotos(alSoltar)
   const apuntandoAFoto = Boolean(sobre?.startsWith('foto:'))
+  /**
+   * Con el dedo no hay de dónde arrastrar, así que las dos cosas que aquí se hacen
+   * arrastrando —añadir una foto y cambiar una que ya está— tienen que poder
+   * pedirse tocando. Salen por el mismo `alSoltar`: ver `ElegirFotos`.
+   */
+  const conElDedo = usePunteroGrueso()
 
   const volver = path(locale, `/gestion/catalogo/${volverA}`)
   /** El nombre de la familia de la que se venía, para decirlo en el botón. */
@@ -236,7 +244,9 @@ export function PiezaEditor({ locale, volverA, pieza, familias }: Props) {
         <div className="flex items-baseline justify-between">
           <span className="eyebrow">Fotos</span>
           <span className="text-micro normal-case tracking-normal text-bark-faint">
-            suéltalas donde quieras para añadirlas, o encima de una para cambiarla
+            {conElDedo
+              ? 'toca el hueco para añadir, o el lápiz de una foto para cambiarla'
+              : 'suéltalas donde quieras para añadirlas, o encima de una para cambiarla'}
           </span>
         </div>
 
@@ -257,6 +267,8 @@ export function PiezaEditor({ locale, volverA, pieza, familias }: Props) {
                 src={foto.src}
                 alt=""
                 draggable={false}
+                loading="lazy"
+                decoding="async"
                 className="size-28 rounded-sm object-cover"
               />
               {sobre === `foto:${foto.id}` && (
@@ -271,6 +283,29 @@ export function PiezaEditor({ locale, volverA, pieza, familias }: Props) {
                   Portada
                 </span>
               )}
+              {/* Cambiar ésta. Con ratón se hace soltando encima —y por eso el
+                  lápiz sólo sale donde no hay de dónde soltar—: dos formas de pedir
+                  lo mismo, cada una donde tiene sentido. */}
+              {conElDedo && (
+                <ElegirFotos
+                  una
+                  alElegir={(lista) => alSoltar({ ficheros: lista, sobre: `foto:${foto.id}` })}
+                  etiqueta="Cambiar esta foto"
+                  className="absolute -bottom-2 -right-2 flex size-7 items-center justify-center rounded-full border border-line bg-linen text-bark-soft"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={1.6}
+                    aria-hidden="true"
+                    className="size-3.5"
+                  >
+                    <path d="M4 20h4L18.5 9.5a2.1 2.1 0 00-3-3L5 17v3z" />
+                  </svg>
+                </ElegirFotos>
+              )}
+
               {pieza.fotos.length > 1 && (
                 <button
                   type="button"
@@ -305,21 +340,29 @@ export function PiezaEditor({ locale, volverA, pieza, familias }: Props) {
           ))}
           {/* El hueco de soltar, para que la zona exista aunque la pieza tenga
               una sola foto y no haya sitio libre a la vista. */}
-          <li className="flex size-28 flex-col items-center justify-center gap-1 rounded-sm border border-dashed border-line px-2 text-center">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#93a188"
-              strokeWidth={1.3}
-              aria-hidden="true"
-              className="size-5"
+          <li className="size-28">
+            {/* El hueco es el botón: con ratón se sueltan fotos encima, con el dedo
+                se toca y se abren las del teléfono. */}
+            <ElegirFotos
+              alElegir={(lista) => alSoltar({ ficheros: lista, sobre: null })}
+              etiqueta="Añadir fotos a esta pieza"
+              className="flex size-full flex-col items-center justify-center gap-1 rounded-sm border border-dashed border-line px-2 text-center transition-colors duration-300 hover:border-sage hover:bg-sage-deep/6"
             >
-              <path d="M12 16V4M8 8l4-4 4 4" />
-              <path d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3" />
-            </svg>
-            <span className="text-micro normal-case tracking-normal text-bark-faint">
-              soltar foto
-            </span>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#93a188"
+                strokeWidth={1.3}
+                aria-hidden="true"
+                className="size-5"
+              >
+                <path d="M12 16V4M8 8l4-4 4 4" />
+                <path d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3" />
+              </svg>
+              <span className="text-micro normal-case tracking-normal text-bark-faint">
+                {conElDedo ? 'añadir foto' : 'soltar foto'}
+              </span>
+            </ElegirFotos>
           </li>
         </ul>
       </div>

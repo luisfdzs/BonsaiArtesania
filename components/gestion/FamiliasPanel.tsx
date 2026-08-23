@@ -1,21 +1,23 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useCallback, useRef, useState, useTransition } from 'react'
+import { useState, useTransition } from 'react'
 import {
   borrarFamilia,
   colocarFamilias,
   guardarDatosDeFamilia,
   nuevaFamilia,
 } from '@/app/[locale]/gestion/catalogo/actions'
+import { Asa } from '@/components/gestion/Asa'
 import { BotonAtras } from '@/components/gestion/BotonAtras'
+import { MedidorArrimo } from '@/components/gestion/MedidorArrimo'
 import { Confirmar, type Peticion } from '@/components/gestion/Confirmar'
-import { EncuadreFotos } from '@/components/gestion/EncuadreFotos'
 import { VeloDeSoltar } from '@/components/gestion/VeloDeSoltar'
 import type { FamiliaPanel } from '@/lib/catalogo-panel'
 import type { Locale, Localized } from '@/lib/i18n/config'
 import { path } from '@/lib/i18n/routes'
-import { useSoltarFotos, type Soltada } from '@/lib/useSoltarFotos'
+import { useReordenar } from '@/lib/useReordenar'
+import { useSoltarFotos } from '@/lib/useSoltarFotos'
 
 /**
  * LAS FAMILIAS DEL CATÁLOGO
@@ -24,12 +26,69 @@ import { useSoltarFotos, type Soltada } from '@/lib/useSoltarFotos'
  * la tienda y el del escaparate de la portada, así que se arrastra igual que las
  * piezas: se mueve al arrastrar y se guarda al soltar.
  *
+ * ## Las tres rayas dicen que se coge; se coge por donde sea
+ *
+ * El asa del principio está para que se vea que la fila se mueve —una lista de
+ * cajas iguales no lo dice por sí sola—, pero no es una cerradura: se arrastra
+ * desde cualquier punto de la tarjeta. Apretar y mover es arrastrar; apretar y
+ * soltar sin moverse sigue abriendo la familia, que es lo que hace el navegador
+ * por su cuenta sin que haya que arbitrarlo.
+ *
+ * ## Lo que se lleva es sólido; lo que se deja es un hueco
+ *
+ * Mientras se arrastra hay dos cosas a la vez, y cada una dice lo suyo. La que va
+ * pegada al cursor es la tarjeta **entera y opaca**: es la que tienes en la mano.
+ *
+ * Esa tarjeta la pintamos nosotros, y no es un capricho. La foto del arrastre la
+ * hace el navegador, y Chrome le pasa un alfa a cualquier foto sacada de un nodo
+ * del DOM: por opaco que sea lo que le des —y se ha comprobado que lo es—, lo
+ * arrastra descolorido, y no hay forma de pedirle que no lo haga. Así que se le da
+ * un píxel transparente por foto y la tarjeta va en el DOM, siguiendo al cursor
+ * con los `dragover`. Ver `solidificar` y `PIXEL`.
+ *
+ * La que se queda en la lista es **el hueco**: mismo alto, borde de puntos y nada
+ * dentro. No se pinta de verde, que es el color de lo abierto y de lo que la mano
+ * señala; un sitio vacío no es nada elegido.
+ *
+ * ## Con el dedo, sólo por las rayas
+ *
+ * En el móvil no hay arrastre nativo —el de HTML5 es cosa del ratón—, así que el
+ * dedo tiene su propio camino, con eventos de puntero, y ahí el asa **sí** es una
+ * cerradura: sólo se arrastra desde las tres rayas. Con el ratón no hacía falta
+ * porque apretar y mover ya se distingue de apretar y soltar; con el dedo no, y
+ * lo que se lleva por delante es el desplazamiento de la página. Ver
+ * `empezarTacto`.
+ *
+ * ## El hueco viaja, las demás se apartan
+ *
+ * Cuando otra tarjeta pasa a ocupar el sitio no aparece de golpe en su nueva
+ * fila: se desliza hasta ella. La lista la reordena el estado, así que la
+ * animación es la vuelta de siempre —mides dónde estaba cada una, la devuelves
+ * ahí con un `translateY` y la sueltas— y quien la hace es `deslizar`. Sin eso el
+ * reordenado es un parpadeo y hay que reconstruir de memoria qué se ha movido.
+ *
+ * El hueco no se desliza: salta a su sitio. Está debajo del cursor, y
+ * una fila que se desliza sola por debajo del puntero vuelve a entrar en él y
+ * pediría otro cambio de orden. Por lo mismo `mover` no atiende dos veces
+ * seguidas antes de que el deslizamiento acabe.
+ *
+ * Aquí no se sueltan fotos. Una pieza nace dentro de una familia y se cataloga
+ * en su rejilla, así que soltar un puñado de fotos sobre esta lista no tendría a
+ * quién dárselas: son todas iguales y están una debajo de otra. Se sigue
+ * escuchando el arrastre para poder decirlo —el cursor de prohibido y la señal
+ * del velo—, porque tragarse las fotos sin más parecería que no ha pasado nada.
+ * Ver `useSoltarFotos` y `VeloDeSoltar`.
+ *
  * Quitar una familia nunca borra sus piezas. Se elige qué pasa con ellas —se
  * mudan a otra familia o se quedan en borrador— y no hay una tercera salida
  * silenciosa. Ver `quitarFamilia` en `lib/catalogo-escritura.ts`.
  */
 
 type Props = { locale: Locale; familias: FamiliaPanel[] }
+
+/** Nada que hacer con lo que se suelte. Fuera del componente para que el gancho
+ *  no vuelva a colgar sus escuchas en cada render. */
+const NADA = () => {}
 
 type Campos = { label: Localized; plural: Localized; note: Localized; intro: Localized }
 
@@ -45,7 +104,6 @@ function camposDe(familia: FamiliaPanel): Campos {
 export function FamiliasPanel({ locale, familias }: Props) {
   const router = useRouter()
   /** Ver la nota de `CatalogoFamilia`: el reinicio lo hace la `key` de la página. */
-  const [orden, setOrden] = useState<FamiliaPanel[]>(familias)
   const [abierta, setAbierta] = useState<string | null>(null)
   const [campos, setCampos] = useState<Campos | null>(null)
   /** Lo que está esperando un «sí». Ver `Confirmar`. */
@@ -54,55 +112,36 @@ export function FamiliasPanel({ locale, familias }: Props) {
   /** Lo escrito en la tranca del borrado de una familia. */
   const [confirmacion, setConfirmacion] = useState('')
   const [destino, setDestino] = useState<string>('')
-  const [moviendo, setMoviendo] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [nombreNuevo, setNombreNuevo] = useState('')
   const [trabajando, empezar] = useTransition()
-  /** Las fotos recién soltadas encima de una familia, camino del encuadre. */
-  const [ficheros, setFicheros] = useState<{
-    familia: string
-    label: string
-    lista: File[]
-  } | null>(null)
-  const arrastrada = useRef<string | null>(null)
 
   /**
-   * Soltar fotos añade piezas a la familia abierta, al final de su rejilla.
-   *
-   * **Sólo la abierta las recibe**, y por eso da igual dónde caigan: mientras se
-   * arrastra, la pantalla entera es rosa y no hay ninguna tarjeta que señalar.
-   * Aquí las familias están una debajo de otra y son todas iguales; apuntar a
-   * una sin querer sería fácil, así que abrirla primero es decir «ésta».
-   *
-   * La cara de la familia **no** se decide aquí: es la primera foto de su
-   * primera pieza, y se cambia en el catálogo poniendo otra pieza la primera.
+   * El arrastre, entero, en `useReordenar`. Aquí sólo se dice qué se ordena y qué
+   * hacer cuando se suelta: preguntar. Nada se escribe sin un «sí».
    */
-  const alSoltar = useCallback(
-    ({ ficheros: lista, sobre }: Soltada) => {
-      if (ficheros) return
+  const { orden, moviendo, restaurar, fila, asa } = useReordenar({
+    lista: familias,
+    claveDe: (familia: FamiliaPanel) => familia.key,
+    alSoltar: (keys) =>
+      pedir({
+        titulo: '¿Guardamos el orden nuevo?',
+        detalle:
+          'Es el orden del carril de la tienda y el del escaparate de la portada. Si dices que no, la lista vuelve a como estaba.',
+        boton: 'Guardar el orden',
+        accion: () => colocarFamilias(keys),
+        // Al arrastrar ya se ha movido lo que se ve; decir que no tiene que
+        // devolverlo a su sitio, no dejarlo mintiendo.
+        alCancelar: restaurar,
+      }),
+  })
 
-      if (lista.length === 0) {
-        setError('Eso no eran fotos. Sirven JPG, PNG y webp.')
-        return
-      }
-
-      const familia = familias.find((una) => una.key === abierta)
-
-      if (!familia) {
-        setError('Abre primero la familia a la que quieras añadirle piezas, y suelta las fotos.')
-        return
-      }
-
-      setError(null)
-      setFicheros({ familia: familia.key, label: familia.label.es, lista })
-    },
-    [abierta, familias, ficheros],
-  )
-
-  const { arrastrando } = useSoltarFotos(alSoltar, { permitido: Boolean(abierta) })
-
-  /** La que está abierta, que es la única que puede recibir una foto. */
-  const abiertaAhora = familias.find((una) => una.key === abierta)
+  /**
+   * No se sueltan fotos aquí, pero sí se sabe que hay algo arrastrándose: con
+   * `permitido: false` el sistema pinta el cursor de prohibido y lo que caiga se
+   * traga sin abrirlo el navegador. El velo pone la señal.
+   */
+  const { arrastrando } = useSoltarFotos(NADA, { permitido: false })
 
   /**
    * Nada se escribe sin preguntar: esto no ejecuta, sólo deja la petición encima
@@ -126,42 +165,6 @@ export function FamiliasPanel({ locale, familias }: Props) {
       if (!resultado.ok) setError(resultado.error ?? 'No he podido guardar el cambio.')
       setPeticion(null)
       if (resultado.ok) router.refresh()
-    })
-  }
-
-  function mover(sobre: string) {
-    const origen = arrastrada.current
-    if (!origen || origen === sobre) return
-
-    setOrden((previas) => {
-      const desde = previas.findIndex((familia) => familia.key === origen)
-      const hasta = previas.findIndex((familia) => familia.key === sobre)
-      if (desde === -1 || hasta === -1) return previas
-
-      const copia = [...previas]
-      const [movida] = copia.splice(desde, 1)
-      if (!movida) return previas
-      copia.splice(hasta, 0, movida)
-      return copia
-    })
-  }
-
-  function guardarOrden() {
-    arrastrada.current = null
-    setMoviendo(null)
-
-    const keys = orden.map((familia) => familia.key)
-    if (keys.join() === familias.map((familia) => familia.key).join()) return
-
-    pedir({
-      titulo: '¿Guardamos el orden nuevo?',
-      detalle:
-        'Es el orden del carril de la tienda y el del escaparate de la portada. Si dices que no, la lista vuelve a como estaba.',
-      boton: 'Guardar el orden',
-      accion: () => colocarFamilias(keys),
-      // Al arrastrar ya se ha movido lo que se ve; decir que no tiene que
-      // devolverlo a su sitio, no dejarlo mintiendo.
-      alCancelar: () => setOrden(familias),
     })
   }
 
@@ -198,7 +201,7 @@ export function FamiliasPanel({ locale, familias }: Props) {
           <h2 className="font-serif text-3xl leading-none">Familias</h2>
           <p className="text-small text-bark-soft">
             Cada familia tiene su espacio de fotos. Este orden es el del carril de la tienda y el
-            del escaparate de la portada.
+            del escaparate de la portada: arrastra una tarjeta para cambiarlo.
           </p>
         </div>
       </header>
@@ -210,24 +213,20 @@ export function FamiliasPanel({ locale, familias }: Props) {
       <ul className="mt-6 flex flex-col gap-2">
         {orden.map((familia) => {
           const editando = abierta === familia.key
+          /** Ésta va en la mano; lo que se ve aquí es el hueco que ha dejado. */
+          const hueca = moviendo === familia.key
 
           return (
             <li
               key={familia.key}
-              draggable={!editando}
-              onDragStart={() => {
-                arrastrada.current = familia.key
-                setMoviendo(familia.key)
-              }}
-              onDragEnter={() => mover(familia.key)}
-              onDragOver={(evento) => evento.preventDefault()}
-              onDragEnd={guardarOrden}
-              onDrop={guardarOrden}
+              {...fila(familia.key, editando)}
               className={`cursor-pointer rounded-sm border px-4 py-3 transition-colors duration-300 ${
-                editando
-                  ? 'border-sage bg-sage-deep/6'
-                  : 'border-line hover:border-sage hover:bg-sage-deep/6'
-              } ${moviendo === familia.key ? 'opacity-60' : ''}`}
+                hueca
+                  ? 'border-dashed border-line'
+                  : editando
+                    ? 'border-sage bg-sage-deep/6'
+                    : 'border-line hover:border-sage hover:bg-sage-deep/6'
+              }`}
               /* La fila entera es el interruptor: cerrada se abre y abierta se
                  cierra, se pinche donde se pinche. Lo único que no cierra es el
                  formulario de dentro —lo marca `data-formulario`—, porque ahí se
@@ -251,7 +250,13 @@ export function FamiliasPanel({ locale, familias }: Props) {
                 else abrir(familia)
               }}
             >
-              <div className="flex flex-wrap items-center gap-4">
+              {/* Invisible y no `hidden`: el hueco tiene que medir exactamente lo
+                  que mide la fila, o la lista daría un salto al empezar a mover. */}
+              <div className={`flex flex-wrap items-center gap-4 ${hueca ? 'invisible' : ''}`}>
+                {/* Con el ratón es sólo la señal —la fila entera se arrastra—, y con
+                    el dedo es por donde se coge. Ver `useReordenar`. */}
+                <Asa fijo={editando} {...asa(familia.key, editando)} className="-my-2 -ml-3 p-2" />
+
                 {familia.thumb ? (
                   // La miniatura es la foto de su primera pieza, como en la tienda.
                   // eslint-disable-next-line @next/next/no-img-element
@@ -259,6 +264,8 @@ export function FamiliasPanel({ locale, familias }: Props) {
                     src={familia.thumb}
                     alt=""
                     draggable={false}
+                    loading="lazy"
+                    decoding="async"
                     className="size-16 flex-none rounded-sm object-cover"
                   />
                 ) : (
@@ -440,24 +447,10 @@ export function FamiliasPanel({ locale, familias }: Props) {
         </p>
       </div>
 
-      <VeloDeSoltar
-        visible={arrastrando}
-        prohibido={!abiertaAhora}
-        titulo={`Suelta tus fotos en ${abiertaAhora?.label.es ?? ''}`}
-        detalle="Cada foto se convierte en una pieza y se coloca la última de esta familia. Nacen en borrador: no salen a la tienda hasta que las publiques."
-      />
+      {/* Temporal, sólo con ?depurar=1 */}
+      <MedidorArrimo />
 
-      {ficheros && (
-        <EncuadreFotos
-          destino={{ tipo: 'familia', familia: ficheros.familia, label: ficheros.label }}
-          ficheros={ficheros.lista}
-          onCerrar={() => setFicheros(null)}
-          onHecho={() => {
-            setFicheros(null)
-            router.refresh()
-          }}
-        />
-      )}
+      <VeloDeSoltar visible={arrastrando} prohibido />
 
       <Confirmar
         peticion={peticion}

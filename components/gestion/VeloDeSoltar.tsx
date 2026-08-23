@@ -13,13 +13,14 @@
  */
 export function VeloDeSoltar({
   visible,
-  titulo,
-  detalle,
+  titulo = '',
+  detalle = '',
   prohibido = false,
 }: {
   visible: boolean
-  titulo: string
-  detalle: string
+  /** Lo que va a pasar al soltar. Con `prohibido` no hace falta: no se pinta. */
+  titulo?: string
+  detalle?: string
   /** Aquí no se puede soltar: ni velo ni explicación, sólo la señal. */
   prohibido?: boolean
 }) {

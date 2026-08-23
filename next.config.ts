@@ -7,6 +7,20 @@ const nextConfig: NextConfig = {
     deviceSizes: [420, 640, 828, 1200, 1600, 2048],
     qualities: [75, 82],
   },
+  /**
+   * Los sitios desde los que se puede abrir el servidor de desarrollo.
+   *
+   * Sólo afecta a `next dev`. Desde Next 16, pedir `/_next/static/…` desde un
+   * origen que no sea `localhost` devuelve un 403: el móvil recibe el HTML y
+   * ningún JavaScript, así que la página se ve entera y no responde a nada —ni a
+   * un toque, ni a un arrastre—, que es de las averías más difíciles de leer
+   * porque no parece una avería.
+   *
+   * Aquí va la IP de esta máquina en la red de casa, que es por donde entra el
+   * teléfono a probar. Si el router reparte otra, se cambia; y si algún día se
+   * prueba desde un túnel, se añade su dominio.
+   */
+  allowedDevOrigins: ['192.168.1.12'],
   experimental: {
     /**
      * Enciende `app/global-not-found.tsx`, que es el 404 de las direcciones que no

@@ -2,8 +2,11 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useCallback, useRef, useState, useTransition } from 'react'
+import { useCallback, useState, useTransition } from 'react'
 import { AccionesDeFoto } from '@/components/gestion/AccionesDeFoto'
+import { Asa } from '@/components/gestion/Asa'
+import { MedidorArrimo } from '@/components/gestion/MedidorArrimo'
+import { ElegirFotos } from '@/components/gestion/ElegirFotos'
 import { Confirmar, type Peticion } from '@/components/gestion/Confirmar'
 import { VeloDeSoltar } from '@/components/gestion/VeloDeSoltar'
 import { EncuadreFotos } from '@/components/gestion/EncuadreFotos'
@@ -11,6 +14,8 @@ import { borrarPieza, colocarPiezas } from '@/app/[locale]/gestion/catalogo/acti
 import type { Locale } from '@/lib/i18n/config'
 import { path } from '@/lib/i18n/routes'
 import type { ProductStatus } from '@/lib/schema'
+import { usePunteroGrueso } from '@/lib/usePunteroGrueso'
+import { useReordenar } from '@/lib/useReordenar'
 import { useSoltarFotos, type Soltada } from '@/lib/useSoltarFotos'
 
 /**
@@ -23,9 +28,14 @@ import { useSoltarFotos, type Soltada } from '@/lib/useSoltarFotos'
  *
  * 1. **Fotos que vienen de fuera** —del escritorio—. Se sueltan sobre la rejilla,
  *    y entonces se catalogan en la familia abierta, o sobre una familia del
- *    carril, y entonces van a ésa. Abren el encuadre antes de subir nada.
+ *    carril, y entonces van a ésa. Abren el encuadre antes de subir nada. En un
+ *    teléfono no hay de dónde arrastrar, así que el hueco de «añadir una pieza» es
+ *    además un botón que abre la galería: la misma puerta, ver `ElegirFotos`.
  * 2. **Tarjetas que ya están** —piezas—. Se arrastran entre ellas para cambiar el
- *    orden, que es el mismo orden que se ve en la tienda.
+ *    orden, que es el mismo orden que se ve en la tienda. La máquina es la misma
+ *    que ordena las familias, `useReordenar`: allí está el porqué de la tarjeta
+ *    sólida en la mano, del hueco que deja, de que las demás se aparten
+ *    deslizándose y de que con el dedo sólo se agarre por las tres rayas.
  *
  * Lo que distingue uno de otro es lo que trae el arrastre: `dataTransfer.types`
  * dice `Files` cuando vienen del escritorio. Sin esa comprobación, arrastrar una
@@ -78,8 +88,6 @@ export function CatalogoFamilia({ locale, familias, familia, piezas, almacenList
    * de Next hacía saltar un «Should not already be working» de React. Remontar es
    * más simple y no tiene ese filo.
    */
-  const [orden, setOrden] = useState<PiezaResumen[]>(piezas)
-  const [moviendo, setMoviendo] = useState<string | null>(null)
   const [ficheros, setFicheros] = useState<{
     familia: string
     label: string
@@ -91,7 +99,27 @@ export function CatalogoFamilia({ locale, familias, familia, piezas, almacenList
   /** Lo que está esperando un «sí». Ver `Confirmar`. */
   const [peticion, setPeticion] = useState<Peticion | null>(null)
   const [guardando, empezar] = useTransition()
-  const arrastrada = useRef<string | null>(null)
+
+  /**
+   * El arrastre de las tarjetas, entero, en `useReordenar`. Aquí sólo se dice qué
+   * se ordena y qué hacer al soltar: preguntar, como todo lo que se escribe.
+   */
+  const { orden, moviendo, restaurar, fila, asa } = useReordenar({
+    lista: piezas,
+    claveDe: (pieza: PiezaResumen) => pieza.slug,
+    alSoltar: (slugs) => {
+      setError(null)
+      setPeticion({
+        titulo: '¿Guardamos el orden nuevo?',
+        detalle: `Es el orden en que se ven las piezas de ${familia.label} en la tienda. Si dices que no, la rejilla vuelve a como estaba.`,
+        boton: 'Guardar el orden',
+        accion: () => colocarPiezas(familia.key, slugs),
+        // Al arrastrar ya se ha movido lo que se ve; decir que no tiene que
+        // devolverlo a su sitio.
+        alCancelar: restaurar,
+      })
+    },
+  })
 
   /**
    * Soltar fotos, caigan donde caigan.
@@ -130,47 +158,13 @@ export function CatalogoFamilia({ locale, familias, familia, piezas, almacenList
   )
 
   const { arrastrando, sobre } = useSoltarFotos(alSoltar)
+  const conElDedo = usePunteroGrueso()
 
   /** La familia que recibiría las fotos si se soltaran ahora mismo. */
   const familiaApuntada =
     (sobre?.startsWith('familia:')
       ? familias.find((una) => una.key === sobre.slice('familia:'.length))?.label
       : null) ?? familia.label
-
-  function moverTarjeta(sobre: string) {
-    const origen = arrastrada.current
-    if (!origen || origen === sobre) return
-
-    setOrden((previas) => {
-      const desde = previas.findIndex((pieza) => pieza.slug === origen)
-      const hasta = previas.findIndex((pieza) => pieza.slug === sobre)
-      if (desde === -1 || hasta === -1) return previas
-
-      const copia = [...previas]
-      const [movida] = copia.splice(desde, 1)
-      if (!movida) return previas
-      copia.splice(hasta, 0, movida)
-      return copia
-    })
-  }
-
-  function guardarOrden() {
-    arrastrada.current = null
-    setMoviendo(null)
-    const slugs = orden.map((pieza) => pieza.slug)
-    if (slugs.join() === piezas.map((pieza) => pieza.slug).join()) return
-
-    setError(null)
-    setPeticion({
-      titulo: '¿Guardamos el orden nuevo?',
-      detalle: `Es el orden en que se ven las piezas de ${familia.label} en la tienda. Si dices que no, la rejilla vuelve a como estaba.`,
-      boton: 'Guardar el orden',
-      accion: () => colocarPiezas(familia.key, slugs),
-      // Al arrastrar ya se ha movido lo que se ve; decir que no tiene que
-      // devolverlo a su sitio.
-      alCancelar: () => setOrden(piezas),
-    })
-  }
 
   function confirmar() {
     if (!peticion) return
@@ -274,7 +268,13 @@ export function CatalogoFamilia({ locale, familias, familia, piezas, almacenList
                       // Miniatura de 36px del panel, servida ya optimizada desde
                       // el almacén: `next/image` aquí sólo añadiría peticiones.
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={una.thumb} alt="" className="size-9 rounded-sm object-cover" />
+                      <img
+                        src={una.thumb}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        className="size-9 rounded-sm object-cover"
+                      />
                     ) : (
                       <span className="size-9 rounded-sm border border-dashed border-line" />
                     )}
@@ -305,26 +305,26 @@ export function CatalogoFamilia({ locale, familias, familia, piezas, almacenList
             {orden.map((pieza) => (
               <li
                 key={pieza.slug}
-                draggable
-                onDragStart={() => {
-                  arrastrada.current = pieza.slug
-                  setMoviendo(pieza.slug)
-                }}
-                onDragEnter={() => moverTarjeta(pieza.slug)}
-                onDragOver={(evento) => {
-                  // Sólo se acepta el arrastre de otra tarjeta. Las fotos que
-                  // vienen de fuera las recoge la ventana entera, no esto.
-                  if (!Array.from(evento.dataTransfer.types).includes('Files')) {
-                    evento.preventDefault()
-                  }
-                }}
-                onDragEnd={guardarOrden}
-                onDrop={guardarOrden}
-                className={`flex cursor-grab flex-col rounded-sm border border-line bg-linen active:cursor-grabbing ${
-                  moviendo === pieza.slug ? 'opacity-60' : ''
+                {...fila(pieza.slug)}
+                /* Hueca: la que va en la mano deja su sitio marcado y vacío, con el
+                   mismo tamaño. `invisible` y no `hidden`, o la rejilla se
+                   recolocaría entera al empezar a mover. */
+                className={`flex cursor-grab flex-col rounded-sm border bg-linen active:cursor-grabbing ${
+                  moviendo === pieza.slug
+                    ? 'border-dashed border-line [&>*]:invisible'
+                    : 'border-line'
                 }`}
               >
                 <div className="relative aspect-square overflow-hidden rounded-t-sm bg-linen-deep">
+                  {/* Las rayas, arriba a la izquierda de la foto: con el ratón sólo
+                      dicen que la tarjeta se mueve —se arrastra desde donde sea—, y
+                      con el dedo son por donde se agarra. Encima de la foto y no
+                      debajo del nombre porque es lo primero que se ve de la tarjeta,
+                      y porque abajo compartiría sitio con los avisos. */}
+                  <Asa
+                    {...asa(pieza.slug)}
+                    className="absolute top-1 left-1 z-10 rounded-full bg-linen/85 p-1.5 text-bark-faint"
+                  />
                   <button
                     type="button"
                     onClick={() => setAbanico(abanico === pieza.slug ? null : pieza.slug)}
@@ -340,6 +340,12 @@ export function CatalogoFamilia({ locale, familias, familia, piezas, almacenList
                         src={pieza.foto}
                         alt=""
                         draggable={false}
+                        /* Diferidas y descodificadas aparte. En una familia larga
+                           son cuarenta y tantas fotos, y traerlas y descomprimirlas
+                           todas de golpe es lo que deja el desplazamiento pastoso en
+                           un teléfono: sólo se ven dos o tres a la vez. */
+                        loading="lazy"
+                        decoding="async"
                         className="size-full object-cover"
                       />
                     ) : (
@@ -397,15 +403,29 @@ export function CatalogoFamilia({ locale, familias, familia, piezas, almacenList
 
             {/* Donde se sueltan las fotos cuando la rejilla está vacía, y el
                 recordatorio de que se puede cuando no lo está. */}
-            <li className="flex min-h-56 flex-col items-center justify-center gap-2 rounded-sm border border-dashed border-line px-4 text-center">
-              <span className="text-small text-bark-soft">Añadir una pieza</span>
-              <span className="text-micro normal-case tracking-normal text-bark-faint">
-                suelta aquí una foto y la creo con ella
-              </span>
+            <li className="min-h-56">
+              {/* El hueco es el botón: tocarlo abre la galería del teléfono, y con
+                  ratón sigue siendo donde se sueltan las fotos. Una sola puerta,
+                  con dos formas de llamar. */}
+              <ElegirFotos
+                alElegir={(lista) => alSoltar({ ficheros: lista, sobre: null })}
+                etiqueta={`Añadir piezas a ${familia.label}`}
+                className="flex size-full flex-col items-center justify-center gap-2 rounded-sm border border-dashed border-line px-4 text-center transition-colors duration-300 hover:border-sage hover:bg-sage-deep/6"
+              >
+                <span className="text-small text-bark-soft">Añadir una pieza</span>
+                <span className="text-micro normal-case tracking-normal text-bark-faint">
+                  {conElDedo
+                    ? 'toca para elegir fotos: creo una pieza con cada una'
+                    : 'suelta aquí una foto y la creo con ella, o toca para buscarla'}
+                </span>
+              </ElegirFotos>
             </li>
           </ul>
         </div>
       </div>
+
+      {/* Temporal, sólo con ?depurar=1 */}
+      <MedidorArrimo />
 
       <Confirmar
         peticion={peticion}
