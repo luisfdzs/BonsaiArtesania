@@ -6,6 +6,22 @@ const nextConfig: NextConfig = {
   images: {
     deviceSizes: [420, 640, 828, 1200, 1600, 2048],
     qualities: [75, 82],
+    /**
+     * El almacén de las fotos que sube Ana.
+     *
+     * Las viejas son rutas del propio despliegue (`/media/…`) y no hacen falta
+     * aquí; las nuevas viven en Vercel Blob, que es otro dominio. `next/image`
+     * se niega a optimizar una imagen de un host que no esté declarado —y se
+     * niega con una excepción, no con un hueco—, así que sin esto la primera
+     * foto subida desde el panel rompe la página donde salga.
+     *
+     * El subdominio es el del almacén y no se escribe a mano: cada almacén tiene
+     * el suyo, y así el mismo fichero vale para el de producción y para
+     * cualquier otro que se dé de alta. Ver `lib/almacen.ts`.
+     */
+    remotePatterns: [
+      { protocol: 'https', hostname: '*.public.blob.vercel-storage.com', pathname: '/**' },
+    ],
   },
   /**
    * Los sitios desde los que se puede abrir el servidor de desarrollo.
@@ -21,6 +37,32 @@ const nextConfig: NextConfig = {
    * prueba desde un túnel, se añade su dominio.
    */
   allowedDevOrigins: ['192.168.1.12'],
+
+  /**
+   * Las tripas de `sharp` que hay que subir con las funciones.
+   *
+   * `sharp` no es JavaScript: es un binario por plataforma —`@img/sharp-linux-x64`
+   * en el servidor— que a su vez carga una biblioteca compartida que vive en otro
+   * paquete hermano, `@img/sharp-libvips-linux-x64`. El rastreador de Next sigue
+   * el `require` hasta el `.node` y ahí se queda: el `.so` lo abre el propio
+   * binario en tiempo de ejecución, así que no aparece en ningún `import` que se
+   * pueda leer y no se sube.
+   *
+   * En Windows no se nota, porque el paquete de win32 trae sus DLL dentro; el
+   * fallo sale sólo en el despliegue, y sale **en todo el panel**: `lib/fotos.ts`
+   * importa `sharp` arriba, `lib/catalogo-escritura.ts` importa `lib/fotos.ts` y
+   * las acciones importan la escritura, así que si el binario no carga no falla
+   * sólo subir una foto —falla crear una familia—.
+   *
+   * Aquí se le dice al rastreador que suba los dos paquetes enteros. Los globs
+   * que no encajan con nada no molestan, así que en esta máquina no pasa nada.
+   */
+  outputFileTracingIncludes: {
+    '/**': [
+      './node_modules/@img/sharp-linux-x64/**',
+      './node_modules/@img/sharp-libvips-linux-x64/**',
+    ],
+  },
   experimental: {
     /**
      * Enciende `app/global-not-found.tsx`, que es el 404 de las direcciones que no

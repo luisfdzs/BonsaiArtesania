@@ -24,13 +24,20 @@ import {
  * Así una foto a medio nombrar no deja una pieza suelta en el catálogo.
  */
 
-/** El lado del cuadro, en píxeles de pantalla. Es la tarjeta de la rejilla. */
-const CUADRO = 460
+/**
+ * El lado del cuadro, en píxeles de pantalla. Es la tarjeta de la rejilla.
+ *
+ * Es un **máximo**, no una medida: en un teléfono no caben 460 píxeles y el
+ * cuadro se queda con el ancho que haya. El lado de verdad lo pone el CSS y lo
+ * lee `useEffect` con un `ResizeObserver`; ver `cuadro` más abajo.
+ */
+const CUADRO_MAXIMO = 460
 const ZOOM_MAXIMO = 3
 
 type Entrada = {
   fichero: File
-  url: string
+  /** Estable y propio: sirve de `key` y sobrevive a que se descarte otra. */
+  id: string
   nombre: string
   /** Tamaño real de la foto, en cuanto el navegador la lee. */
   ancho: number
@@ -74,27 +81,27 @@ function nombreDesdeFichero(nombre: string): string {
 }
 
 /** Lo que hay que multiplicar la foto para que cubra el cuadro sin huecos. */
-function escalaBase(ancho: number, alto: number): number {
+function escalaBase(ancho: number, alto: number, cuadro: number): number {
   if (!ancho || !alto) return 1
-  return Math.max(CUADRO / ancho, CUADRO / alto)
+  return Math.max(cuadro / ancho, cuadro / alto)
 }
 
-function encajar(entrada: Entrada): Entrada {
-  const escala = escalaBase(entrada.ancho, entrada.alto) * entrada.zoom
+function encajar(entrada: Entrada, cuadro: number): Entrada {
+  const escala = escalaBase(entrada.ancho, entrada.alto, cuadro) * entrada.zoom
   const anchoPintado = entrada.ancho * escala
   const altoPintado = entrada.alto * escala
 
   return {
     ...entrada,
-    x: Math.min(0, Math.max(CUADRO - anchoPintado, entrada.x)),
-    y: Math.min(0, Math.max(CUADRO - altoPintado, entrada.y)),
+    x: Math.min(0, Math.max(cuadro - anchoPintado, entrada.x)),
+    y: Math.min(0, Math.max(cuadro - altoPintado, entrada.y)),
   }
 }
 
 function primeraLectura(ficheros: File[]): Entrada[] {
-  return ficheros.map((fichero) => ({
+  return ficheros.map((fichero, i) => ({
     fichero,
-    url: URL.createObjectURL(fichero),
+    id: `${i}·${fichero.name}`,
     nombre: nombreDesdeFichero(fichero.name),
     ancho: 0,
     alto: 0,
@@ -113,20 +120,84 @@ export function EncuadreFotos({ destino, ficheros, onCerrar, onHecho }: Props) {
   const [arrastrando, setArrastrando] = useState(false)
   const [enviando, empezarEnvio] = useTransition()
   const arrastre = useRef<{ x: number; y: number; ex: number; ey: number } | null>(null)
-  const direcciones = useRef(entradas.map((entrada) => entrada.url))
 
-  // Las direcciones temporales de las fotos hay que soltarlas a mano: mientras
-  // vivan, el navegador guarda el fichero entero en memoria.
+  /**
+   * Las direcciones temporales de las fotos.
+   *
+   * Se crean **dentro del efecto** que las revoca, y eso no es un rodeo. Hay que
+   * revocarlas —mientras vivan, el navegador guarda el fichero entero en
+   * memoria—, y el único sitio honrado para hacerlo es la limpieza del efecto.
+   * Creándolas fuera, esa limpieza mataba unas direcciones que el estado seguía
+   * usando: en desarrollo el modo estricto monta, limpia y vuelve a montar con el
+   * mismo estado, así que la foto llegaba al cuadro con la dirección ya revocada
+   * y no se veía nada —ni un error, un hueco—. Creándolas aquí, cada montaje
+   * trae las suyas y la limpieza sólo mata las que ese montaje abrió.
+   */
+  const [direcciones, setDirecciones] = useState<ReadonlyMap<File, string>>(() => new Map())
+
   useEffect(() => {
-    const abiertas = direcciones.current
+    const abiertas = new Map(ficheros.map((fichero) => [fichero, URL.createObjectURL(fichero)]))
+    // El aviso está bien puesto de norma y aquí no hay otra salida: la limpieza es
+    // la que revoca, así que después de una limpieza hace falta un renderizado más
+    // para que el cuadro reciba las direcciones nuevas. Crearlas en el estado o en
+    // un `useMemo` deja la foto pegada a la que ya se revocó.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDirecciones(abiertas)
     return () => abiertas.forEach((url) => URL.revokeObjectURL(url))
+  }, [ficheros])
+
+  /**
+   * El lado del cuadro, medido de lo que el CSS le haya dado.
+   *
+   * El encuadre se guarda en fracciones, así que el lado no cambia el resultado;
+   * lo que sí hace es entrar en todas las cuentas de la pantalla —la escala, el
+   * tope del arrastre—, y si aquí se dijera 460 mientras se pintan 320, la foto
+   * se saldría del cuadro por abajo y a la derecha.
+   */
+  const marco = useRef<HTMLDivElement | null>(null)
+  const [cuadro, setCuadro] = useState(CUADRO_MAXIMO)
+
+  useEffect(() => {
+    const nodo = marco.current
+    if (!nodo) return
+
+    const observador = new ResizeObserver((medidas) => {
+      const lado = Math.round(medidas[0]?.contentRect.width ?? 0)
+      if (lado > 0) setCuadro((previo) => (Math.abs(previo - lado) < 1 ? previo : lado))
+    })
+
+    observador.observe(nodo)
+    return () => observador.disconnect()
   }, [])
+
+  /**
+   * Al cambiar el lado —al girar el teléfono, al abrir por primera vez— la foto
+   * se reescala con él. Todo lo que se guarda de la posición está en píxeles de
+   * pantalla y es proporcional al lado, así que multiplicar por el factor deja el
+   * encuadre exactamente donde estaba en vez de mandarlo al centro.
+   */
+  const ladoAnterior = useRef(cuadro)
+
+  useEffect(() => {
+    const previo = ladoAnterior.current
+    ladoAnterior.current = cuadro
+    if (previo === cuadro || !previo) return
+
+    const factor = cuadro / previo
+    setEntradas((previas) =>
+      previas.map((entrada) =>
+        encajar({ ...entrada, x: entrada.x * factor, y: entrada.y * factor }, cuadro),
+      ),
+    )
+  }, [cuadro])
 
   const actual = entradas[indice]
 
   function cambiar(cambios: Partial<Entrada>) {
     setEntradas((previas) =>
-      previas.map((entrada, i) => (i === indice ? encajar({ ...entrada, ...cambios }) : entrada)),
+      previas.map((entrada, i) =>
+        i === indice ? encajar({ ...entrada, ...cambios }, cuadro) : entrada,
+      ),
     )
   }
 
@@ -135,7 +206,7 @@ export function EncuadreFotos({ destino, ficheros, onCerrar, onHecho }: Props) {
     setEntradas((previas) =>
       previas.map((entrada, i) =>
         i === indice
-          ? encajar({ ...entrada, ancho: naturalWidth, alto: naturalHeight, x: 0, y: 0 })
+          ? encajar({ ...entrada, ancho: naturalWidth, alto: naturalHeight, x: 0, y: 0 }, cuadro)
           : entrada,
       ),
     )
@@ -168,10 +239,10 @@ export function EncuadreFotos({ destino, ficheros, onCerrar, onHecho }: Props) {
 
   /** El recorte elegido, en fracciones de la foto original. */
   function recorteDe(entrada: Entrada) {
-    const escala = escalaBase(entrada.ancho, entrada.alto) * entrada.zoom
+    const escala = escalaBase(entrada.ancho, entrada.alto, cuadro) * entrada.zoom
     if (!escala || !entrada.ancho) return null
 
-    const lado = CUADRO / escala
+    const lado = cuadro / escala
 
     return {
       x: Math.max(0, -entrada.x / escala / entrada.ancho),
@@ -245,7 +316,8 @@ export function EncuadreFotos({ destino, ficheros, onCerrar, onHecho }: Props) {
 
   if (!actual) return null
 
-  const escala = escalaBase(actual.ancho, actual.alto) * actual.zoom
+  const escala = escalaBase(actual.ancho, actual.alto, cuadro) * actual.zoom
+  const direccion = direcciones.get(actual.fichero)
 
   /** Lo que se dice en la esquina: a dónde va a parar esto. */
   const dondeVa = destino.tipo === 'familia' ? destino.label : destino.nombre
@@ -253,9 +325,9 @@ export function EncuadreFotos({ destino, ficheros, onCerrar, onHecho }: Props) {
   const esPiezaNueva = destino.tipo === 'familia'
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-linen">
-      <header className="flex items-center justify-between gap-6 border-b border-line px-7 py-4">
-        <div className="flex items-center gap-4">
+    <div className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-linen">
+      <header className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-line px-4 py-3 sm:px-7 sm:py-4">
+        <div className="flex items-center gap-3 sm:gap-4">
           {/* Atrás sale de aquí sin subir nada, y por eso lleva la flecha: es la
               misma salida que en el resto del panel, no un «cancelar» escondido
               en la esquina de la derecha. */}
@@ -281,8 +353,12 @@ export function EncuadreFotos({ destino, ficheros, onCerrar, onHecho }: Props) {
           </button>
 
           <div className="flex flex-col gap-1">
-            <h2 className="font-serif text-2xl leading-none">Coloca la foto en su tarjeta</h2>
-            <p className="text-small text-bark-soft">
+            <h2 className="font-serif text-xl leading-none sm:text-2xl">
+              Coloca la foto en su tarjeta
+            </h2>
+            {/* En un teléfono esta explicación se come la pantalla que hace falta
+                para el cuadro, y lo que dice se ve haciéndolo. */}
+            <p className="hidden text-small text-bark-soft lg:block">
               Arrástrala dentro del cuadro y acerca o aleja hasta que la pieza quede donde quieres.
               Del recorte, el peso y el formato me encargo yo.
             </p>
@@ -293,13 +369,20 @@ export function EncuadreFotos({ destino, ficheros, onCerrar, onHecho }: Props) {
         </span>
       </header>
 
-      <div className="flex min-h-0 flex-1">
-        <div className="flex flex-1 flex-col items-center justify-center gap-6 bg-linen-deep p-6">
+      <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 bg-linen-deep p-4 sm:gap-6 sm:p-6">
+          {/* El lado lo pone el CSS —lo que quepa, con 460 de tope y sin pasar de
+              media pantalla de alto— y `cuadro` lo lee de aquí. Cuadrado siempre:
+              es la tarjeta de la rejilla. */}
           <div
-            className="relative touch-none overflow-hidden bg-linen"
+            ref={marco}
+            className="relative aspect-square w-full touch-none overflow-hidden bg-linen"
+            /* El tope va en el estilo y no en una clase: `min()` con coma dentro
+               de un valor arbitrario de Tailwind no llega a generar regla, y sin
+               regla mandaba `w-full` y el cuadro se iba a miles de píxeles. Los
+               `52vh` son para que en horizontal quepan encima el zoom y el pie. */
             style={{
-              width: CUADRO,
-              height: CUADRO,
+              maxWidth: `min(${CUADRO_MAXIMO}px, 52vh)`,
               cursor: arrastrando ? 'grabbing' : 'grab',
             }}
             onPointerDown={empezarArrastre}
@@ -307,21 +390,23 @@ export function EncuadreFotos({ destino, ficheros, onCerrar, onHecho }: Props) {
             onPointerUp={soltarArrastre}
             onPointerCancel={soltarArrastre}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element -- es un fichero
-                local que todavía no existe en el servidor: no hay nada que optimizar. */}
-            <img
-              src={actual.url}
-              alt=""
-              onLoad={alCargar}
-              draggable={false}
-              className="absolute max-w-none select-none"
-              style={{
-                width: actual.ancho ? actual.ancho * escala : CUADRO,
-                height: actual.alto ? actual.alto * escala : CUADRO,
-                left: actual.x,
-                top: actual.y,
-              }}
-            />
+            {direccion && (
+              /* eslint-disable-next-line @next/next/no-img-element -- es un fichero
+                 local que todavía no existe en el servidor: no hay nada que optimizar. */
+              <img
+                src={direccion}
+                alt=""
+                onLoad={alCargar}
+                draggable={false}
+                className="absolute max-w-none select-none"
+                style={{
+                  width: actual.ancho ? actual.ancho * escala : cuadro,
+                  height: actual.alto ? actual.alto * escala : cuadro,
+                  left: actual.x,
+                  top: actual.y,
+                }}
+              />
+            )}
             <div className="pointer-events-none absolute inset-0 border border-linen/70">
               <div className="absolute inset-y-0 left-1/3 w-px bg-linen/40" />
               <div className="absolute inset-y-0 left-2/3 w-px bg-linen/40" />
@@ -330,7 +415,7 @@ export function EncuadreFotos({ destino, ficheros, onCerrar, onHecho }: Props) {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex w-full max-w-[460px] items-center gap-3 sm:gap-4">
             <span className="text-micro text-bark-faint">Alejar</span>
             <input
               type="range"
@@ -339,26 +424,26 @@ export function EncuadreFotos({ destino, ficheros, onCerrar, onHecho }: Props) {
               step={0.01}
               value={actual.zoom}
               onChange={(evento) => cambiar({ zoom: Number(evento.target.value) })}
-              className="w-64 accent-sage-deep"
+              className="min-w-0 flex-1 accent-sage-deep"
               aria-label="Acercar o alejar la foto"
             />
             <span className="text-micro text-bark-faint">Acercar</span>
             <button
               type="button"
               onClick={() => cambiar({ zoom: 1, x: 0, y: 0 })}
-              className="btn min-h-10 px-4 py-0"
+              className="btn min-h-10 flex-none px-4 py-0"
             >
               Centrar
             </button>
           </div>
 
-          <p className="text-small text-bark-faint">
+          <p className="hidden text-small text-bark-faint lg:block">
             Lo de fuera del cuadro no se pierde: la foto entera se guarda por si luego quieres otro
             encuadre.
           </p>
         </div>
 
-        <aside className="flex w-[420px] flex-none flex-col gap-5 overflow-y-auto border-l border-line p-6">
+        <aside className="flex w-full flex-none flex-col gap-5 border-t border-line p-4 sm:p-6 lg:w-[420px] lg:overflow-y-auto lg:border-t-0 lg:border-l">
           <label className="flex flex-col gap-2">
             <span className="eyebrow">
               {esPiezaNueva ? 'Nombre de la pieza' : 'Qué se ve en la foto'}
@@ -408,28 +493,36 @@ export function EncuadreFotos({ destino, ficheros, onCerrar, onHecho }: Props) {
         </aside>
       </div>
 
-      <footer className="flex items-center gap-4 border-t border-line px-7 py-3">
-        <span className="eyebrow">
-          {entradas.length === 1 ? 'Una foto' : `${entradas.length} fotos`}
-        </span>
-        <ul className="flex items-center gap-3">
-          {entradas.map((entrada, i) => (
-            <li key={entrada.url}>
-              <button
-                type="button"
-                onClick={() => setIndice(i)}
-                aria-current={i === indice ? 'true' : undefined}
-                className={`block size-12 overflow-hidden rounded-sm ${
-                  i === indice ? 'ring-2 ring-sage-deep' : 'opacity-60'
-                }`}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element -- ídem: fichero local. */}
-                <img src={entrada.url} alt="" className="size-full object-cover" />
-              </button>
-            </li>
-          ))}
-        </ul>
-      </footer>
+      {/* Con una sola foto el pie no dice nada que no esté ya en la cabecera, y en
+          un teléfono ocupa lo que le falta al cuadro. */}
+      {entradas.length > 1 && (
+        <footer className="flex flex-none items-center gap-4 border-t border-line px-4 py-3 sm:px-7">
+          <span className="eyebrow whitespace-nowrap">{entradas.length} fotos</span>
+          <ul className="flex min-w-0 items-center gap-3 overflow-x-auto">
+            {entradas.map((entrada, i) => {
+              const suya = direcciones.get(entrada.fichero)
+
+              return (
+                <li key={entrada.id} className="flex-none">
+                  <button
+                    type="button"
+                    onClick={() => setIndice(i)}
+                    aria-current={i === indice ? 'true' : undefined}
+                    className={`block size-12 overflow-hidden rounded-sm bg-linen-deep ${
+                      i === indice ? 'ring-2 ring-sage-deep' : 'opacity-60'
+                    }`}
+                  >
+                    {suya && (
+                      /* eslint-disable-next-line @next/next/no-img-element -- ídem: fichero local. */
+                      <img src={suya} alt="" className="size-full object-cover" />
+                    )}
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
+        </footer>
+      )}
     </div>
   )
 }
