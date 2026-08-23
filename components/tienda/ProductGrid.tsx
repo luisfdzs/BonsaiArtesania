@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { ProductCard } from '@/components/sections/ProductCard'
 import { Reveal } from '@/components/ui/Reveal'
 import { cn } from '@/lib/cn'
-import type { ProductCardData } from '@/content/products'
+import type { PiezaTarjeta } from '@/lib/catalogo'
 import type { Locale } from '@/lib/i18n/config'
 
 /**
@@ -16,7 +16,7 @@ export const productGridClass =
   'grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-8 sm:gap-y-16 lg:grid-cols-3'
 
 type Props = {
-  items: ProductCardData[]
+  items: PiezaTarjeta[]
   locale: Locale
   /** La primera tarjeta de la primera rejilla de la página es candidata a LCP. */
   priority?: boolean

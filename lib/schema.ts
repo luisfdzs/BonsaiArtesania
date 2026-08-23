@@ -1,6 +1,6 @@
 import type { Collection, ObjectId } from 'mongodb'
 import { getDb } from './db'
-import type { Locale } from '@/lib/i18n/config'
+import type { Locale, Localized } from '@/lib/i18n/config'
 
 /**
  * Forma de los documentos y acceso tipado a las colecciones.
@@ -214,6 +214,122 @@ export async function orders(): Promise<Collection<OrderDoc>> {
 
 export async function pushSubscriptions(): Promise<Collection<PushSubscriptionDoc>> {
   return (await getDb()).collection<PushSubscriptionDoc>('push_subscriptions')
+}
+
+/* ============================================================================
+   EL CATÁLOGO
+   ========================================================================= */
+
+/**
+ * Una foto del catálogo, tal y como queda guardada con su pieza.
+ *
+ * Se guardan **dos** ficheros por foto y no uno: el original entero que subió
+ * Ana y el derivado que sirve la web. El derivado es lo que se pinta —recortado
+ * al encuadre elegido, redimensionado y en webp—; el original queda para poder
+ * reencuadrar más adelante sin pedirle la foto otra vez, que es justo lo que
+ * pasa cuando una pieza cambia de sitio y el recorte cuadrado ya no le sirve.
+ *
+ * El `blur` es el mismo LQIP que generaba `npm run images`: una miniatura en
+ * base64 que se pinta mientras llega la foto de verdad. Se guarda con la foto
+ * porque se calcula una sola vez, al subirla.
+ */
+export type PhotoDoc = {
+  /** Estable y propio de la foto: es el nombre con el que vive en el almacén. */
+  id: string
+  /** Lo que pinta la web. */
+  src: string
+  width: number
+  height: number
+  blur: string
+  /** Se lee en voz alta, así que va traducido como cualquier otro texto. */
+  alt: Localized
+  /** El original sin recortar. Sin él no se puede volver a encuadrar. */
+  original: { src: string; width: number; height: number } | null
+  /**
+   * El encuadre elegido sobre el original, en fracciones de 0 a 1. Se guarda
+   * para poder devolver el recuadro a donde lo dejó Ana cuando vuelva a abrirlo.
+   */
+  crop: { x: number; y: number; w: number; h: number } | null
+  createdAt: Date
+}
+
+/**
+ * Una familia de la tienda: pendientes, anillos, el taller…
+ *
+ * `key` es la que va en la dirección (`/tienda/categoria/pendientes`), así que
+ * no se traduce y no cambia cuando se renombra la familia: renombrar es cosa de
+ * `label`. El `order` es el de la barra de familias y el del escaparate de la
+ * portada, y es el que Ana coloca arrastrando.
+ */
+export type FamilyDoc = {
+  _id: ObjectId
+  key: string
+  label: Localized
+  /** Lo que se lee en el botón «Ver más …». En minúscula: va dentro de una frase. */
+  plural: Localized
+  /** La media línea que acompaña al nombre en la barra de familias. */
+  note: Localized
+  /** La línea que encabeza su página. */
+  intro: Localized
+  order: number
+  /*
+   * Una familia no guarda foto propia: la suya es la primera foto de su primera
+   * pieza, y se cambia poniendo otra pieza la primera en el catálogo. Un campo
+   * aparte serían dos verdades para lo mismo, y la que se olvida de actualizar
+   * es siempre la de aquí.
+   */
+  /**
+   * Escondida a mano. Una familia sin piezas publicadas tampoco sale, pero eso
+   * se calcula; esto es la decisión explícita de retirarla teniendo piezas.
+   */
+  hidden: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+/** Publicada se ve en la tienda; en borrador sólo se ve en el panel. */
+export type ProductStatus = 'publicada' | 'borrador'
+
+/**
+ * Una pieza del catálogo.
+ *
+ * Es el mismo objeto que vivía en `content/products.ts` con dos cambios: las
+ * fotos son una lista —la primera es la de la rejilla— y hay un estado, para que
+ * Ana pueda dejar algo a medias sin que salga a la tienda.
+ *
+ * El precio sigue en euros y no en céntimos: lo escribe una persona a mano y
+ * aquí no se suma nada. La conversión a céntimos ocurre al archivar el pedido.
+ */
+export type ProductDoc = {
+  _id: ObjectId
+  /** La dirección de su ficha. No se traduce. */
+  slug: string
+  /** `key` de su familia. */
+  family: string
+  /** Su sitio dentro de la familia, el que Ana coloca arrastrando. */
+  order: number
+  name: Localized
+  /** Una línea, encima del título de la ficha. */
+  summary: Localized
+  description: Localized<string[]>
+  materials: Localized<string[]>
+  /** `null` = pieza a medida: no pasa por el carrito. */
+  price: number | null
+  /** La primera es la de la rejilla y la de la portada. */
+  photos: PhotoDoc[]
+  /** Abre su familia en el escaparate de la portada. */
+  featured: boolean
+  status: ProductStatus
+  createdAt: Date
+  updatedAt: Date
+}
+
+export async function families(): Promise<Collection<FamilyDoc>> {
+  return (await getDb()).collection<FamilyDoc>('catalog_families')
+}
+
+export async function catalogProducts(): Promise<Collection<ProductDoc>> {
+  return (await getDb()).collection<ProductDoc>('catalog_products')
 }
 
 /** Euros del catálogo → céntimos del pedido. Redondea para evitar 3199.9999. */

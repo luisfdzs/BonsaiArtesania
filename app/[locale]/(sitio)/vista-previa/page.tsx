@@ -15,5 +15,5 @@ export default async function VistaPreviaPage({ params }: Params) {
   const { locale } = await params
   if (!isLocale(locale)) notFound()
 
-  return <Pruebas familias={shopFamilies(locale)} locale={locale as Locale} />
+  return <Pruebas familias={await shopFamilies(locale)} locale={locale as Locale} />
 }

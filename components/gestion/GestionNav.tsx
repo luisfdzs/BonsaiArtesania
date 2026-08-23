@@ -23,6 +23,12 @@ const items: {
     Icon: PackageIcon,
   },
   {
+    route: '/gestion/catalogo',
+    label: { es: 'Catálogo', gl: 'Catálogo' },
+    waiting: { es: 'Abriendo el catálogo', gl: 'Abrindo o catálogo' },
+    Icon: GridIcon,
+  },
+  {
     route: '/gestion/cuenta',
     label: { es: 'Tu cuenta', gl: 'A túa conta' },
     waiting: { es: 'Abriendo tu cuenta', gl: 'Abrindo a túa conta' },
@@ -31,9 +37,35 @@ const items: {
 ]
 
 /**
- * Las dos secciones del panel. Sólo dos, y no es que falte nada: la cuenta del
- * taller gestiona pedidos y tiene una contraseña que cambiar, y ahí se acaba
- * —ver `lib/admin.ts`—. Ni direcciones, ni carrito, ni «tus pedidos».
+ * La rejilla del catálogo. Cuatro cuadros: es lo que se ve al entrar —las
+ * tarjetas de las piezas— y no se parece a ningún otro icono de la barra.
+ */
+function GridIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.4}
+      aria-hidden="true"
+      className={className}
+    >
+      <rect x="3.5" y="3.5" width="7" height="7" />
+      <rect x="13.5" y="3.5" width="7" height="7" />
+      <rect x="3.5" y="13.5" width="7" height="7" />
+      <rect x="13.5" y="13.5" width="7" height="7" />
+    </svg>
+  )
+}
+
+/**
+ * Las tres secciones del panel, y no es que falte ninguna: la cuenta del taller
+ * prepara los pedidos, cuida el catálogo y tiene una contraseña que cambiar, y
+ * ahí se acaba —ver `lib/admin.ts`—. Ni direcciones, ni carrito, ni «tus pedidos».
+ *
+ * El catálogo va en medio a propósito: los pedidos son lo que se mira cada día
+ * —lo primero—, la cuenta es lo que casi nunca se toca —lo último—, y entre
+ * ambos queda lo que se toca a ratos, cuando hay fotos nuevas.
  *
  * Cliente por una sola razón, la misma que `CuentaNav`: `usePathname`, que es lo
  * que permite encender la sección en la que se está. Y mismo lenguaje de activo

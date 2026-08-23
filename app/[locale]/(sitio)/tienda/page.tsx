@@ -8,7 +8,7 @@ export default async function TiendaPage({ params }: Params) {
   const { locale } = await params
   if (!isLocale(locale)) notFound()
 
-  const primera = shopFamilies(locale)[0]
+  const primera = (await shopFamilies(locale))[0]
   if (!primera) notFound()
 
   redirect(primera.href)

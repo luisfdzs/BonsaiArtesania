@@ -1,5 +1,5 @@
 import { Escaparate, type EscaparateFamilia } from '@/components/sections/Escaparate'
-import { categories, HOME_PREVIEW_SIZE, products, productsByCategory } from '@/content/products'
+import { HOME_PREVIEW_SIZE, todasLasFamilias, todasLasPiezas, type Pieza } from '@/lib/catalogo'
 import { translator, type Locale } from '@/lib/i18n/config'
 import { path } from '@/lib/i18n/routes'
 
@@ -21,17 +21,25 @@ import { path } from '@/lib/i18n/routes'
  * familia lo hace {@link Escaparate} en el navegador. Lo que cruza son los
  * rótulos ya traducidos y cinco tarjetas por familia, nada más.
  */
-export function DestacadasSection({ locale }: { locale: Locale }) {
+export async function DestacadasSection({ locale }: { locale: Locale }) {
   const t = translator(locale)
 
-  const conPiezas = categories
-    .map((category) => ({ ...category, items: productsByCategory(category.key) }))
+  const [familiasDelCatalogo, piezas] = await Promise.all([todasLasFamilias(), todasLasPiezas()])
+  const porFamilia = new Map<string, Pieza[]>()
+  for (const pieza of piezas) {
+    const lista = porFamilia.get(pieza.category)
+    if (lista) lista.push(pieza)
+    else porFamilia.set(pieza.category, [pieza])
+  }
+
+  const conPiezas = familiasDelCatalogo
+    .map((category) => ({ ...category, items: porFamilia.get(category.key) ?? [] }))
     .filter((category) => category.items.length > 0)
 
   // Las piezas marcadas como destacadas abren su familia; el orden del catálogo
   // decide el resto. Así la portada sigue enseñando lo que Ana quiere enseñar,
   // pero repartido por familia en vez de en un montón.
-  const muestra = (items: typeof products) =>
+  const muestra = (items: Pieza[]) =>
     [...items]
       .sort((a, b) => Number(b.featured) - Number(a.featured))
       .slice(0, HOME_PREVIEW_SIZE)

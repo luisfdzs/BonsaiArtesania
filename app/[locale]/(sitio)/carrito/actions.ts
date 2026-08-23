@@ -20,7 +20,7 @@ function revalidateCarrito(): void {
 }
 import { cookies } from 'next/headers'
 import { auth } from '@/auth'
-import { getProduct } from '@/content/products'
+import { piezaPorSlug } from '@/lib/catalogo'
 import { isAdmin } from '@/lib/admin'
 import { GUEST_COOKIE } from '@/lib/cart'
 import { carts } from '@/lib/schema'
@@ -71,7 +71,7 @@ export async function addToCart(formData: FormData): Promise<void> {
   if (await isAdmin()) return
 
   const slug = String(formData.get('slug') ?? '')
-  const product = getProduct(slug)
+  const product = await piezaPorSlug(slug)
 
   // Una pieza a medida se organiza hablando, así que no entra al carrito. El botón
   // ya lleva a WhatsApp, esto es la comprobación real.

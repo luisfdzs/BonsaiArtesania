@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
-import { categories, products, productsByCategory } from '@/content/products'
 import { site } from '@/content/site'
+import { todasLasFamilias, todasLasPiezas } from '@/lib/catalogo'
 import { locales } from '@/lib/i18n/config'
 import { path } from '@/lib/i18n/routes'
 
@@ -15,7 +15,10 @@ import { path } from '@/lib/i18n/routes'
  * Las direcciones sin idioma no se listan: ya no existen, sólo redirigen con un
  * 308 (`proxy.ts`), y un sitemap no debe apuntar a una redirección.
  */
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const [familias, piezas] = await Promise.all([todasLasFamilias(), todasLasPiezas()])
+  const conPiezas = new Set(piezas.map((pieza) => pieza.category))
+
   // Sólo las páginas públicas. No entra nada tras el login (cuenta, carrito,
   // gestión), que además lleva `robots: noindex` en sus metadatos.
   // Encargos no se lista: ya no es una página, es una sección de la portada, y
@@ -23,10 +26,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
     '/',
     '/legal/privacidad',
-    ...categories
-      .filter((category) => productsByCategory(category.key).length > 0)
-      .map((category) => `/tienda/categoria/${category.key}`),
-    ...products.map((product) => `/tienda/${product.slug}`),
+    ...familias
+      .filter((familia) => conPiezas.has(familia.key))
+      .map((familia) => `/tienda/categoria/${familia.key}`),
+    ...piezas.map((pieza) => `/tienda/${pieza.slug}`),
   ]
 
   return routes.flatMap((route) =>

@@ -1,12 +1,12 @@
 import Link from 'next/link'
 import { Media } from '@/components/ui/Media'
-import { type ProductCardData } from '@/content/products'
+import type { PiezaTarjeta } from '@/lib/catalogo'
 import { translator, type Locale } from '@/lib/i18n/config'
 import { path } from '@/lib/i18n/routes'
 
 type Props = {
-  /** Sólo lo que se ve en la tarjeta; ver `ProductCardData`. */
-  product: ProductCardData
+  /** Sólo lo que se ve en la tarjeta; ver `PiezaTarjeta`. */
+  product: PiezaTarjeta
   locale: Locale
   /** La primera tarjeta de un listado carga con prioridad (candidata a LCP). */
   priority?: boolean

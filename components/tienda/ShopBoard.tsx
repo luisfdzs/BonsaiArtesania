@@ -3,7 +3,7 @@
 import { FamilyFlow } from '@/components/tienda/FamilyFlow'
 import { ProductGrid } from '@/components/tienda/ProductGrid'
 import { ShopDeck, ShopDeckProvider, bucle, useShopDeck } from '@/components/tienda/ShopDeck'
-import type { ProductCardData } from '@/content/products'
+import type { PiezaTarjeta } from '@/lib/catalogo'
 import type { Locale } from '@/lib/i18n/config'
 import type { Image } from '@/lib/media'
 
@@ -15,7 +15,7 @@ export type ShopFamily = {
   notice: boolean
   /** La primera foto de la familia: la miniatura de la barra. */
   thumb: Image | null
-  items: ProductCardData[]
+  items: PiezaTarjeta[]
 }
 
 type Props = {

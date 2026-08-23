@@ -1,8 +1,8 @@
 import { ObjectId } from 'mongodb'
 import { cookies } from 'next/headers'
 import { getSession } from '@/auth'
-import { getProduct } from '@/content/products'
 import { isAdmin } from '@/lib/admin'
+import { todasLasPiezas } from '@/lib/catalogo'
 import { pick, type Locale } from '@/lib/i18n/config'
 import type { Image } from '@/lib/media'
 import { carts, toCents, type CartDoc } from '@/lib/schema'
@@ -124,8 +124,13 @@ export async function readCart(locale: Locale): Promise<Cart> {
   const doc = await cartDoc()
   if (!doc || doc.items.length === 0) return EMPTY
 
+  // El catálogo entero de una vez y luego un índice por `slug`: leerlo pieza a
+  // pieza serían tantas consultas como líneas tenga el carrito, y el catálogo ya
+  // viene cacheado bajo la etiqueta `catalogo`.
+  const porSlug = new Map((await todasLasPiezas()).map((pieza) => [pieza.slug, pieza]))
+
   const lines = doc.items.flatMap((item) => {
-    const product = getProduct(item.slug)
+    const product = porSlug.get(item.slug)
     // `price === null` son las piezas a medida: se organizan hablando y no
     // deberían haber entrado al carrito. Si alguna se colara, se ignora.
     if (!product || product.price === null) return []

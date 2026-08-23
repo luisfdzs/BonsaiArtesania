@@ -24,6 +24,11 @@
   --color-sage-deep: #6b7a62; /* mismo acento sobre fondo claro, con contraste AA */
   --color-petal: #dcbdb4; /* acento flor */
   --color-petal-soft: #f3e5e0; /* fondo de etiquetas y notas */
+  /* El único rojo del sistema, y sólo para lo que no se deshace: borrar una
+     pieza, quitar una familia. Vive en el panel de Ana, nunca en la tienda.
+     Es una amapola apagada, no un rojo de alerta de software: tiene que
+     distinguirse del pétalo sin gritar más que las fotos. */
+  --color-amapola: #a34436;
 
   /* --- Tipografía --------------------------------------------------------
      Una serif humanista de trazo fino para las voces (títulos y nombres de

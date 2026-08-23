@@ -6,7 +6,7 @@ import { ProductGrid } from '@/components/tienda/ProductGrid'
 import { ShopDeck, ShopDeckProvider, bucle, useShopDeck } from '@/components/tienda/ShopDeck'
 import { Reveal } from '@/components/ui/Reveal'
 import { cn } from '@/lib/cn'
-import type { ProductCardData } from '@/content/products'
+import type { PiezaTarjeta } from '@/lib/catalogo'
 import type { Locale } from '@/lib/i18n/config'
 import type { Image } from '@/lib/media'
 
@@ -17,7 +17,7 @@ export type EscaparateFamilia = {
   verMasLabel: string
   /** La primera foto de la familia: la miniatura de la barra. */
   thumb: Image | null
-  items: ProductCardData[]
+  items: PiezaTarjeta[]
 }
 
 type Props = {

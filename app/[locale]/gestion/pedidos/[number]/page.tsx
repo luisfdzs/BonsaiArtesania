@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { FormPending } from '@/components/ui/FormPending'
 import { LocaleField } from '@/components/ui/LocaleField'
 import { Media } from '@/components/ui/Media'
-import { getProduct } from '@/content/products'
+import { todasLasPiezas } from '@/lib/catalogo'
 import { isLocale, localeHtmlLang, translator } from '@/lib/i18n/config'
 import { path } from '@/lib/i18n/routes'
 import { NOTE_MAX_LENGTH, orderStatusAdminLabel, ORDER_STATUS_FLOW } from '@/lib/order-status'
@@ -25,6 +25,11 @@ export default async function GestionPedidoPage({ params }: Params) {
   const collection = await orders()
   const order = await collection.findOne({ number })
   if (!order) notFound()
+
+  // Las fotos de las piezas del pedido salen del catálogo, que puede haber
+  // cambiado desde que se hizo: lo que se archiva del pedido es el nombre y el
+  // precio, no la foto. Si una pieza ya no está, la línea se pinta sin foto.
+  const porSlug = new Map((await todasLasPiezas()).map((pieza) => [pieza.slug, pieza]))
 
   const address = order.shipping.address
   const nota = t({
@@ -51,7 +56,7 @@ export default async function GestionPedidoPage({ params }: Params) {
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           <ul className="flex flex-wrap content-start justify-center gap-4 rounded-xl border border-line p-5">
             {order.items.map((item) => {
-              const product = getProduct(item.slug)
+              const product = porSlug.get(item.slug)
               const image = product?.image ? t(product.image) : null
 
               return (
