@@ -332,6 +332,46 @@ export async function catalogProducts(): Promise<Collection<ProductDoc>> {
   return (await getDb()).collection<ProductDoc>('catalog_products')
 }
 
+/* ============================================================================
+   LA PORTADA
+   ========================================================================= */
+
+/**
+ * Un vídeo del fondo de la portada, de los que sube Ana desde el panel.
+ *
+ * **Sólo se ven en móvil.** En escritorio la portada sigue siendo el díptico de
+ * `content/reel.ts`, que son dos clips verticales pensados para verse juntos en
+ * una pantalla ancha; meter ahí un vídeo suelto rompería ese reparto. Lo que Ana
+ * pone aquí sustituye a lo que se encadenaba en móvil, y si no pone nada vuelven
+ * los de siempre. Ver `components/ui/ReelBackdrop.tsx`.
+ *
+ * `order` es el orden en que se encadenan, y es el que Ana coloca arrastrando.
+ *
+ * Del vídeo no se guarda copia ni derivado, al revés que de las fotos: no hay un
+ * `sharp` para vídeo en el servidor, así que el fichero es el que subió y por eso
+ * el panel pone un tope de tamaño —ver `lib/portada.ts`—. El `poster` sí se saca
+ * al subir, en el navegador, del primer fotograma: es lo que se ve mientras el
+ * vídeo llega, y sin él la portada arranca en tinta.
+ */
+export type ReelDoc = {
+  _id: ObjectId
+  /** Estable y propio: es la clave de la lista y con la que se borra. */
+  id: string
+  /** La dirección pública en el almacén. */
+  src: string
+  /** Primer fotograma, o `null` si el navegador no pudo sacarlo. */
+  poster: string | null
+  /** Cómo se llamaba el fichero que subió Ana. Sólo para que ella lo reconozca. */
+  nombre: string
+  order: number
+  createdAt: Date
+  updatedAt: Date
+}
+
+export async function portadaReels(): Promise<Collection<ReelDoc>> {
+  return (await getDb()).collection<ReelDoc>('portada_reels')
+}
+
 /** Euros del catálogo → céntimos del pedido. Redondea para evitar 3199.9999. */
 export function toCents(euros: number): number {
   return Math.round(euros * 100)

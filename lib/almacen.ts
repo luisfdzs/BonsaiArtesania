@@ -67,3 +67,18 @@ export async function guardar(nombre: string, datos: Buffer, tipo: string): Prom
 export function almacenListo(): boolean {
   return hayAlmacen() || process.env.NODE_ENV === 'development'
 }
+
+/**
+ * Lo mismo, **sin el atajo de desarrollo**: aquí sí hace falta el almacén de
+ * verdad, esté donde esté.
+ *
+ * Lo usan los vídeos de la portada. Una foto de más de cuatro megas no la hay, y
+ * por eso puede viajar hasta el servidor y acabar en `public/media` cuando no hay
+ * token; un vídeo no cabe por ese camino, así que sube directo del navegador al
+ * almacén (ver `app/api/gestion/reel/route.ts`) y sin token no hay a dónde. Con
+ * `almacenListo` el panel diría que todo está en orden y la subida se caería a
+ * mitad con un error de la librería, que es peor que decirlo antes.
+ */
+export function almacenRemoto(): boolean {
+  return hayAlmacen()
+}

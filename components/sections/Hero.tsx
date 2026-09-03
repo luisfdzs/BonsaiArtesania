@@ -2,7 +2,8 @@ import { ReelBackdrop } from '@/components/ui/ReelBackdrop'
 import { reels } from '@/content/reel'
 import { site } from '@/content/site'
 import { translator, type Locale } from '@/lib/i18n/config'
-import { imgSrc } from '@/lib/media'
+import { imgSrc, reelSrc } from '@/lib/media'
+import { reelsDePortada } from '@/lib/portada'
 
 /**
  * Portada: **el taller a pantalla completa, y una frase encima.**
@@ -24,6 +25,16 @@ import { imgSrc } from '@/lib/media'
  * llenan una pantalla ancha sin pedirle a ninguno lo que no tiene. El reparto vive en
  * `ReelBackdrop`, que es también quien explica por qué en móvil sigue habiendo uno solo.
  *
+ * **En móvil el vídeo lo pone Ana.** Los que suba desde `/gestion/portada` se encadenan
+ * aquí, en el orden en que ella los deje, y sustituyen a los del taller —sólo en móvil:
+ * el díptico de escritorio no se toca, porque está pensado para esos dos clips y para
+ * dos exactamente—. Si no hay ninguno, en móvil vuelven los del taller y esta pantalla
+ * es exactamente la que era. Ver `lib/portada.ts`.
+ *
+ * Que esto lea de la base convierte la portada en una página con consulta, y por eso la
+ * lectura va cacheada bajo su etiqueta: se invalida cuando Ana toca algo y no en cada
+ * visita.
+ *
  * **El texto va abajo y no en el centro.** Arriba está la cabecera flotando, y el
  * centro es donde el vídeo tiene lo que hay que ver —las manos, la prensa—. Pegado al
  * borde inferior, el titular no tapa nada y el degradado que le da contraste cae donde
@@ -42,9 +53,15 @@ import { imgSrc } from '@/lib/media'
  * porque el fondo es decorativo y `ReelBackdrop` lo marca `aria-hidden` — lo que se
  * lee de esta pantalla es el titular, y ése sí está en los dos.
  */
-export function Hero({ locale }: { locale: Locale }) {
+export async function Hero({ locale }: { locale: Locale }) {
   const t = translator(locale)
-  const first = reels[0]
+
+  const taller = reels.map((clip) => ({
+    src: reelSrc(clip.file),
+    poster: clip.poster ? imgSrc(clip.poster) : null,
+  }))
+
+  const deAna = (await reelsDePortada()).map((reel) => ({ src: reel.src, poster: reel.poster }))
 
   return (
     <section
@@ -56,11 +73,8 @@ export function Hero({ locale }: { locale: Locale }) {
          o sea invisible. Si cambia el alto de la barra, cambia aquí. */
       className="relative isolate -mt-20 flex min-h-[100svh] flex-col justify-end overflow-hidden bg-bark md:-mt-24"
     >
-      {first && (
-        <ReelBackdrop
-          clips={reels.map((clip) => ({ file: clip.file }))}
-          poster={first.poster ? imgSrc(first.poster) : undefined}
-        />
+      {(taller.length > 0 || deAna.length > 0) && (
+        <ReelBackdrop escritorio={taller} movil={deAna} />
       )}
 
       {/* El velo, anclado en `rem` y no en porcentajes del alto: los topes en `rem`

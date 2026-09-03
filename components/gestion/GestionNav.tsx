@@ -29,6 +29,12 @@ const items: {
     Icon: GridIcon,
   },
   {
+    route: '/gestion/portada',
+    label: { es: 'Portada', gl: 'Portada' },
+    waiting: { es: 'Abriendo la portada', gl: 'Abrindo a portada' },
+    Icon: PeliculaIcon,
+  },
+  {
     route: '/gestion/cuenta',
     label: { es: 'Tu cuenta', gl: 'A túa conta' },
     waiting: { es: 'Abriendo tu cuenta', gl: 'Abrindo a túa conta' },
@@ -59,13 +65,37 @@ function GridIcon({ className }: { className?: string }) {
 }
 
 /**
- * Las tres secciones del panel, y no es que falte ninguna: la cuenta del taller
- * prepara los pedidos, cuida el catálogo y tiene una contraseña que cambiar, y
- * ahí se acaba —ver `lib/admin.ts`—. Ni direcciones, ni carrito, ni «tus pedidos».
+ * Una claqueta: dice «vídeo» sin parecerse a la rejilla del catálogo ni al
+ * paquete de los pedidos.
+ */
+function PeliculaIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className={className}
+    >
+      <rect x="2.5" y="5.5" width="19" height="13" rx="1.5" />
+      <path d="M8 5.5v13M16 5.5v13M2.5 12h19" />
+    </svg>
+  )
+}
+
+/**
+ * Las cuatro secciones del panel, y no es que falte ninguna: la cuenta del taller
+ * prepara los pedidos, cuida el catálogo, cambia el vídeo de la portada y tiene
+ * una contraseña que cambiar, y ahí se acaba —ver `lib/admin.ts`—. Ni
+ * direcciones, ni carrito, ni «tus pedidos».
  *
- * El catálogo va en medio a propósito: los pedidos son lo que se mira cada día
- * —lo primero—, la cuenta es lo que casi nunca se toca —lo último—, y entre
- * ambos queda lo que se toca a ratos, cuando hay fotos nuevas.
+ * El orden es el de cada cuánto se toca: los pedidos son lo que se mira cada día
+ * —lo primero—, la cuenta es lo que casi nunca se toca —lo último—, y en medio
+ * queda el catálogo, cuando hay fotos nuevas, y la portada, que se cambia cuando
+ * hay un reel nuevo que enseñar.
  *
  * Cliente por una sola razón, la misma que `CuentaNav`: `usePathname`, que es lo
  * que permite encender la sección en la que se está. Y mismo lenguaje de activo

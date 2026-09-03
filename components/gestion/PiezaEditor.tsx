@@ -11,7 +11,7 @@ import {
 } from '@/app/[locale]/gestion/catalogo/actions'
 import { BotonAtras } from '@/components/gestion/BotonAtras'
 import { Confirmar, type Peticion } from '@/components/gestion/Confirmar'
-import { ElegirFotos } from '@/components/gestion/ElegirFotos'
+import { ElegirFotos } from '@/components/gestion/ElegirFicheros'
 import { EncuadreFotos } from '@/components/gestion/EncuadreFotos'
 import { VeloDeSoltar } from '@/components/gestion/VeloDeSoltar'
 import type { PiezaPanel } from '@/lib/catalogo-panel'
