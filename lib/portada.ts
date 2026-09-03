@@ -33,11 +33,29 @@ export type ReelDePortada = {
 /**
  * Los vídeos de la portada, en su orden. Cacheados como el catálogo: los lee
  * cada visita a la portada y cambian unas pocas veces al año.
+ *
+ * **Y caducan solos al minuto, que el catálogo no hace.** La invalidación por
+ * etiqueta sólo llega hasta donde llega la función que la ejecuta, y aquí eso no
+ * basta: la web está desplegada **dos veces** —el sitio y el de pruebas— contra
+ * **la misma base**, así que un vídeo que se quita desde el panel de uno se
+ * queda en la caché del otro. Sin caducidad, para siempre: la caché de datos de
+ * Vercel sobrevive a los despliegues, de modo que ni volver a desplegar lo
+ * arregla.
+ *
+ * Se aprendió a base de dejar un vídeo de prueba puesto en la portada de verdad.
+ *
+ * Un minuto es barato —la portada no consulta más que esto y son cuatro campos—
+ * y pone un techo a lo que puede durar una discrepancia entre los dos sitios. La
+ * etiqueta se queda igualmente: es lo que hace que el cambio se vea **al
+ * instante** en el sitio donde se hizo, que es donde alguien está mirando.
  */
 export const reelsDePortada = unstable_cache(
   async (): Promise<ReelDePortada[]> => leer(),
-  ['portada-reels'],
-  { tags: [ETIQUETA_PORTADA] },
+  // La clave lleva versión: cambiarla es la única forma de dejar atrás las
+  // entradas ya guardadas, que conservan la caducidad que tenían al escribirse
+  // —ninguna— por mucho que este fichero diga ahora otra cosa.
+  ['portada-reels-v2'],
+  { tags: [ETIQUETA_PORTADA], revalidate: 60 },
 )
 
 /**
