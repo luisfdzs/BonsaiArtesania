@@ -18,3 +18,4 @@ fotos-originales/
 
 # Copias de la base que deja scripts/db-reset.mjs: llevan datos personales.
 db-backup-*.json
+disenos/
