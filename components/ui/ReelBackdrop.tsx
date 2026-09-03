@@ -168,7 +168,14 @@ export function ReelBackdrop({ escritorio, movil = [] }: { escritorio: Clip[]; m
 
       // `loop` es lo que separa los dos modos: puesto, `onEnded` no salta nunca y cada
       // clip se repite en su mitad; quitado, el relevo lo da el `onEnded`.
-      video.loop = esDiptico
+      //
+      // **Y puesto también cuando la cadena es de uno solo**, que es el caso más
+      // probable en cuanto Ana suba un reel. Sin esto se queda congelado en el último
+      // fotograma: el relevo del `onEnded` lleva a la misma posición de la que salió,
+      // así que `enCurso` no cambia, este efecto no se vuelve a ejecutar y nadie pide
+      // `play()` otra vez. Con dos o más no se nota, porque cada relevo sí cambia de
+      // clip. El bucle de uno solo lo tiene que llevar el navegador.
+      video.loop = esDiptico || cadena.length === 1
       video.muted = true
       // Rebobinar sólo al entrar por relevo. En díptico cada clip va por su cuenta y
       // esto lo cortaría cada vez que cambia el ancho de la ventana.
@@ -177,7 +184,7 @@ export function ReelBackdrop({ escritorio, movil = [] }: { escritorio: Clip[]; m
       // fallo que haya que contarle a nadie: al volver, el fondo sigue ahí.
       void video.play().catch(() => {})
     })
-  }, [enCurso, esDiptico, reducido, escritorio])
+  }, [cadena, enCurso, esDiptico, reducido, escritorio])
 
   // Calentar los que esperan turno. Sólo tiene sentido con encadenado: en díptico ya
   // están todos pedidos por el efecto de arriba, y con movimiento reducido no se pide
@@ -198,8 +205,15 @@ export function ReelBackdrop({ escritorio, movil = [] }: { escritorio: Clip[]; m
     }
   }, [cadena, enCurso, warm, esDiptico, reducido])
 
-  /** El primero de la cadena: el que se queda solo con movimiento reducido. */
-  const quieto = cadena[0]?.src
+  /**
+   * Con movimiento reducido se queda **el primero de cada lista**, no el primero de la
+   * cadena, y la diferencia importa: con reels de Ana la cadena es la suya, así que un
+   * escritorio quieto habría escondido los dos del taller por no ser «el primero» y,
+   * como los de Ana llevan `md:hidden`, la portada se habría quedado en tinta pelada.
+   * Cada lista se queda con su propia cabeza y cada pantalla enseña la que le toca.
+   */
+  const quietoEscritorio = escritorio[0]?.src
+  const quietoMovil = cadena[0]?.src
 
   return (
     <div
@@ -227,7 +241,7 @@ export function ReelBackdrop({ escritorio, movil = [] }: { escritorio: Clip[]; m
                relevo ya había pasado al siguiente—. */
             hayMovil && 'max-md:hidden',
             !hayMovil && !reducido && clip.src !== enCurso && 'max-md:hidden',
-            reducido && clip.src !== quieto && 'hidden',
+            reducido && clip.src !== quietoEscritorio && 'hidden',
           )}
         />
       ))}
@@ -244,7 +258,7 @@ export function ReelBackdrop({ escritorio, movil = [] }: { escritorio: Clip[]; m
           className={cn(
             'md:hidden',
             !reducido && clip.src !== enCurso && 'hidden',
-            reducido && clip.src !== quieto && 'hidden',
+            reducido && clip.src !== quietoMovil && 'hidden',
           )}
         />
       ))}

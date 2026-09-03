@@ -129,13 +129,20 @@ export function PortadaReels({ reels, almacenListo }: Props) {
     try {
       const fotograma = await primerFotograma(fichero)
 
+      // El póster lleva el nombre del vídeo sin su extensión: `reel-de-ana-poster.jpg`
+      // y no `reel-de-ana.mp4-poster.jpg`, que es lo que sale de pegarle el sufijo al
+      // nombre entero y queda escrito para siempre en la dirección del fichero.
       let poster: string | null = null
       if (fotograma) {
-        const subido = await upload(`portada/${nombreLimpio(fichero.name)}-poster.jpg`, fotograma, {
-          access: 'public',
-          contentType: 'image/jpeg',
-          handleUploadUrl: '/api/gestion/reel',
-        })
+        const subido = await upload(
+          `portada/${nombreLimpio(fichero.name, '')}-poster.jpg`,
+          fotograma,
+          {
+            access: 'public',
+            contentType: 'image/jpeg',
+            handleUploadUrl: '/api/gestion/reel',
+          },
+        )
         poster = subido.url
       }
 
@@ -315,11 +322,15 @@ function megas(bytes: number): string {
  * La dirección la escribe el almacén con este nombre dentro, así que los espacios
  * y los acentos acabarían escapados en la URL del vídeo de la portada. Lo mismo
  * que hace `comoDireccion` con los nombres de las piezas.
+ *
+ * `conExtension` la cambia por otra —o la quita, con cadena vacía— para el póster,
+ * que es un jpg del mismo vídeo y no otro mp4.
  */
-function nombreLimpio(nombre: string): string {
+function nombreLimpio(nombre: string, conExtension?: string): string {
   const punto = nombre.lastIndexOf('.')
   const cuerpo = punto > 0 ? nombre.slice(0, punto) : nombre
-  const extension = punto > 0 ? nombre.slice(punto).toLowerCase() : ''
+  const extension =
+    conExtension !== undefined ? conExtension : punto > 0 ? nombre.slice(punto).toLowerCase() : ''
 
   const limpio = cuerpo
     .normalize('NFD')
