@@ -14,8 +14,21 @@ import { MongoClient, type Db } from 'mongodb'
  * suya y la reutiliza entre invocaciones, que es lo que recomienda Atlas.
  */
 
-/** Nombre de la base dentro del cluster, que aloja también otros proyectos. */
-export const DB_NAME = 'bonsaiartesania'
+/**
+ * Nombre de la base dentro del cluster, que aloja también otros proyectos.
+ *
+ * **Lo pone la variable, y por eso el sitio de pruebas puede tener la suya.** El
+ * cluster es el mismo para todo —una sola cadena de conexión— así que lo único
+ * que separa un despliegue de otro es este nombre. Estuvo fijo aquí, y mientras
+ * lo estuvo `bonsaiartesaniatest` escribía en la base del sitio de verdad por
+ * mucho que fuera otro proyecto de Vercel: lo que Ana probaba en test salía
+ * publicado. Se descubrió dejando sin querer un vídeo de prueba en la portada.
+ *
+ * Sin la variable se usa la de siempre, que es lo que hace que producción y
+ * cualquier máquina sin configurar sigan yendo donde iban. En el proyecto de
+ * pruebas va `MONGODB_DB=bonsaiartesania_test`.
+ */
+export const DB_NAME = process.env.MONGODB_DB || 'bonsaiartesania'
 
 declare global {
   var _mongoClientPromise: Promise<MongoClient> | undefined

@@ -15,7 +15,8 @@
     "icons": "node scripts/build-icons.mjs",
     "db:setup": "node scripts/db-setup.mjs",
     "push:keys": "node scripts/push-keys.mjs",
-    "catalogo:import": "tsx --env-file=.env.local scripts/catalogo-import.ts"
+    "catalogo:import": "tsx --env-file=.env.local scripts/catalogo-import.ts",
+    "db:clonar-test": "tsx --env-file=.env.local scripts/clonar-a-test.ts"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.11.3",
